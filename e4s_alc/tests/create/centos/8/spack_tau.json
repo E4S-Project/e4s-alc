@@ -1,0 +1,12 @@
+{
+	"image": "centos:8",
+	"name": "centos-8-spack-tau",
+	"spack": true,
+	"spack-packages": [
+		"tau"
+	],
+	"os-packages": [
+	],
+	"copy": [
+	]
+}

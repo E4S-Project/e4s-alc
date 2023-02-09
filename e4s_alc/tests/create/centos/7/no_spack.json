@@ -1,0 +1,11 @@
+{
+	"image": "centos:7",
+	"name": "centos-7-no-spack",
+	"spack": false,
+	"spack-packages": [
+	],
+	"os-packages": [
+	],
+	"copy": [
+	]
+}

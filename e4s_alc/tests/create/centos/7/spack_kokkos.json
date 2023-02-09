@@ -1,0 +1,12 @@
+{
+	"image": "centos:7",
+	"name": "centos-7-spack-kokkos",
+	"spack": true,
+	"spack-packages": [
+		"kokkos"
+	],
+	"os-packages": [
+	],
+	"copy": [
+	]
+}

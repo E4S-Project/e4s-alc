@@ -1,0 +1,11 @@
+{
+	"image": "ubuntu:latest",
+	"name": "ubuntu-latest-no-spack",
+	"spack": false,
+	"spack-packages": [
+	],
+	"os-packages": [
+	],
+	"copy": [
+	]
+}

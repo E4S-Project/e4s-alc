@@ -1,0 +1,12 @@
+{
+	"image": "ubuntu:latest",
+	"name": "ubuntu-latest-spack-trilinos",
+	"spack": true,
+	"spack-packages": [
+		"trilinos"
+	],
+	"os-packages": [
+	],
+	"copy": [
+	]
+}

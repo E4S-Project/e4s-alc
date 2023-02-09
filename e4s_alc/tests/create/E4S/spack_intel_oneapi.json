@@ -1,0 +1,12 @@
+{
+	"image": "ecpe4s/ubuntu20.04-runner-x86_64:2022-12-01",
+	"name": "ecpe4s-spack-intel-oneapi",
+	"spack": true,
+	"spack-packages": [
+		"intel-oneapi-compilers"
+	],
+	"os-packages": [
+	],
+	"copy": [
+	]
+}

@@ -1,0 +1,11 @@
+{
+	"image": "ecpe4s/ubuntu20.04-runner-x86_64:2022-12-01",
+	"name": "ecpe4s-spack",
+	"spack": true,
+	"spack-packages": [
+	],
+	"os-packages": [
+	],
+	"copy": [
+	]
+}

@@ -1,0 +1,12 @@
+{
+	"image": "centos:8",
+	"name": "centos-8-spack-trilinos",
+	"spack": true,
+	"spack-packages": [
+		"trilinos"
+	],
+	"os-packages": [
+	],
+	"copy": [
+	]
+}
