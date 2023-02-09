@@ -18,7 +18,7 @@ from e4s_alc.database.edit import read_entry, modify_entry
 @click.option('-c', '--copy', help='The directory to copy to the image', multiple=True, default=[])
 def add(name, package, os_package, copy):
     print()
-    click.secho('E4S ALC', fg='green')
+    click.secho('E4S-ALC', fg='green')
     print('name: ', name)
     print('packages: ', list(package))
     print('os-packages: ', list(os_package))

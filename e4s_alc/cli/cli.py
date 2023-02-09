@@ -10,16 +10,16 @@ from .list import list
 
 home_options = {
   'create':  'Create a new docker image',
-  'list':    'List e4s alc images',
+  'list':    'List e4s-alc images',
   'add':     'Add spack packages to a docker image',
-  'version': 'The current version of the e4s alc runtime'
+  'version': 'The current version of the e4s-alc runtime'
 }
 
 class HomeGroup(click.Group):
     def format_help(self, ctx, formatter):
         click.echo('Python Version: {}'.format(sys.version))
         click.echo()
-        click.echo('\te4s alc is the CLI for interacting with docker images and spack packages', nl=False)
+        click.echo('\te4s-alc is the CLI for interacting with docker images and spack packages', nl=False)
         click.echo()
         click.echo()
         self.format_usage(ctx, formatter)
@@ -28,7 +28,7 @@ class HomeGroup(click.Group):
 
     def format_usage(self, ctx, formatter):
         click.echo('Usage:')
-        click.echo('  e4s_alc [commands]')
+        click.echo('  e4s-alc [commands]')
 
     def format_options(self, ctx, formatter):
         click.echo('Commands:')

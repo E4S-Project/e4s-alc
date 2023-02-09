@@ -1,3 +1,4 @@
-e4s_alc add \
+e4s-alc add \
 	--name add-spack-test \
-	-a rolldice
+	-a rolldice \
+	-a valgrind

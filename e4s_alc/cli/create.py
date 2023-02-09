@@ -23,7 +23,7 @@ from e4s_alc.database.edit import add_entry
 def create(file, image, name, package, os_package, spack, copy):
     """Create a new docker image with spack packages"""
     print()
-    click.secho('E4S ALC', fg='green')
+    click.secho('E4S-ALC', fg='green')
     if file:
         with open(file) as f:
             file_data = json.loads(f.read())

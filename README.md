@@ -1,13 +1,13 @@
 This code is unstable. The structure of this project is being rewritten and the original code can be found at https://github.com/PlatinumCD/Boxmake.
 
-# E4S_ALC
+# E4S-ALC
 
 Build docker images quickly with Spack integration.
 
 ### Install
 
 ```
-$ pip3 install e4s_alc
+$ pip3 install e4s-alc
 ```
 
 ### Usage
@@ -15,7 +15,7 @@ $ pip3 install e4s_alc
 Create image
 
 ```
-$ e4s_alc create \
+$ e4s-alc create \
 	--image centos:8 \
 	--name my-centos-image \
 	-p py-numpy \
@@ -23,7 +23,7 @@ $ e4s_alc create \
 ```
 or
 ```
-$ e4s_alc create \
+$ e4s-alc create \
 	--image ubuntu:22.04 \
 	--name my-ubuntu-image \
 	--no-spack
@@ -34,25 +34,27 @@ $ cat test.json
 
 {
 	"image": "ubuntu:22.04",
-	"name": "test-file-kokkos",
+	"name": "test-file-kokkos-raja",
 	"spack": true,
 	"spack-packages": [
-		"kokkos"
+		"kokkos",
+		"raja"
 	],
 	"os-packages": [
-		"neovim"
+		"neovim",
+		"valgrind"
 	]
 }
 
-$ e4s_alc create -f test.json
+$ e4s-alc create -f test.json
 ```
 
 List images
 
 ```
-$ e4s_alc list
+$ e4s-alc list
 
-E4S_ALC images:
+E4S-ALC images:
 ====================
 	my-centos-image (centos:8): - 2022-01-01 00:00:00
 		+ py-numpy
@@ -61,18 +63,19 @@ E4S_ALC images:
 	my-ubuntu-image (ubuntu:22.04): - 2022-01-01 00:00:00
 		No spack packages or spack installed
 
-	test-file-kokkos (ubuntu:22.04): - 2022-01-01 00:00:00
+	test-file-kokkos-raja (ubuntu:22.04): - 2022-01-01 00:00:00
 		+ kokkos
+		+ raja
 ```
 
 Add package to image
 
 ```
-$ e4s_alc add -n my-ubuntu-image -p kokkos -a neovim
+$ e4s-alc add -n my-ubuntu-image -p kokkos -a neovim
 
-$ e4s_alc list
+$ e4s-alc list
 
-E4S_ALC images:
+E4S-ALC images:
 ====================
         my-centos-image (centos:8): - 2022-01-01 00:00:00
                 + py-numpy
@@ -81,8 +84,9 @@ E4S_ALC images:
         my-ubuntu-image (ubuntu:22.04): - 2022-01-01 00:00:00
 		+ kokkos
 
-        test-file-kokkos (ubuntu:22.04): - 2022-01-01 00:00:00
+        test-file-kokkos-raja (ubuntu:22.04): - 2022-01-01 00:00:00
                 + kokkos
+		+ raja
 
 ```
 
@@ -90,19 +94,19 @@ E4S_ALC images:
 
 Create an E4S image loaded with intel oneapi compilers and create a centos:8 image loaded with kokkos in a single call:
 ```
-$ e4s_alc create \
+$ e4s-alc create \
 	--image ecpe4s/ubuntu20.04-runner-x86_64:2022-12-01 \
 	--name e4s-intel \
 	-p intel-oneapi-compilers \ 
 && \
-e4s_alc create \
+e4s-alc create \
 	--image centos:8 \
 	--name centos8-kokkos \
 	-p kokkos 
 
-$ e4s_alc list
+$ e4s-alc list
 
-E4S_ALC images:
+E4S-ALC images:
 ====================
 	cameron-kokkos (centos:8): - 2022-12-31 11:29:49.014343
 		+ kokkos

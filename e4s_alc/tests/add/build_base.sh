@@ -1,3 +1,3 @@
-e4s_alc create \
+e4s-alc create \
 	--image ubuntu \
 	--name add-spack-test \

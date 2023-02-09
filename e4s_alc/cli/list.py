@@ -1,8 +1,8 @@
 import click
 import docker
 
-import boxmake
-from boxmake.database.edit import read_all_entries, remove_entry
+import e4s_alc
+from e4s_alc.database.edit import read_all_entries, remove_entry
 
 # ==============
 # List Command
@@ -11,7 +11,7 @@ from boxmake.database.edit import read_all_entries, remove_entry
 @click.command()
 def list():
     print()
-    click.secho('Boxmake images:', fg='green')
+    click.secho('E4S-ALC images:', fg='green')
     print('=' * 40) 
 
     client = docker.from_env()

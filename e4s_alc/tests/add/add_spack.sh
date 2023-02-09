@@ -1,3 +1,3 @@
-e4s_alc add \
+e4s-alc add \
 	--name add-spack-test \
 	-p bzip2
