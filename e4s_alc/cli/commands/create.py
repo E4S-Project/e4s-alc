@@ -1,11 +1,13 @@
 import os
 from e4s_alc import E4S_ALC_VERSION, E4S_ALC_URL, E4S_ALC_SCRIPT
+from e4s_alc.model.create import CreateModel
 from e4s_alc.cli.command import AbstractCommand
 
 HELP_PAGE_FMT = "'%(command)s' page to be written."
 
 class Create(AbstractCommand):
-    def __init__(self):
+    def __init__(self, model):
+        self.model = model()
         summary_parts = ["E4S-ALC %s " % E4S_ALC_VERSION, E4S_ALC_URL]
         super().__init__(__name__, summary_fmt=''.join(summary_parts), help_page_fmt=HELP_PAGE_FMT)
         self.command = os.path.basename(E4S_ALC_SCRIPT)
@@ -16,8 +18,9 @@ class Create(AbstractCommand):
         
         self.parser.add_argument('-i', '--image', metavar='\b', help='Image name')
         self.parser.add_argument('-n', '--name', metavar='\b', help='Image to name')
-        self.parser.add_argument('-p', '--package', metavar='\b', help='Package name', action='append')
-        self.parser.add_argument('-a', '--os-package', metavar='\b', help='OS Package name', action='append')
+        self.parser.add_argument('-p', '--package', metavar='\b', help='Package name', action='append', default=[])
+        self.parser.add_argument('-a', '--os-package', metavar='\b', help='OS Package name', action='append', default=[])
+        self.parser.add_argument('-c', '--copy', metavar='\b', help='File/directory to copy into the Image', action='append', default=[])
         self.parser.add_argument('-f', '--file', metavar='\b', help='File to create Image')
 
     def check_correct_args(self, args):
@@ -34,7 +37,7 @@ class Create(AbstractCommand):
             exit(1)
 
     def main(self, args):
-        print('CREATE', args)
         self.check_correct_args(args)
+        self.model.main(args)
 
-AbstractCommand.commands['create'] = Create()
+AbstractCommand.commands['create'] = Create(CreateModel)

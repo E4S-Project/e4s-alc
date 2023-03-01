@@ -21,9 +21,11 @@ class Model():
         if 'backend' not in config['DEFAULT']:
             self.create_configuration_file()
 
-        self.backend = config.get('DEFAULT', 'backend')
-        if self.backend == 'None':
-            self.backend = None
+        backend = config.get('DEFAULT', 'backend')
+        if backend == 'None':
+            backend = None
+        
+        return backend
 
     def update_configuration_file(self, key, value):
         config = configparser.ConfigParser()
@@ -33,7 +35,6 @@ class Model():
             config.write(f)
 
     def create_configuration_file(self):
-        # Write configuration to file
         config = configparser.ConfigParser()
         config['DEFAULT'] = {'name': 'e4s-alc',
                              'backend': 'None'}
@@ -49,22 +50,16 @@ class Model():
         return True
 
     def check_working_backend(self, backend, controller):
-        # Check if the backend is working
-
         if backend == 'docker':
             docker_controller = controller()
             if docker_controller.is_active:
                 self.controller = docker_controller
-                self.set_backend(backend)
                 return True
-            else:
-                return False
 
         if backend == 'podman':
             podman_controller = controller()
             if podman_controller.is_active:
                 self.controller = podman_controller
-                self.set_backend(backend)
                 return True
-            else:
-                return False
+        
+        return False

@@ -1,11 +1,6 @@
 from e4s_alc.mvc.model import Model
 from e4s_alc.model.container import * 
 
-SUPPORTED_BACKENDS = {
-        'docker': DockerController, 
-        'podman': PodmanController
-}
-
 class InitModel(Model):
     def __init__(self):
         super().__init__(module_name='InitModel')
@@ -14,9 +9,11 @@ class InitModel(Model):
         # Check for container runtime
         for backend, controller in SUPPORTED_BACKENDS.items():
             if self.check_working_backend(backend, controller):
+                print('Found {}!'.format(backend))
+                self.set_backend(backend)
                 return True
-
         return False
+
 
     def main(self, args):
         if args.backend:
