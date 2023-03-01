@@ -18,6 +18,9 @@ class CreateModel(Model):
             print('Failed to connect to \'{}\' client'.format(self.backend))
             exit(1)
 
+
+        #TODO Add functionality for file read in
+
         if args.copy:
             for item in args.copy:
                 if ':' not in item:
@@ -32,5 +35,6 @@ class CreateModel(Model):
 
         self.controller.init_image(args.image)
         self.controller.add_system_package_commands(args.os_package)
+        self.controller.install_spack()
         self.controller.add_spack_package_commands(args.package)
         self.controller.execute_build(args.name)
