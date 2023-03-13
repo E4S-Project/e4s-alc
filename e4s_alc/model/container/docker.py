@@ -1,4 +1,5 @@
 import os
+import json
 from e4s_alc.mvc.controller import Controller
 
 class DockerController(Controller):
@@ -9,17 +10,25 @@ class DockerController(Controller):
         try:
             import docker
         except ImportError:
-            print('Error: failed to find Docker python library')
+            print('Failed to find Docker python library')
             return
 
         # Try to connect with the docker runtime
         try:
             self.client = docker.from_env(timeout=600)
         except docker.errors.DockerException:
-            print('Error: failed to connect to Docker client')
+            print('Failed to connect to Docker client')
             return
         
         self.is_active = True
+
+
+    def read_args_file(self, file_path):
+        abs_file_path = os.path.abspath(file_path)
+        with open(abs_file_path, 'r') as json_file:
+            data = json.load(json_file)
+
+        return data
 
 
     def pull_image(self, image):
@@ -124,6 +133,20 @@ class DockerController(Controller):
         # Add command to copy directory from mounted volume to image
         self.commands.append('cp -r /tmp{} {}'.format(image_path, image_path))
 
+    
+    def expand_tarball(self, host_path, image_path):
+        abs_host_path = os.path.abspath(host_path)
+        if image_path[0] != '/':
+            image_path = '/' + image_path
+
+        # Add items to mount list
+        host_body, file_tail = os.path.split(abs_host_path)
+        host_body_parent, host_body_dir =  os.path.split(host_body)
+        mount_item = '{}:/tmp/{}'.format(host_body, host_body_dir)
+        self.mounts.append(mount_item)
+
+        # Add command to open the tarball into the specified path
+        self.commands.append('tar xf /tmp/{}/{} -C {}'.format(host_body_dir, file_tail, image_path))
 
     def add_ubuntu_package_commands(self, os_packages):
         # Ubuntu packages needed for spack
@@ -177,7 +200,7 @@ class DockerController(Controller):
         # Commands for downloading, unpacking, moving, and activating spack
         self.commands.append('curl -OL {}'.format(SPACK_URL)) 
         self.commands.append('gunzip /spack-0.19.1.tar.gz')
-        self.commands.append('tar -xvf /spack-0.19.1.tar')
+        self.commands.append('tar -xf /spack-0.19.1.tar')
         self.commands.append('rm /spack-0.19.1.tar')
         self.commands.append('mv /spack-0.19.1 /spack')
         self.commands.append('. /spack/share/spack/setup-env.sh')
@@ -189,6 +212,9 @@ class DockerController(Controller):
         for package in packages:
             self.commands.append('spack install {}'.format(package))
 
+    def print_line(self):
+        for i in range(os.get_terminal_size()[0]):
+            print('=', end='')
 
     def execute_build(self, name):
         # Create environment for container
@@ -201,24 +227,30 @@ class DockerController(Controller):
         # Create a running detached container
         container = self.client.containers.run(self.image, detach=True, tty=True, volumes=self.mounts)
 
-        # Iterate through each command and execute
-        for command in self.commands:
-            print('=' * 90)
-            print('Command: ', command)
-            print('=' * 90)
+        try:
+            # Iterate through each command and execute
+            for command in self.commands:
+                self.print_line()
+                print('Command: ', command)
+                self.print_line()
 
-            # Execute
-            rv, stream = container.exec_run(
-                'bash -c \"{}\"'.format(command),
-                stream=True,
-                environment=env
-            )
+                # Execute
+                rv, stream = container.exec_run(
+                    'bash -c \"{}\"'.format(command),
+                    stream=True,
+                    environment=env
+                )
 
-            # Print to screen
-            print()
-            for chunk in stream:
-                print(chunk.decode().strip())
-            print()
+                # Print to screen
+                print()
+                for chunk in stream:
+                    print(chunk.decode().strip())
+                print()
+
+        except:
+            print('Stopping container...')
+            container.stop()
+            exit(1)
 
         # Commit new image
         container.commit(name)

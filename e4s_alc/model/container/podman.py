@@ -7,14 +7,22 @@ class PodmanController(Controller):
         try:
             import podman
         except ImportError:
-            print('Error: failed to find Podman python library')
+            print('Failed to find Podman python library')
             return
 
         try:
-            self.client = podman.PodmanClient()
-            print(self.client.version())
+#            self.client = podman.PodmanClient(base_url='ssh://core@localhost:49363/run/user/501/podman/podman.sock')
+#            print(self.client.version())
+
+            uri = 'unix:///run/user/501/podman/podman.sock'
+
+            with podman.PodmanClient(base_url=uri) as client:
+                version = client.version()
+                print("Release: ", version["Version"])
+
+
         except podman.errors.exceptions.APIError:
-            print('Error: failed to connect to Podman client')
+            print('Failed to connect to Podman client')
             return
         
         self.is_active = True

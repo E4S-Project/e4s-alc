@@ -19,7 +19,33 @@ class CreateModel(Model):
             exit(1)
 
 
-        #TODO Add functionality for file read in
+        if args.file:
+            file_args = self.controller.read_args_file(args.file)
+            if 'name' not in file_args:
+                print('Input file must include a name')
+                exit(1)
+            args.name = file_args['name']
+
+            if 'image' not in file_args:
+                print('Input file must include an image')
+                exit(1)
+            args.image = file_args['image']
+
+            if 'spack-packages' in file_args:
+                if file_args['spack-packages']:
+                    args.package = file_args['spack-packages']
+
+            if 'os-packages' in file_args:
+                if file_args['os-packages']:
+                    args.os_package = file_args['os-packages']
+
+            if 'copy' in file_args:
+                if file_args['copy']:
+                    args.copy = file_args['copy']
+
+            if 'tarball' in file_args:
+                if file_args['tarball']:
+                    args.tarball = file_args['tarball']
 
         if args.copy:
             for item in args.copy:
@@ -32,6 +58,18 @@ class CreateModel(Model):
                     exit(1)
                 host_path, image_path = host_image_path
                 self.controller.mount_and_copy(host_path, image_path)
+
+        if args.tarball:
+            for item in args.tarball:
+                if ':' not in item:
+                    print('Invalid tarball format. Use {host-tarball-path}:{image-tarball-path}')
+                    exit(1)
+                host_image_path = item.split(':')
+                if len(host_image_path) != 2:
+                    print('Invalid tarball format. Use {host-tarball-path}:{image-tarball-path}')
+                    exit(1)
+                host_path, image_path = host_image_path
+                self.controller.expand_tarball(host_path, image_path)
 
         self.controller.init_image(args.image)
         self.controller.add_system_package_commands(args.os_package)

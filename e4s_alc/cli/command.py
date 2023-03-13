@@ -40,7 +40,7 @@ class AbstractCommand(metaclass=ABCMeta):
 
     def add_subparser(self, subparsers):
         subparser_name = self.module_name.split('.')[-1]
-        self._parser = subparsers.add_parser(subparser_name, help=self.parser_help)
+        self._parser = subparsers.add_parser(subparser_name, help=self.parser_help, add_help=False)
         self._construct_parser()
 
     def _parse_args(self, argv):

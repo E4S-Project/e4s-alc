@@ -18,12 +18,13 @@ class MainCommand(AbstractCommand):
         self.command = os.path.basename(E4S_ALC_SCRIPT)
 
     def _construct_parser(self):
-        usage = '%s [arguments] <subcommand> [options]' % self.command 
-        
+        usage = '%s [arguments] [options]' % self.command 
+        description = 'E4S à la carte is a tool that allows a user to customize a container image by adding packages to it. These can be system packages and Spack packages.'
+
         parser = argparse.ArgumentParser(
-                    prog = 'E4S-ALC',
-                    description = '** TODO DESCRIPTION **',
-                    epilog = '** TODO EPILOG **',
+                    prog = 'e4s-alc',
+                    usage = usage,
+                    description = description,
                     formatter_class = NoSubparsersMetavarFormatter)
 
         subparsers = parser.add_subparsers(dest='command')
@@ -39,7 +40,9 @@ class MainCommand(AbstractCommand):
     def main(self, argv):
         if not len(sys.argv) > 1:
             self.parser.print_help()
-            exit(0)
+            print()
+            exit(1)
+
         args = self._parse_args(argv)
         command = args.command
         AbstractCommand.commands[command].main(args)
