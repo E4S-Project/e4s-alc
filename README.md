@@ -22,6 +22,12 @@ $ pip3 install e4s-alc
 
 ### Usage
 
+Initialize the backend
+
+```
+$ e4s-alc init
+```
+
 Create image
 
 ```
