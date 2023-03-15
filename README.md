@@ -1,4 +1,14 @@
-This code is unstable. The structure of this project is being rewritten and the original code can be found at https://github.com/PlatinumCD/Boxmake.
+Operation systems supported: 
+
+- ![](https://raw.githubusercontent.com/EgoistDeveloper/operating-system-logos/master/src/24x24/UBT.png "Ubuntu (16x16)") Ubuntu ✅ 
+- ![](https://raw.githubusercontent.com/EgoistDeveloper/operating-system-logos/master/src/24x24/RHT.png "Red Hat (16x16)") Red Hat ✅
+- ![](https://raw.githubusercontent.com/EgoistDeveloper/operating-system-logos/master/src/24x24/SSE.png "Suse (48x48)") SUSE (In progress)
+
+Backends supported:
+
+- <img src="https://www.docker.com/wp-content/uploads/2022/03/horizontal-logo-monochromatic-white.png" width="100" height="30"> Docker ✅
+- <img src="https://github.com/containers/podman/raw/main/logo/podman-logo-source.svg" width="100" height="30"> Podman (In progress)
+
 
 # E4S-ALC
 
@@ -49,44 +59,10 @@ $ cat test.json
 $ e4s-alc create -f test.json
 ```
 
-List images
-
-```
-$ e4s-alc list
-
-E4S-ALC images:
-====================
-	my-centos-image (centos:8): - 2022-01-01 00:00:00
-		+ py-numpy
-		+ autodiff
-
-	my-ubuntu-image (ubuntu:22.04): - 2022-01-01 00:00:00
-		No spack packages or spack installed
-
-	test-file-kokkos-raja (ubuntu:22.04): - 2022-01-01 00:00:00
-		+ kokkos
-		+ raja
-```
-
 Add package to image
 
 ```
 $ e4s-alc add -n my-ubuntu-image -p kokkos -a neovim
-
-$ e4s-alc list
-
-E4S-ALC images:
-====================
-        my-centos-image (centos:8): - 2022-01-01 00:00:00
-                + py-numpy
-                + autodiff
-
-        my-ubuntu-image (ubuntu:22.04): - 2022-01-01 00:00:00
-		+ kokkos
-
-        test-file-kokkos-raja (ubuntu:22.04): - 2022-01-01 00:00:00
-                + kokkos
-		+ raja
 
 ```
 
@@ -104,13 +80,4 @@ e4s-alc create \
 	--name centos8-kokkos \
 	-p kokkos 
 
-$ e4s-alc list
-
-E4S-ALC images:
-====================
-	cameron-kokkos (centos:8): - 2022-12-31 11:29:49.014343
-		+ kokkos
-
-	e4s-intel (ecpe4s/ubuntu20.04-runner-x86_64:2022-12-01): - 2022-12-31 11:35:53.293490
-		+ intel-oneapi-compilers
 ```
