@@ -63,7 +63,6 @@ Add package to image
 
 ```
 $ e4s-alc add -n my-ubuntu-image -p kokkos -a neovim
-
 ```
 
 ### Examples
@@ -79,5 +78,4 @@ e4s-alc create \
 	--image centos:8 \
 	--name centos8-kokkos \
 	-p kokkos 
-
 ```
