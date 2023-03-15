@@ -1,4 +1,4 @@
-Operation systems supported: 
+Operating Systems supported: 
 
 - ![](https://raw.githubusercontent.com/EgoistDeveloper/operating-system-logos/master/src/24x24/UBT.png "Ubuntu (16x16)") Ubuntu ✅ 
 - ![](https://raw.githubusercontent.com/EgoistDeveloper/operating-system-logos/master/src/24x24/RHT.png "Red Hat (16x16)") Red Hat ✅
