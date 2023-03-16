@@ -21,12 +21,8 @@ classifiers = [
     "Natural Language :: English",
     "Programming Language :: Python :: 3",
 ]
-dependencies = []
+dependencies = ['docker', 'podman']
 dynamic = ["version"]
-
-[project.optional-dependencies]
-docker = ['docker']
-podman = ['podman']
 
 [project.urls]
 repository = "https://github.com/E4S-Project/e4s-alc.git"
