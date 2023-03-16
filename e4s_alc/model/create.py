@@ -47,6 +47,11 @@ class CreateModel(Model):
                 if file_args['tarball']:
                     args.tarball = file_args['tarball']
 
+            args.spack = True
+            if 'spack' in file_args:
+                if not file_args['spack']:
+                    args.spack = False
+
         if args.copy:
             for item in args.copy:
                 if ':' not in item:
@@ -73,6 +78,9 @@ class CreateModel(Model):
 
         self.controller.init_image(args.image)
         self.controller.add_system_package_commands(args.os_package)
-        self.controller.install_spack()
-        self.controller.add_spack_package_commands(args.package)
+
+        if args.spack:
+            self.controller.install_spack()
+            self.controller.add_spack_package_commands(args.package)
+
         self.controller.execute_build(args.name)

@@ -24,7 +24,8 @@ class Create(AbstractCommand):
         self.parser.add_argument('-c', '--copy', metavar='\b', help='Directory to copy into the image', action='append', default=[])
         self.parser.add_argument('-t', '--tarball', metavar='\b', help='Tarball to expand in the image', action='append', default=[])
         self.parser.add_argument('-f', '--file', metavar='\b', help='The file used to create a new image')
-        self.parser.add_argument('-h', '--help', action='store_true')
+        self.parser.add_argument('-ns', '--no-spack', help='\b\b\b\bChoose to install spack', action='store_false', dest='spack')
+        self.parser.add_argument('-h', '--help', help='\b\b\b\b',action='store_true')
 
     def check_correct_args(self, args):
         if args.help:
