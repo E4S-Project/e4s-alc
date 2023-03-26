@@ -1,4 +1,5 @@
 import os
+import re
 import json
 from e4s_alc.mvc.controller import Controller
 
@@ -50,7 +51,9 @@ class DockerController(Controller):
         except docker.errors.ImageNotFound:
             print('Image was not found.')
             exit(1)
-
+        except docker.errors.NotFound:
+            print('Image was not found.')
+            exit(1)
 
     def find_image(self, image):
         import docker
@@ -183,11 +186,26 @@ class DockerController(Controller):
         self.commands.append('python3 -m pip install boto3')
 
 
+    def add_sles_package_commands(self, os_packages):
+        # SLES packages needed for spack
+        sles_packages = ' '.join([ 
+            'curl', 'gzip', 'tar', 'python3', 'python3-pip', 'gcc',
+            'gcc-c++', 'gcc-fortran', 'patch', 'make', 'gawk', 'xz',
+            'cmake', 'bzip2', 'vim'
+        ] + list(os_packages))
+
+        # Add commands to install SLES packages
+        self.commands.append('zypper update') 
+        self.commands.append('zypper install -y {}'.format(sles_packages))
+
+
     def add_system_package_commands(self, os_packages):
         # Create a mapping from os specified -> packages required
+
         package_map = {
             'ubuntu': self.add_ubuntu_package_commands,
-            'centos': self.add_centos_package_commands
+            'centos': self.add_centos_package_commands,
+            'sles': self.add_sles_package_commands
         }
         package_map[self.os_release['ID']](os_packages) 
 
@@ -197,9 +215,9 @@ class DockerController(Controller):
         # Get correct version of spack progmatically
         SPACK_URL = 'https://github.com/spack/spack/releases/download/v0.19.1/spack-0.19.1.tar.gz'
 
-        # Commands for downloading, unpacking, moving, and activating spack
-        self.commands.append('curl -OL {}'.format(SPACK_URL)) 
-        self.commands.append('gunzip /spack-0.19.1.tar.gz')
+        # Commands for downloading, unpacking, moving, and activating spack on SLES systems
+        self.commands.append('curl -OL {}'.format(SPACK_URL))
+        self.commands.append('gzip -d /spack-0.19.1.tar.gz')
         self.commands.append('tar -xf /spack-0.19.1.tar')
         self.commands.append('rm /spack-0.19.1.tar')
         self.commands.append('mv /spack-0.19.1 /spack')
@@ -241,10 +259,19 @@ class DockerController(Controller):
                     environment=env
                 )
 
+
+                pattern = re.compile(r"(\[|\[\.+|\.)$")
+
                 # Print to screen
                 print()
                 for chunk in stream:
-                    print(chunk.decode().strip())
+                    output = chunk.decode().strip()
+                    matches = pattern.findall(output)
+
+                    if matches:
+                        print(output, end='')
+                    else:
+                        print(output)
                 print()
 
         except:
@@ -256,5 +283,4 @@ class DockerController(Controller):
         container.commit(name)
 
         # Stop the running container
-        container.stop()
 
