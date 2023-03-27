@@ -19,6 +19,9 @@ class CreateTests(unittest.TestCase):
         self.assertIn('ubuntu', controller.image_os)
         self.assertIn('latest', controller.image_tag)
 
+ #   Commented out because this creates a image in the docker client and e4s-alc doesn't support
+ #   deleting images
+ #
  #   @unittest.skipIf('docker' not in sys.modules, "Docker not available") 
  #   def test_create_ubuntu_docker_spack(self):
  #       controller = DockerController()
