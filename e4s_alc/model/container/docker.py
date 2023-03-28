@@ -259,7 +259,8 @@ class DockerController(Controller):
                     environment=env
                 )
 
-
+                # Create capture group for printing output.
+                # In the future, a printing module will be used.
                 pattern = re.compile(r"(\[|\[\.+|\.)$")
 
                 # Print to screen
@@ -283,4 +284,4 @@ class DockerController(Controller):
         container.commit(name)
 
         # Stop the running container
-
+        container.stop()
