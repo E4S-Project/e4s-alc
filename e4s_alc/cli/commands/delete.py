@@ -11,12 +11,12 @@ class Delete(AbstractCommand):
         summary_parts = ["E4S-ALC %s " % E4S_ALC_VERSION, E4S_ALC_URL]
         super().__init__(__name__, summary_fmt=''.join(summary_parts), help_page_fmt=HELP_PAGE_FMT)
         self.command = os.path.basename(E4S_ALC_SCRIPT)
-        self.parser_help = 'Create a new image'
+        self.parser_help = 'Delete the specified image'
 
     def _construct_parser(self):
-        usage = '%s create [options]' % self.command      
+        usage = '%s delete [options]' % self.command      
         self.parser.usage = usage
-        self.parser.add_argument('-n', '--name', metavar='\b', help='The name of the newly created image')
+        self.parser.add_argument('-n', '--name', metavar='\b', help='The name of the image to delete')
         self.parser.add_argument('-h', '--help', help='\b\b\b\b',action='store_true')
 
     def check_correct_args(self, args):
@@ -37,4 +37,5 @@ class Delete(AbstractCommand):
         self.check_correct_args(args)
         self.model.main(args)
 
+import pdb;pdb.set_trace
 AbstractCommand.commands['delete'] = Delete(DeleteModel)

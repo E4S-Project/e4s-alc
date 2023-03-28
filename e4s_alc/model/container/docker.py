@@ -257,4 +257,6 @@ class DockerController(Controller):
 
         # Stop the running container
         container.stop()
-
+    
+    def delete_image(self, name):
+        self.client.images.remove(name)

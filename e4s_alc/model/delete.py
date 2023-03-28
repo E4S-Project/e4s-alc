@@ -18,11 +18,4 @@ class DeleteModel(Model):
             print('Failed to connect to \'{}\' client'.format(self.backend))
             exit(1)
 
-        self.controller.init_image(args.image)
-        self.controller.add_system_package_commands(args.os_package)
-
-        if args.spack:
-            self.controller.install_spack()
-            self.controller.add_spack_package_commands(args.package)
-
-        self.controller.execute_build(args.name)
+        self.controller.delete_image(args.name)
