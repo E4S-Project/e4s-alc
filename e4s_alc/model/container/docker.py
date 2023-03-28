@@ -1,5 +1,6 @@
 import os
 import json
+import requests
 from e4s_alc.mvc.controller import Controller
 
 class DockerController(Controller):
@@ -257,6 +258,10 @@ class DockerController(Controller):
 
         # Stop the running container
         container.stop()
-    
+
     def delete_image(self, name):
-        self.client.images.remove(name)
+        try:
+            self.client.images.remove(name)
+        except requests.exceptions.HTTPError as err:
+            print("Image deletion has failed:")
+            print(err)
