@@ -1,3 +1,5 @@
+import os
+import subprocess
 from e4s_alc.mvc.controller import Controller
 
 class PodmanController(Controller):
@@ -11,10 +13,16 @@ class PodmanController(Controller):
             return
 
         try:
-#            self.client = podman.PodmanClient(base_url='ssh://core@localhost:49363/run/user/501/podman/podman.sock')
-#            print(self.client.version())
+            process = subprocess.Popen(['podman', 'info'],
+                                 stdout=subprocess.PIPE, 
+                                 stderr=subprocess.PIPE)
+            process_out, process_err = process.communicate()
+            if process_err:
+                print('Failed to connect to Podman client')
+                return
 
-            uri = 'unix:///run/user/501/podman/podman.sock'
+            p_out = process_out.decode('utf-8')
+            print(p_out)
 
             with podman.PodmanClient(base_url=uri) as client:
                 version = client.version()
