@@ -18,4 +18,7 @@ class DeleteModel(Model):
             print('Failed to connect to \'{}\' client'.format(self.backend))
             exit(1)
 
-        self.controller.delete_image(args.name, args.force)
+        if args.prune:
+            self.controller.prune_images()
+        else:
+            self.controller.delete_image(args.name, args.force)

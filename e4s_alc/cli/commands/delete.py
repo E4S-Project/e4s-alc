@@ -18,6 +18,7 @@ class Delete(AbstractCommand):
         self.parser.usage = usage
         self.parser.add_argument('-n', '--name', metavar='\b', help='The name of the image to delete')
         self.parser.add_argument('-f', '--force', help='Attempt to force the deletion', action='store_true')
+        self.parser.add_argument('-p', '--prune', help='Delete unused images', action='store_true')
         self.parser.add_argument('-h', '--help', help='\b\b\b\b',action='store_true')
 
     def check_correct_args(self, args):
@@ -27,8 +28,15 @@ class Delete(AbstractCommand):
             print()
             exit(0)
 
-        if not args.name:
-            print('Error: Argument \'-n/--name\' is required.')
+        if not (args.name or args.prune):
+            print('Error: Arguments \'-n/--name\' or \'-p/--prune\' is required.')
+            print()
+            self.parser.print_help()
+            print()
+            exit(1)
+
+        if args.name and args.prune:
+            print('Error: Arguments \'-n/--name\' and \'-p/--prune\' can\'t be used together.')
             print()
             self.parser.print_help()
             print()

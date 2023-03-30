@@ -259,7 +259,12 @@ class DockerController(Controller):
         # Stop the running container
         container.stop()
 
-    def delete_image(self, name, force):
+    def prune_images(self):
+        deleted = self.client.images.prune(filters={"dangling": True})
+        if not deleted["ImagesDeleted"]:
+            print("No images were deleted: no unused images found.\nAre exited containers removed?\nConsider using 'e4s-alc delete --prune-containers'.")
+
+    def delete_image(self, name, force, prune):
         try:
             self.client.images.remove(name, force=force)
         except requests.exceptions.HTTPError as err:
