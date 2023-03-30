@@ -215,7 +215,7 @@ class DockerController(Controller):
         # Get correct version of spack progmatically
         SPACK_URL = 'https://github.com/spack/spack/releases/download/v0.19.1/spack-0.19.1.tar.gz'
 
-        # Commands for downloading, unpacking, moving, and activating spack on SLES systems
+        # Commands for downloading, unpacking, moving, and activating spack
         self.commands.append('curl -OL {}'.format(SPACK_URL))
         self.commands.append('gzip -d /spack-0.19.1.tar.gz')
         self.commands.append('tar -xf /spack-0.19.1.tar')
