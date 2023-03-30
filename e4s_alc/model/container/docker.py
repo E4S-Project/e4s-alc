@@ -268,7 +268,12 @@ class DockerController(Controller):
         if not deleted["ImagesDeleted"]:
             print("No images were deleted: no unused images found.\nAre exited containers removed?\nConsider using 'e4s-alc delete --prune-containers'.")
         else:
-            print(deleted)
+            self.print_line()
+            print("Pruned images:\n")
+            for item in deleted['ImagesDeleted']:
+                print(item)
+            print("\nSpace Reclaimed:\n")
+            print(deleted['SpaceReclaimed'])
 
     def prune_containers(self):
         entered_value = input("All stopped containers will be deleted, are you sure you want to proceed?[y/N]\n")
@@ -280,7 +285,12 @@ class DockerController(Controller):
             if not deleted["ContainersDeleted"]:
                 print("No containers were deleted: no stopped containers found.")
             else:
-                print(deleted)
+                self.print_line()
+                print("Pruned containers:\n")
+                for item in deleted['ContainerDeleted']:
+                    print(item)
+                print("\nSpace Reclaimed:\n")
+                print(deleted['SpaceReclaimed'])
 
     def delete_image(self, name, force):
         try:
