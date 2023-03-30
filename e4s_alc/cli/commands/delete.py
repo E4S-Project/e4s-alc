@@ -17,6 +17,7 @@ class Delete(AbstractCommand):
         usage = '%s delete [options]' % self.command      
         self.parser.usage = usage
         self.parser.add_argument('-n', '--name', metavar='\b', help='The name of the image to delete')
+        self.parser.add_argument('-f', '--force', help='Attempt to force the deletion', action='store_true')
         self.parser.add_argument('-h', '--help', help='\b\b\b\b',action='store_true')
 
     def check_correct_args(self, args):
@@ -37,5 +38,4 @@ class Delete(AbstractCommand):
         self.check_correct_args(args)
         self.model.main(args)
 
-import pdb;pdb.set_trace
 AbstractCommand.commands['delete'] = Delete(DeleteModel)

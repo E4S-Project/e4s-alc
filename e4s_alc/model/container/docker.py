@@ -259,9 +259,9 @@ class DockerController(Controller):
         # Stop the running container
         container.stop()
 
-    def delete_image(self, name):
+    def delete_image(self, name, force):
         try:
-            self.client.images.remove(name)
+            self.client.images.remove(name, force=force)
         except requests.exceptions.HTTPError as err:
             print("Image deletion has failed:")
             print(err)
