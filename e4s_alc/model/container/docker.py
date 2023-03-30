@@ -1,6 +1,7 @@
 import os
 import json
 import requests
+import docker
 from e4s_alc.mvc.controller import Controller
 
 class DockerController(Controller):
@@ -260,11 +261,28 @@ class DockerController(Controller):
         container.stop()
 
     def prune_images(self):
-        deleted = self.client.images.prune(filters={"dangling": True})
+        try:
+            deleted = self.client.images.prune(filters={"dangling": True})
+        except docker.errors.APIError as err:
+            raise SystemExit(err) from err
         if not deleted["ImagesDeleted"]:
             print("No images were deleted: no unused images found.\nAre exited containers removed?\nConsider using 'e4s-alc delete --prune-containers'.")
+        else:
+            print(deleted)
 
-    def delete_image(self, name, force, prune):
+    def prune_containers(self):
+        entered_value = input("All stopped containers will be deleted, are you sure you want to proceed?[y/N]\n")
+        if entered_value in ['y', 'Y', 'yes']:
+            try:
+                deleted = self.client.containers.prune()
+            except docker.errors.APIError as err:
+                raise SystemExit(err) from err
+            if not deleted["ContainersDeleted"]:
+                print("No containers were deleted: no stopped containers found.")
+            else:
+                print(deleted)
+
+    def delete_image(self, name, force):
         try:
             self.client.images.remove(name, force=force)
         except requests.exceptions.HTTPError as err:
