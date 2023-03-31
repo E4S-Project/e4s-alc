@@ -278,10 +278,11 @@ class DockerController(Controller):
             if not deleted["ImagesDeleted"]:
                 print("No images were deleted: no unused images found.\nAre the corresponding stopped containers removed?\nConsider using 'e4s-alc delete -c $CONTAINER_ID' or 'e4s-alc delete --prune-containers'.")
             else:
+                import pdb;pdb.set_trace()
                 self.print_line()
                 print("Pruned images:\n")
                 for item in deleted['ImagesDeleted']:
-                    print(item)
+                    print(item['Deleted'])
                 print("\nSpace Reclaimed:\n")
                 print(human_readable_size(deleted['SpaceReclaimed']))
 
