@@ -4,6 +4,13 @@ import requests
 import docker
 from e4s_alc.mvc.controller import Controller
 
+def human_readable_size(size, decimal_places=2):
+    for unit in ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB']:
+        if abs(size) < 1024.0 or unit == 'PiB':
+            break
+        size /= 1024.0
+    return f"{size:.{decimal_places}f} {unit}"
+
 class DockerController(Controller):
     def __init__(self):
         super().__init__('DockerController')
@@ -260,23 +267,26 @@ class DockerController(Controller):
         # Stop the running container
         container.stop()
 
+
     def prune_images(self):
-        try:
-            deleted = self.client.images.prune(filters={"dangling": True})
-        except docker.errors.APIError as err:
-            raise SystemExit(err) from err
-        if not deleted["ImagesDeleted"]:
-            print("No images were deleted: no unused images found.\nAre exited containers removed?\nConsider using 'e4s-alc delete --prune-containers'.")
-        else:
-            self.print_line()
-            print("Pruned images:\n")
-            for item in deleted['ImagesDeleted']:
-                print(item)
-            print("\nSpace Reclaimed:\n")
-            print(deleted['SpaceReclaimed'])
+        entered_value = input("WARNING: All dangling images will be deleted, are you sure you want to proceed?[y/N]\n")
+        if entered_value in ['y', 'Y', 'yes']:
+            try:
+                deleted = self.client.images.prune(filters={'dangling':True})
+            except docker.errors.APIError as err:
+                raise SystemExit(err) from err
+            if not deleted["ImagesDeleted"]:
+                print("No images were deleted: no unused images found.\nAre the corresponding stopped containers removed?\nConsider using 'e4s-alc delete -c $CONTAINER_ID' or 'e4s-alc delete --prune-containers'.")
+            else:
+                self.print_line()
+                print("Pruned images:\n")
+                for item in deleted['ImagesDeleted']:
+                    print(item)
+                print("\nSpace Reclaimed:\n")
+                print(human_readable_size(deleted['SpaceReclaimed']))
 
     def prune_containers(self):
-        entered_value = input("All stopped containers will be deleted, are you sure you want to proceed?[y/N]\n")
+        entered_value = input("WARNING: All stopped containers will be deleted, are you sure you want to proceed?[y/N]\n")
         if entered_value in ['y', 'Y', 'yes']:
             try:
                 deleted = self.client.containers.prune()
@@ -287,10 +297,11 @@ class DockerController(Controller):
             else:
                 self.print_line()
                 print("Pruned containers:\n")
-                for item in deleted['ContainerDeleted']:
+                for item in deleted['ContainersDeleted']:
                     print(item)
-                print("\nSpace Reclaimed:\n")
-                print(deleted['SpaceReclaimed'])
+                print("\nSpace Reclaimed:")
+                print(human_readable_size(deleted['SpaceReclaimed'], 2))
+                self.print_line()
 
     def delete_image(self, name, force):
         try:
