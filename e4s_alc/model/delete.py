@@ -22,5 +22,7 @@ class DeleteModel(Model):
             self.controller.prune_containers()
         if args.prune_images:
             self.controller.prune_images()
+        if args.container:
+            self.controller.delete_container(args.container, args.force)
         if args.name:
             self.controller.delete_image(args.name, args.force)

@@ -316,3 +316,12 @@ class DockerController(Controller):
                     error_string += " image used by container. Use '-f' to force remove, or remove container using 'docker rm $CONTAINER_ID'."
             print(error_string)
             raise SystemExit(err) from err
+
+    def delete_container(self, ID, force):
+        try:
+            current = self.client.containers.get(ID)
+            current.remove(force=force)
+        except docker.errors.APIError as err:
+            error_string = "Container deletion has failed:"
+            print(error_string)
+            raise SystemExit(err) from err

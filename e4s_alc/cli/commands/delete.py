@@ -16,7 +16,8 @@ class Delete(AbstractCommand):
     def _construct_parser(self):
         usage = '%s delete [options]' % self.command      
         self.parser.usage = usage
-        self.parser.add_argument('-n', '--name', metavar='', help='The name of the image to delete')
+        self.parser.add_argument('-n', '--name', metavar='', help='Name of the image to delete')
+        self.parser.add_argument('-c','--container', metavar='', help='ID of the container to delete')
         self.parser.add_argument('-f', '--force', help='Attempt to force the deletion', action='store_true')
         self.parser.add_argument('--prune-images', help='Delete unused images', action='store_true')
         self.parser.add_argument('--prune-containers', help='Delete stopped containers', action='store_true')
@@ -29,7 +30,7 @@ class Delete(AbstractCommand):
             print()
             exit(0)
 
-        if not (args.name or args.prune_images or args.prune_containers):
+        if not (args.name  or args.container or args.prune_images or args.prune_containers):
             print('Error: Arguments \'-n/--name\' or \'-p/--prune\' or \'-c/--prune-containers\' is required.')
             print()
             self.parser.print_help()
