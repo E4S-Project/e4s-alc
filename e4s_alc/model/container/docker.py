@@ -230,9 +230,11 @@ class DockerController(Controller):
         for package in packages:
             self.commands.append('spack install {}'.format(package))
 
+
     def print_line(self):
         for i in range(os.get_terminal_size()[0]):
             print('=', end='')
+
 
     def execute_build(self, name):
         # Create environment for container
