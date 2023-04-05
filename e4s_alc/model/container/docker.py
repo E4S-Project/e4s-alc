@@ -1,5 +1,6 @@
 import os
 import json
+import docker
 from e4s_alc.mvc.controller import Controller
 
 class DockerController(Controller):
@@ -257,4 +258,13 @@ class DockerController(Controller):
 
         # Stop the running container
         container.stop()
+
+    def list_images(self, name=None, inter=False):
+        try:
+            images = self.client.images.list(name, all=inter)
+            print(images)
+        except docker.errors.APIError as err:
+            error_string = "Image listing has failed:"
+            print(error_string)
+            raise SystemExit(err) from err
 
