@@ -1,9 +1,15 @@
 import os
 import json
-import docker
 from prettytable import PrettyTable
 from dateutil import parser
 from e4s_alc.mvc.controller import Controller
+
+def human_readable_size(size, decimal_places=2):
+    for unit in ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB']:
+        if abs(size) < 1024.0 or unit == 'PiB':
+            break
+        size /= 1024.0
+    return f"{size:.{decimal_places}f} {unit}"
 
 class DockerController(Controller):
     def __init__(self):
@@ -262,6 +268,7 @@ class DockerController(Controller):
         container.stop()
 
     def list_images(self, name=None, inter=False):
+        import docker
         try:
             images = self.client.images.list(name, all=inter)
         except docker.errors.APIError as err:
@@ -279,5 +286,5 @@ class DockerController(Controller):
                 image_name, image_tag = "<none>", "<none>"
             short_id = image.short_id.split(':')[1]
             creation_date = parser.parse(image.attrs.get('Created'))
-            t.add_row([image_name, image_tag, short_id, creation_date.strftime("%m/%d/%Y, %H:%M:%S"), image.attrs.get('Size')])
+            t.add_row([image_name, image_tag, short_id, creation_date.strftime("%m/%d/%Y, %H:%M:%S"), human_readable_size(image.attrs.get('Size'))])
         print(t)
