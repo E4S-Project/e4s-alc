@@ -1,6 +1,7 @@
 import os
 import json
 import docker
+from prettytable import PrettyTable
 from e4s_alc.mvc.controller import Controller
 
 class DockerController(Controller):
@@ -262,9 +263,19 @@ class DockerController(Controller):
     def list_images(self, name=None, inter=False):
         try:
             images = self.client.images.list(name, all=inter)
-            print(images)
         except docker.errors.APIError as err:
             error_string = "Image listing has failed:"
             print(error_string)
             raise SystemExit(err) from err
+        self.show_images(images)
 
+    def show_images(self, image_list):
+        t = PrettyTable(['Name', 'Tag', 'Id', 'Created', 'Size'])
+        for image in image_list:
+            if image.tags:
+                image_name, image_tag = image.tags[0].split(':')
+            else:
+                image_name, image_tag = "<none>", "<none>"
+            short_id = image.short_id.split(':')[1]
+            t.add_row([image_name, image_tag, short_id, image.attrs.get('Created'), image.attrs.get('Size')])
+        print(t)
