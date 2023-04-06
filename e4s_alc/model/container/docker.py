@@ -2,6 +2,7 @@ import os
 import json
 import docker
 from prettytable import PrettyTable
+from dateutil import parser
 from e4s_alc.mvc.controller import Controller
 
 class DockerController(Controller):
@@ -277,5 +278,6 @@ class DockerController(Controller):
             else:
                 image_name, image_tag = "<none>", "<none>"
             short_id = image.short_id.split(':')[1]
-            t.add_row([image_name, image_tag, short_id, image.attrs.get('Created'), image.attrs.get('Size')])
+            creation_date = parser.parse(image.attrs.get('Created'))
+            t.add_row([image_name, image_tag, short_id, creation_date.strftime("%m/%d/%Y, %H:%M:%S"), image.attrs.get('Size')])
         print(t)
