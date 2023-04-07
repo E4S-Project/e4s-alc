@@ -47,6 +47,7 @@ class Model():
 
     def set_backend(self, backend):
         self.update_configuration_file('backend', backend)
+        print('Setting {} as backend!'.format(backend))
         return True
 
     def check_working_backend(self, backend, controller):
