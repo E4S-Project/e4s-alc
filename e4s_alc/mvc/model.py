@@ -61,5 +61,11 @@ class Model():
             if podman_controller.is_active:
                 self.controller = podman_controller
                 return True
+
+        if backend == 'singularity':
+            singularity_controller = controller()
+            if singularity_controller.is_active:
+                self.controller = singularity_controller
+                return True
         
         return False

@@ -12,6 +12,7 @@ class SingularityController(Controller):
         except ImportError:
             print('Failed to find Singularity python library')
             return
+        self.client = Client
 
         self.is_active = True
 
