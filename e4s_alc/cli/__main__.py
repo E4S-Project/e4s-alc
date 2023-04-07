@@ -7,6 +7,13 @@ from e4s_alc.cli.cli_view import NoSubparsersMetavarFormatter
 from e4s_alc.cli.command import AbstractCommand
 import e4s_alc.cli.commands
 
+try:
+    from e4s_alc.version import __version__
+except ModuleNotFoundError:
+    # the version.py file is created dynamically at install.
+    # This should only fail when the code is run in an unsupported manner
+    __version__ = 'DEV0.0'
+
 HELP_PAGE_FMT = "'%(command)s' page to be written."
 
 class MainCommand(AbstractCommand):
@@ -44,6 +51,11 @@ class MainCommand(AbstractCommand):
             exit(1)
 
         args = self._parse_args(argv)
+
+        if args.version:
+            print(__version__)
+            return 0
+
         command = args.command
         AbstractCommand.commands[command].main(args)
 
