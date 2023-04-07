@@ -64,6 +64,9 @@ class CreateModel(Model):
                 host_path, image_path = host_image_path
                 self.controller.mount_and_copy(host_path, image_path)
 
+        self.controller.init_image(args.image)
+        self.controller.add_system_package_commands(args.os_package)
+
         if args.tarball:
             for item in args.tarball:
                 if ':' not in item:
@@ -75,9 +78,6 @@ class CreateModel(Model):
                     exit(1)
                 host_path, image_path = host_image_path
                 self.controller.expand_tarball(host_path, image_path)
-
-        self.controller.init_image(args.image)
-        self.controller.add_system_package_commands(args.os_package)
 
         if args.spack:
             self.controller.install_spack()
