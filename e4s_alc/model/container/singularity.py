@@ -8,13 +8,22 @@ class SingularityController(Controller):
 
         # Try to import the python library
         try:
-            from spython.main import Client
+            import docker
         except ImportError:
-            print('Failed to find Singularity python library')
+            print('Failed to find Docker python library')
             return
-        self.client = Client
 
+        # Try to connect with the docker runtime
+        try:
+            self.client = docker.from_env(timeout=600)
+        except docker.errors.DockerException:
+            print('Failed to connect to Docker client')
+            return
+        
         self.is_active = True
+
+        self.config_dir = os.path.join(os.path.expanduser('~'), '.e4s-alc')
+        self.images_dir = os.path.join(self.config_dir, "singularity_images")
 
 
     def read_args_file(self, file_path):
@@ -26,7 +35,6 @@ class SingularityController(Controller):
 
 
     def pull_image(self, image):
-        from spython.main import Client
         self.image = image
 
         # Parse the image and tag
@@ -251,4 +259,7 @@ class SingularityController(Controller):
 
         # Stop the running container
         container.stop()
+
+        from spython.main import Client
+        Client.build(recipe="docker-daemon://" + name + ":" + self.image_tag, build_folder=self.images_dir, image= name + ".sif", sudo=False)
 
