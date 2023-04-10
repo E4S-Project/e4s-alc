@@ -200,7 +200,7 @@ class DockerController(Controller):
         sles_packages = ' '.join([ 
             'curl', 'gzip', 'tar', 'python3', 'python3-pip', 'gcc',
             'gcc-c++', 'gcc-fortran', 'patch', 'make', 'gawk', 'xz',
-            'cmake', 'bzip2', 'vim'
+            'cmake', 'bzip2', 'vim', 'file', 'unzip'
         ] + list(os_packages))
 
         # Add commands to install SLES packages
