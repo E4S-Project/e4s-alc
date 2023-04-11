@@ -54,11 +54,7 @@ class SingularityController(Controller):
 
         return data
 
-
-    def pull_image(self, image):
-        self.image = image
-
-        # Parse the image and tag
+    def parse_image_name(self, image):
         if ':' in self.image:
             image_chunks = self.image.split(':')
             if len(image_chunks) != 2:
@@ -66,6 +62,13 @@ class SingularityController(Controller):
             self.image_os, self.image_tag = image_chunks
         else:
             self.image_os, self.image_tag = self.image, 'latest'
+        return self.image_os, self.image_tag
+
+    def pull_image(self, image):
+        self.image = image
+
+        # Parse the image and tag
+        self.image_os, self.image_tag = self.parse_image_name(image)
 
         # Try to pull the image if it exists
         try:
@@ -119,7 +122,7 @@ class SingularityController(Controller):
             item_name, item_value = item.split('=')
             self.environment[item_name] = item_value
 
-    
+
     def init_image(self, image):
         # Pull image
         self.pull_image(image)
@@ -172,14 +175,14 @@ class SingularityController(Controller):
 
     def add_ubuntu_package_commands(self, os_packages):
         # Ubuntu packages needed for spack
-        ubuntu_packages = ' '.join([ 
+        ubuntu_packages = ' '.join([
             'build-essential', 'ca-certificates', 'coreutils', 'curl', 
             'environment-modules', 'gfortran', 'git', 'gpg', 'lsb-release', 'vim', 
             'python3', 'python3-distutils', 'python3-venv', 'unzip', 'zip', 'cmake' 
         ] + list(os_packages))
 
         # Add commands to install Ubuntu packages
-        self.commands.append('apt-get update') 
+        self.commands.append('apt-get update')
         self.commands.append('apt-get install -y {}'.format(ubuntu_packages))
 
 
@@ -280,5 +283,6 @@ class SingularityController(Controller):
         # Stop the running container
         container.stop()
 
+        if not self.image_tag:
+            self.image_tag = self.parse_image_name(self.image)[1]
         Client.build(recipe="docker-daemon://" + name + ":" + self.image_tag, build_folder=self.images_dir, image= name + ".sif", sudo=False)
-
