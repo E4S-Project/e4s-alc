@@ -1,16 +1,34 @@
 import os
 import json
 from e4s_alc.mvc.controller import Controller
+has_docker=False
+try:
+    import docker
+    has_docker=True
+except ImportError:
+    pass
+has_singularity=False
+try:
+    from spython.main import Client
+    has_singularity=True
+except ImportError:
+    pass
 
 class SingularityController(Controller):
     def __init__(self):
         super().__init__('SingularityController')
+        self.lacks_backend = False
 
-        # Try to import the python library
-        try:
-            import docker
-        except ImportError:
+        # Check if the python libraries are imported
+        if not has_docker:
             print('Failed to find Docker python library')
+            self.lacks_backend = True
+        if not has_singularity:
+            print('Failed to find Singularity python library')
+            self.lacks_backend = True
+
+        if self.lacks_backend:
+            print("Missing package docker or spython: docker is also needed to manipulate singularity images with e4s-alc")
             return
 
         # Try to connect with the docker runtime
@@ -24,6 +42,9 @@ class SingularityController(Controller):
 
         self.config_dir = os.path.join(os.path.expanduser('~'), '.e4s-alc')
         self.images_dir = os.path.join(self.config_dir, "singularity_images")
+
+        if not os.path.exists(self.images_dir):
+            os.makedirs(self.images_dir)
 
 
     def read_args_file(self, file_path):
@@ -55,7 +76,6 @@ class SingularityController(Controller):
 
 
     def find_image(self, image):
-        import docker
         self.image = image
 
         # Try to get image from client
@@ -260,6 +280,5 @@ class SingularityController(Controller):
         # Stop the running container
         container.stop()
 
-        from spython.main import Client
         Client.build(recipe="docker-daemon://" + name + ":" + self.image_tag, build_folder=self.images_dir, image= name + ".sif", sudo=False)
 
