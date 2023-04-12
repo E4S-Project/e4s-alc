@@ -365,7 +365,7 @@ class DockerController(Controller):
                 case 404:
                     error_string += " image not found with name."
                 case 409:
-                    error_string += " image used by container. Use '-f' to force remove, or remove container using 'docker rm $CONTAINER_ID'."
+                    error_string += " image used by container. Use '-f' to force remove, or remove container using 'e4s-alc -c $CONTAINER_ID'."
             print(error_string)
             raise SystemExit(err) from err
 
