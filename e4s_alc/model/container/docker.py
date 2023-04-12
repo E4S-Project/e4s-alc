@@ -23,15 +23,6 @@ class DockerController(Controller):
         
         self.is_active = True
 
-
-    def read_args_file(self, file_path):
-        abs_file_path = os.path.abspath(file_path)
-        with open(abs_file_path, 'r') as json_file:
-            data = json.load(json_file)
-
-        return data
-
-
     def pull_image(self, image):
         import docker
         self.image = image
@@ -208,21 +199,6 @@ class DockerController(Controller):
             'sles': self.add_sles_package_commands
         }
         package_map[self.os_release['ID']](os_packages) 
-
-
-    def install_spack(self):
-        #TODO
-        # Get correct version of spack progmatically
-        SPACK_URL = 'https://github.com/spack/spack/releases/download/v0.19.1/spack-0.19.1.tar.gz'
-
-        # Commands for downloading, unpacking, moving, and activating spack
-        self.commands.append('curl -OL {}'.format(SPACK_URL))
-        self.commands.append('gzip -d /spack-0.19.1.tar.gz')
-        self.commands.append('tar -xf /spack-0.19.1.tar')
-        self.commands.append('rm /spack-0.19.1.tar')
-        self.commands.append('mv /spack-0.19.1 /spack')
-        self.commands.append('. /spack/share/spack/setup-env.sh')
-        self.commands.append('echo export PATH={}:/spack/bin >> ~/.bashrc'.format(self.environment['PATH']))
 
 
     def add_spack_package_commands(self, packages):

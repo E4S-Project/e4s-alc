@@ -1,3 +1,6 @@
+import os
+import json
+
 class Controller():
     def __init__(self, module_name):
         self.module_name = module_name
@@ -6,34 +9,29 @@ class Controller():
         self.image = None
         self.image_os = None
         self.image_tag = None
+        self.image_id = None
         self.os_release = {}
         self.environment = {}
         self.commands = []
         self.mounts = []
 
-    def pull_image(self, image):
-        pass
+    def read_args_file(self, file_path):
+        abs_file_path = os.path.abspath(file_path)
+        with open(abs_file_path, 'r') as json_file:
+            data = json.load(json_file)
 
-    def parse_os_release(self):
-        pass
+        return data
 
-    def parse_environment(self):
-        pass
+    def install_spack(self):
+        #TODO
+        # Get correct version of spack progmatically
+        SPACK_URL = 'https://github.com/spack/spack/releases/download/v0.19.1/spack-0.19.1.tar.gz'
 
-    def add_ubuntu_package_commands(self, os_packages):
-        pass
-    
-    def add_centos_package_commands(self, os_packages):
-        pass
-
-    def init_image(self, image):
-        pass
-
-    def mount_and_copy(self, host_path, image_path):
-        pass
-
-    def add_system_package_commands(self, os_packages):
-        pass
-
-    def execute_build(self, name):
-        pass
+        # Commands for downloading, unpacking, moving, and activating spack
+        self.commands.append('curl -OL {}'.format(SPACK_URL))
+        self.commands.append('gzip -d /spack-0.19.1.tar.gz')
+        self.commands.append('tar -xf /spack-0.19.1.tar')
+        self.commands.append('rm /spack-0.19.1.tar')
+        self.commands.append('mv /spack-0.19.1 /spack')
+        self.commands.append('. /spack/share/spack/setup-env.sh')
+        self.commands.append('echo export PATH={}:/spack/bin >> ~/.bashrc'.format(self.environment['PATH']))
