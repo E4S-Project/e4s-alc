@@ -1,8 +1,9 @@
 import os
 import re
 import json
+from prettytable import PrettyTable
+from dateutil import parser
 import requests
-import docker
 from e4s_alc.mvc.controller import Controller
 
 def human_readable_size(size, decimal_places=2):
@@ -295,7 +296,30 @@ class DockerController(Controller):
         # Stop the running container
         container.stop()
 
+    def list_images(self, name=None, inter=False):
+        import docker
+        try:
+            images = self.client.images.list(name, all=inter)
+        except docker.errors.APIError as err:
+            error_string = "Image listing has failed:"
+            print(error_string)
+            raise SystemExit(err) from err
+        self.show_images(images)
+
+    def show_images(self, image_list):
+        t = PrettyTable(['Name', 'Tag', 'Id', 'Created', 'Size'])
+        for image in image_list:
+            if image.tags:
+                image_name, image_tag = image.tags[0].split(':')
+            else:
+                image_name, image_tag = "<none>", "<none>"
+            short_id = image.short_id.split(':')[1]
+            creation_date = parser.parse(image.attrs.get('Created'))
+            t.add_row([image_name, image_tag, short_id, creation_date.strftime("%m/%d/%Y, %H:%M:%S"), human_readable_size(image.attrs.get('Size'))])
+        print(t)
+    
     def prune_images(self):
+        import docker
         entered_value = input("WARNING: All dangling images will be deleted, are you sure you want to proceed?[y/N]\n")
         if entered_value in ['y', 'Y', 'yes']:
             try:
@@ -313,6 +337,7 @@ class DockerController(Controller):
                 print(human_readable_size(deleted['SpaceReclaimed']))
 
     def prune_containers(self):
+        import docker
         entered_value = input("WARNING: All stopped containers will be deleted, are you sure you want to proceed?[y/N]\n")
         if entered_value in ['y', 'Y', 'yes']:
             try:
@@ -345,6 +370,7 @@ class DockerController(Controller):
             raise SystemExit(err) from err
 
     def delete_container(self, ID, force):
+        import docker
         try:
             current = self.client.containers.get(ID)
             current.remove(force=force)
