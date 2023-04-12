@@ -361,11 +361,10 @@ class DockerController(Controller):
         except requests.exceptions.HTTPError as err:
             error_string = "Image deletion has failed:"
             error_code = err.response.status_code
-            match error_code:
-                case 404:
-                    error_string += " image not found with name."
-                case 409:
-                    error_string += " image used by container. Use '-f' to force remove, or remove container using 'e4s-alc -c $CONTAINER_ID'."
+            if error_code == 404:
+                error_string += " image not found with name."
+            elif 409:
+                error_string += " image used by container. Use '-f' to force remove, or remove container using 'docker rm $CONTAINER_ID'."
             print(error_string)
             raise SystemExit(err) from err
 
