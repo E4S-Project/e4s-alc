@@ -1,5 +1,7 @@
 import os
 import json
+from prettytable import PrettyTable
+from datetime import datetime
 from e4s_alc.mvc.controller import Controller
 has_docker=False
 try:
@@ -13,6 +15,13 @@ try:
     has_singularity=True
 except ImportError:
     pass
+
+def human_readable_size(size, decimal_places=2):
+    for unit in ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB']:
+        if abs(size) < 1024.0 or unit == 'PiB':
+            break
+        size /= 1024.0
+    return f"{size:.{decimal_places}f} {unit}"
 
 class SingularityController(Controller):
     def __init__(self):
@@ -286,3 +295,18 @@ class SingularityController(Controller):
         if not self.image_tag:
             self.image_tag = self.parse_image_name(self.image)[1]
         Client.build(recipe="docker-daemon://" + name + ":" + self.image_tag, build_folder=self.images_dir, image= name + ".sif", sudo=False)
+
+    def list_images(self, name=None, inter=False):
+        contentIterator = os.scandir(self.images_dir)
+        contentDict = {}
+        for entry in contentIterator:
+            if not entry.name.startswith('.') and entry.is_file():
+                contentDict[entry.name] = entry.stat()
+        self.show_images(contentDict)
+
+    def show_images(self, image_dict):
+        t = PrettyTable(['Name', 'Created', 'Size'])
+        for image in image_dict:
+            creation_date = datetime.fromtimestamp(image_dict.get(image).st_ctime).strftime("%m/%d/%Y, %H:%M:%S")
+            t.add_row([image, creation_date, human_readable_size(image_dict.get(image).st_size)])
+        print(t)
