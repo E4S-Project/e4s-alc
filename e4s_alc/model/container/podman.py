@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import atexit
 import subprocess
@@ -70,14 +71,12 @@ class PodmanController(Controller):
 
     def parse_os_release(self):
         # Run the image and execute cat command to read os release
-#        image = self.client.images.get(self.image_id)
-#        print(dir(image))
-        print(self.image)
-        os_release_raw = self.client.containers.run(self.image, 'cat /etc/os-release', remove=True)
-        print(os_release_raw)
+        container = self.client.containers.run(self.image, ['cat', '/etc/os-release'], remove=True, detach=True)
+        os_release_gen = container.logs()
 
-        for i in os_release_raw:
-            print(i)
+        os_release_raw = b''
+        for line in os_release_gen:
+            os_release_raw += line + b'\n'
 
         # Parse the response from the container
         os_release_parsed = os_release_raw.decode().replace('\"', '').splitlines()
@@ -94,15 +93,93 @@ class PodmanController(Controller):
             self.os_release[item_name] = item_value
 
 
+    def parse_environment(self):
+        # Run the image and execute printenv to read existing environment
+        container = self.client.containers.run(self.image, ['printenv'], remove=True, detach=True)
+        environment_gen = container.logs()
+
+        environment_raw = b''
+        for line in environment_gen:
+            environment_raw += line + b'\n'
+
+        # Parse the response from the container
+        environment_parsed = environment_raw.decode().replace('\"', '').splitlines()
+
+        # Iterate through each item of the environment
+        for item in environment_parsed:
+
+            # Add key, value pair to class dictionary
+            item_name, item_value = item.split('=')
+            self.environment[item_name] = item_value
+
+
     def init_image(self, image):
         # Pull image
         self.pull_image(image)
 
         # Parse image os release
         self.parse_os_release()
-        print(self.os_release)
 
         # Parse the existing environment of the image
         self.parse_environment()
 
 
+    def execute_build(self, name):
+        # Create environment for container
+        env = {
+            'PYTHONUNBUFFERED': '1',
+            'DEBIAN_FRONTEND': 'noninteractive',
+            'PATH': '{}:/spack/bin'.format(self.environment['PATH'])
+        }
+
+        mounts = []
+        for mount in self.mounts:
+            mount_src, mount_dest = mount.split(':')
+            mount = {
+                'type': 'bind',
+                'source': mount_src,
+                'target': mount_dest,
+                'read_only': True
+            }
+            mounts.append(mount)
+
+        # Create a running detached container
+        container = self.client.containers.run(self.image, detach=True, tty=True, mounts=mounts)
+
+        try:
+            # Iterate through each command and execute
+            for command in self.commands:
+                self.print_line()
+                print('Command: ', command)
+                self.print_line()
+
+                # Execute
+                rv, stream = container.exec_run(
+                    'bash -c \"{}\"'.format(command),
+                    stream=True,
+                    environment=env
+                )
+
+                # Create capture group for printing output.
+                # In the future, a printing module will be used.
+                pattern = re.compile(r"(\[|\[\.+|\.)$")
+
+                # Print to screen
+                print()
+                for chunk in stream:
+                    print(chr(chunk), end='') 
+
+                print()
+
+        except Exception as e:
+            raise e
+            print(e)
+            print('Stopping container...')
+            container.stop()
+            exit(1)
+
+        # Commit new image
+        container.commit(name)
+
+        # Stop the running container
+        container.stop()
