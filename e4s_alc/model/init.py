@@ -21,9 +21,11 @@ class InitModel(Model):
                 print('Error: backend \'{}\' not supported'.format(args.backend))
                 exit(1)
 
-            if not self.check_working_backend(args.backend, SUPPORTED_BACKENDS[args.backend]):
+            elif not self.check_working_backend(args.backend, SUPPORTED_BACKENDS[args.backend]):
                 print('Error: failed to find backend: {}'.format(args.backend))
                 exit(1)
+            else:
+                self.set_backend(args.backend)
         else:
             if not self.discover_backend():
                 print('Error: No backend discovered')
