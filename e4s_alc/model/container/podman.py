@@ -68,6 +68,16 @@ class PodmanController(Controller):
             print('Image was not found.')
             exit(1)
 
+    def find_image(self, image):
+        import podman
+        self.image = image
+
+        # Try to get image from client
+        try:
+            self.client.images.get(image)
+        except podman.errors.ImageNotFound:
+            print('Image was not found.')
+            exit(1)
 
     def parse_os_release(self):
         # Run the image and execute cat command to read os release
