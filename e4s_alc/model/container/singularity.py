@@ -310,3 +310,11 @@ class SingularityController(Controller):
             creation_date = datetime.fromtimestamp(image_dict.get(image).st_ctime).strftime("%m/%d/%Y, %H:%M:%S")
             t.add_row([image, creation_date, human_readable_size(image_dict.get(image).st_size)])
         print(t)
+
+    def delete_image(self, name, force):
+        image_path = self.images_dir + "/" + name
+        try:
+            os.remove(image_path)
+        except FileNotFoundError as err:
+            print("{} not found".format(image_path))
+            raise SystemExit(err) from err
