@@ -17,7 +17,6 @@ class InitModel(Model):
 
     def main(self, args):
         if args.backend:
-            print(args.backend)
             if args.backend not in SUPPORTED_BACKENDS:
                 print('Error: backend \'{}\' not supported'.format(args.backend))
                 exit(1)
