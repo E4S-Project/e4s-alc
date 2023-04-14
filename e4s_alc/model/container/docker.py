@@ -1,7 +1,17 @@
 import os
 import re
 import json
+from prettytable import PrettyTable
+from dateutil import parser
+import requests
 from e4s_alc.mvc.controller import Controller
+
+def human_readable_size(size, decimal_places=2):
+    for unit in ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB']:
+        if abs(size) < 1024.0 or unit == 'PiB':
+            break
+        size /= 1024.0
+    return f"{size:.{decimal_places}f} {unit}"
 
 class DockerController(Controller):
     def __init__(self):
@@ -143,3 +153,85 @@ class DockerController(Controller):
 
         # Stop the running container
         container.stop()
+
+    def list_images(self, name=None, inter=False):
+        import docker
+        try:
+            images = self.client.images.list(name, all=inter)
+        except docker.errors.APIError as err:
+            error_string = "Image listing has failed:"
+            print(error_string)
+            raise SystemExit(err) from err
+        self.show_images(images)
+
+    def show_images(self, image_list):
+        t = PrettyTable(['Name', 'Tag', 'Id', 'Created', 'Size'])
+        for image in image_list:
+            if image.tags:
+                image_name, image_tag = image.tags[0].split(':')
+            else:
+                image_name, image_tag = "<none>", "<none>"
+            short_id = image.short_id.split(':')[1]
+            creation_date = parser.parse(image.attrs.get('Created'))
+            t.add_row([image_name, image_tag, short_id, creation_date.strftime("%m/%d/%Y, %H:%M:%S"), human_readable_size(image.attrs.get('Size'))])
+        print(t)
+    
+    def prune_images(self):
+        import docker
+        entered_value = input("WARNING: All dangling images will be deleted, are you sure you want to proceed?[y/N]\n")
+        if entered_value in ['y', 'Y', 'yes']:
+            try:
+                deleted = self.client.images.prune(filters={'dangling':True})
+            except docker.errors.APIError as err:
+                raise SystemExit(err) from err
+            if not deleted["ImagesDeleted"]:
+                print("No images were deleted: no unused images found.\nAre the corresponding stopped containers removed?\nConsider using 'e4s-alc delete -c $CONTAINER_ID' or 'e4s-alc delete --prune-containers'.")
+            else:
+                self.print_line()
+                print("Pruned images:\n")
+                for item in deleted['ImagesDeleted']:
+                    print(item['Deleted'])
+                print("\nSpace Reclaimed:\n")
+                print(human_readable_size(deleted['SpaceReclaimed']))
+
+    def prune_containers(self):
+        import docker
+        entered_value = input("WARNING: All stopped containers will be deleted, are you sure you want to proceed?[y/N]\n")
+        if entered_value in ['y', 'Y', 'yes']:
+            try:
+                deleted = self.client.containers.prune()
+            except docker.errors.APIError as err:
+                raise SystemExit(err) from err
+            if not deleted["ContainersDeleted"]:
+                print("No containers were deleted: no stopped containers found.")
+            else:
+                self.print_line()
+                print("Pruned containers:\n")
+                for item in deleted['ContainersDeleted']:
+                    print(item)
+                print("\nSpace Reclaimed:")
+                print(human_readable_size(deleted['SpaceReclaimed'], 2))
+                self.print_line()
+
+    def delete_image(self, name, force):
+        try:
+            self.client.images.remove(name, force=force)
+        except requests.exceptions.HTTPError as err:
+            error_string = "Image deletion has failed:"
+            error_code = err.response.status_code
+            if error_code == 404:
+                error_string += " image not found with name."
+            elif 409:
+                error_string += " image used by container. Use '-f' to force remove, or remove container using 'docker rm $CONTAINER_ID'."
+            print(error_string)
+            raise SystemExit(err) from err
+
+    def delete_container(self, ID, force):
+        import docker
+        try:
+            current = self.client.containers.get(ID)
+            current.remove(force=force)
+        except docker.errors.APIError as err:
+            error_string = "Container deletion has failed:"
+            print(error_string)
+            raise SystemExit(err) from err
