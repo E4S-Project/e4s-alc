@@ -238,9 +238,9 @@ class SingularityController(Controller):
             self.image_tag = self.parse_image_name(self.image)[1]
 
         
-        podmanSaveToTar = subprocess.Popen(['podman', 'save', '-o', self.tar_dir + '/' + name + '.tar', 'localhost/' + name]).wait()
+        podmanSaveToTar = subprocess.Popen(['podman', 'save', '--format=oci-archive', '-o', self.tar_dir + '/' + name + '.tar', 'localhost/' + name]).wait()
 
-        Client.build(recipe="docker-archive://" + self.tar_dir + '/' + name + ".tar", build_folder=self.images_dir, image= name + ".sif", sudo=False)
+        Client.build(recipe="oci-archive://" + self.tar_dir + '/' + name + ".tar", build_folder=self.images_dir, image= name + ".sif", sudo=False)
 
     def list_images(self, name=None, inter=False):
         contentIterator = os.scandir(self.images_dir)
