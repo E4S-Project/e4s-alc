@@ -26,6 +26,8 @@ class InitModel(Model):
                 exit(1)
             else:
                 self.set_backend(args.backend)
+                print('Found {}!'.format(args.backend))
+
         else:
             if not self.discover_backend():
                 print('Error: No backend discovered')
