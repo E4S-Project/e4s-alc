@@ -49,6 +49,16 @@ class PodmanController(Controller):
         
         self.is_active = True
 
+    def parse_image_name(self, image):
+        if ':' in self.image:
+            image_chunks = self.image.split(':')
+            if len(image_chunks) != 2:
+                print('Error processing image \'{}\'.'.format(self.image))
+            self.image_os, self.image_tag = image_chunks
+        else:
+            self.image_os, self.image_tag = self.image, 'latest'
+        return self.image_os, self.image_tag
+
     def pull_image(self, image):
         self.image = image
 
