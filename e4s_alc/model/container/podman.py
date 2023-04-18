@@ -3,7 +3,16 @@ import re
 import json
 import atexit
 import subprocess
+from prettytable import PrettyTable
+from datetime import datetime
 from e4s_alc.mvc.controller import Controller
+
+def human_readable_size(size, decimal_places=2):
+    for unit in ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB']:
+        if abs(size) < 1024.0 or unit == 'PiB':
+            break
+        size /= 1024.0
+    return f"{size:.{decimal_places}f} {unit}"
 
 class PodmanController(Controller):
     def __init__(self):
@@ -193,3 +202,19 @@ class PodmanController(Controller):
 
         # Stop the running container
         container.stop()
+    
+
+    def list_images(self, name=None, inter=False):
+        images = self.client.images.list(name=name, all=inter)
+        self.show_images(images)
+
+    def show_images(self, image_list):
+        t = PrettyTable(['Name', 'Tag', 'Id', 'Created', 'Size'])
+        for image in image_list:
+            if image.tags:
+                image_name, image_tag = image.tags[0].split(':')
+            else:
+                image_name, image_tag = "<none>", "<none>"
+            creation_date = datetime.fromtimestamp(image.attrs.get('Created')).strftime("%m/%d/%Y, %H:%M:%S")
+            t.add_row([image_name, image_tag, image.short_id, creation_date, human_readable_size(image.attrs.get('Size'))])
+        print(t)
