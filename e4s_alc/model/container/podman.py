@@ -3,6 +3,7 @@ import re
 import json
 import atexit
 import subprocess
+import requests
 from prettytable import PrettyTable
 from datetime import datetime
 from e4s_alc.mvc.controller import Controller
@@ -218,3 +219,16 @@ class PodmanController(Controller):
             creation_date = datetime.fromtimestamp(image.attrs.get('Created')).strftime("%m/%d/%Y, %H:%M:%S")
             t.add_row([image_name, image_tag, image.short_id, creation_date, human_readable_size(image.attrs.get('Size'))])
         print(t)
+    
+    def delete_image(self, name, force):
+        try:
+            self.client.images.remove(name, force=force)
+        except requests.exceptions.HTTPError as err:
+            error_string = "Image deletion has failed:"
+            error_code = err.response.status_code
+            if error_code == 404:
+                error_string += " image not found with name."
+            elif 409:
+                error_string += " image used by container. Use '-f' to force remove, or remove container using 'alc delete -c $CONTAINER_ID'."
+            print(error_string)
+            raise SystemExit(err) from err
