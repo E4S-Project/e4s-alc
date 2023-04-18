@@ -5,14 +5,19 @@ import atexit
 import subprocess
 from e4s_alc.mvc.controller import Controller
 
+has_podman=False
+try:
+    import podman
+    has_podman=True
+except ImportError:
+    pass
+
 class PodmanController(Controller):
     def __init__(self):
         super().__init__('PodmanController')
 
         # Try to import podman
-        try:
-            import podman
-        except ImportError:
+        if not has_podman:
             print('Failed to find Podman python library')
             return
 
@@ -44,8 +49,17 @@ class PodmanController(Controller):
         
         self.is_active = True
 
+    def parse_image_name(self, image):
+        if ':' in self.image:
+            image_chunks = self.image.split(':')
+            if len(image_chunks) != 2:
+                print('Error processing image \'{}\'.'.format(self.image))
+            self.image_os, self.image_tag = image_chunks
+        else:
+            self.image_os, self.image_tag = self.image, 'latest'
+        return self.image_os, self.image_tag
+
     def pull_image(self, image):
-        import podman
         self.image = image
 
         # Parse the image and tag
@@ -69,7 +83,6 @@ class PodmanController(Controller):
             exit(1)
 
     def find_image(self, image):
-        import podman
         self.image = image
 
         # Try to get image from client
