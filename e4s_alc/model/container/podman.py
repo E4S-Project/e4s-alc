@@ -245,3 +245,30 @@ class PodmanController(Controller):
                 error_string += " image used by container. Use '-f' to force remove, or remove container using 'alc delete -c $CONTAINER_ID'."
             print(error_string)
             raise SystemExit(err) from err
+
+    def delete_container(self, ID, force):
+        try:
+            current = self.client.containers.get(ID)
+            current.remove(force=force)
+        except podman.errors.APIError as err:
+            error_string = "Container deletion has failed:"
+            print(error_string)
+            raise SystemExit(err) from err
+
+    def prune_containers(self):
+        entered_value = input("WARNING: All stopped containers will be deleted, are you sure you want to proceed?[y/N]\n")
+        if entered_value in ['y', 'Y', 'yes']:
+            try:
+                deleted = self.client.containers.prune()
+            except podman.errors.APIError as err:
+                raise SystemExit(err) from err
+            if not deleted["ContainersDeleted"]:
+                print("No containers were deleted: no stopped containers found.")
+            else:
+                self.print_line()
+                print("Pruned containers:\n")
+                for item in deleted['ContainersDeleted']:
+                    print(item)
+                print("\nSpace Reclaimed:")
+                print(human_readable_size(deleted['SpaceReclaimed'], 2))
+                self.print_line()
