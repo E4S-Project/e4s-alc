@@ -18,7 +18,6 @@ class CreateModel(Model):
             print('Failed to connect to \'{}\' client'.format(self.backend))
             exit(1)
 
-
         if args.file:
             file_args = self.controller.read_args_file(args.file)
             if 'name' not in file_args:

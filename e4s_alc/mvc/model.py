@@ -47,6 +47,7 @@ class Model():
 
     def set_backend(self, backend):
         self.update_configuration_file('backend', backend)
+        print('Setting {} as backend!'.format(backend))
         return True
 
     def check_working_backend(self, backend, controller):
@@ -60,6 +61,12 @@ class Model():
             podman_controller = controller()
             if podman_controller.is_active:
                 self.controller = podman_controller
+                return True
+
+        if backend == 'singularity':
+            singularity_controller = controller()
+            if singularity_controller.is_active:
+                self.controller = singularity_controller
                 return True
         
         return False
