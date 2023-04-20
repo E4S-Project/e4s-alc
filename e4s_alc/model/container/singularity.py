@@ -103,52 +103,43 @@ class SingularityController(PodmanController, DockerController):
 
         if not os.path.exists(self.tar_dir):
             os.makedirs(self.tar_dir)
+
+    def set_parent(self, arg_parent):
+        if arg_parent == "docker":
+            self.parent = DockerController
+            self.client = self.client_docker
+        else:
+            self.parent = PodmanController
+            self.client = self.client_podman
+
     
-    def read_image(self, image, arg_parent):
-        if arg_parent == "docker":
-            parent = DockerController
-            self.client = self.client_docker
-        else:
-            parent = PodmanController
-            self.client = self.client_podman
-        parent.find_image(self, image)
+    def read_image(self, image):
+        self.parent.find_image(self, image)
         
-        parent.parse_os_release(self)
+        self.parent.parse_os_release(self)
         
-        parent.parse_environment(self)
+        self.parent.parse_environment(self)
 
 
-    def init_image(self, image, arg_parent):
-        if arg_parent == "docker":
-            parent = DockerController
-            self.client = self.client_docker
-        else:
-            parent = PodmanController
-            self.client = self.client_podman
-        parent.pull_image(self, image)
+    def init_image(self, image):
+        self.parent.pull_image(self, image)
         
-        parent.parse_os_release(self)
+        self.parent.parse_os_release(self)
         
-        parent.parse_environment(self)
+        self.parent.parse_environment(self)
 
 
-    def execute_build(self, name, arg_parent):
-        if arg_parent == "docker":
-            parent = DockerController
-            self.client = self.client_docker
-        else:
-            parent = PodmanController
-            self.client = self.client_podman
-        parent.execute_build(self, name)
+    def execute_build(self, name):
+        self.parent.execute_build(self, name)
 
         # Build the singularity image
-        self.build_to_sif(name, arg_parent)
+        self.build_to_sif(name)
 
 
-    def build_to_sif(self, name, args_parent):
+    def build_to_sif(self, name):
         if not self.image_tag:
             self.image_tag = self.parse_image_name(self.image)[1]
-        if args_parent == "docker":
+        if self.parent == DockerController:
             Client.build(recipe="docker-daemon://" + name + ":" + self.image_tag, build_folder=self.images_dir, image= name + ".sif", sudo=False)
         else:
             podmanSaveToTar = subprocess.Popen(['podman', 'save', '--format=oci-archive', '-o', self.tar_dir + '/' + name + '.tar', 'localhost/' + name]).wait()
