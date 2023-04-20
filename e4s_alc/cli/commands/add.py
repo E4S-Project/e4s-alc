@@ -23,6 +23,7 @@ class Add(AbstractCommand):
         self.parser.add_argument('-c', '--copy', metavar='\b', help='Directory to copy into the image', action='append', default=[])
         self.parser.add_argument('-t', '--tarball', metavar='\b', help='Tarball to expand in the image', action='append', default=[])
         self.parser.add_argument('-f', '--file', metavar='\b', help='The file used to add to a image')
+        self.parser.add_argument('-P', '--parent', help='\b\b\b\bSpecific to singularity backend, choose which backend to use between Podman and Docker to add to the image', choices=['docker', 'podman'], default='podman')
         self.parser.add_argument('-h', '--help', action='store_true')
 
     def check_correct_args(self, args):

@@ -66,7 +66,7 @@ class AddModel(Model):
                 host_path, image_path = host_image_path
                 self.controller.expand_tarball(host_path, image_path)
 
-        self.controller.read_image(args.name)
+        self.controller.read_image(args.name, args.parent)
         self.controller.add_system_package_commands(args.os_package)
         self.controller.add_spack_package_commands(args.package)
-        self.controller.execute_build(args.name)
+        self.controller.execute_build(args.name, args.parent)
