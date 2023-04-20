@@ -63,7 +63,10 @@ class CreateModel(Model):
                 host_path, image_path = host_image_path
                 self.controller.mount_and_copy(host_path, image_path)
 
-        self.controller.init_image(args.image, args.parent)
+        if self.backend == 'singularity':
+            self.controller.init_image(args.image, args.parent)
+        else:
+            self.controller.init_image(args.image)
         self.controller.add_system_package_commands(args.os_package)
 
         if args.tarball:
@@ -82,4 +85,7 @@ class CreateModel(Model):
             self.controller.install_spack()
             self.controller.add_spack_package_commands(args.package)
 
-        self.controller.execute_build(args.name, args.parent)
+        if self.backend == 'singularity':
+            self.controller.execute_build(args.name, args.parent)
+        else:
+            self.controller.execute_build(args.name)
