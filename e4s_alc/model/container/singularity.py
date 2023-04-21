@@ -75,6 +75,9 @@ class SingularityController(PodmanController, DockerController):
             uri = 'unix://{}'.format(process_out_dict['host']['remoteSocket']['path'])
 
             self.client_podman = podman.PodmanClient(base_url=uri)
+        except FileNotFoundError:
+            self.use_podman = False
+            pass
         except podman.errors.exceptions.APIError:
             print('Failed to connect to Podman client')
             self.use_podman = False
