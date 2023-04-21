@@ -136,7 +136,7 @@ class Controller():
     def add_spack_package_commands(self, packages):
         # Create installation command for each package
         for package in packages:
-            self.commands.append('spack install {}'.format(package))
+            self.commands.append('spack install --yes-to-all {}'.format(package))
 
 
     def install_spack(self):
