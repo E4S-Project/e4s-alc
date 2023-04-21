@@ -66,6 +66,9 @@ class AddModel(Model):
                 host_path, image_path = host_image_path
                 self.controller.expand_tarball(host_path, image_path)
 
+        if self.backend == "singularity":
+            self.controller.set_parent(args.parent)
+
         self.controller.read_image(args.name)
         self.controller.add_system_package_commands(args.os_package)
         self.controller.add_spack_package_commands(args.package)
