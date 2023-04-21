@@ -43,8 +43,8 @@ class SingularityController(PodmanController, DockerController):
         self.use_podman = True
 
         # Check if the python libraries are imported
-        if not has_docker or not has_podman:
-            print('Failed to find Podman or Docker python library')
+        if not has_docker and not has_podman:
+            print('Failed to find Podman and Docker python library')
             self.lacks_backend = True
         if not has_singularity:
             print('Failed to find Singularity python library')
@@ -87,12 +87,10 @@ class SingularityController(PodmanController, DockerController):
             self.use_docker = False
         
         if not self.use_docker and not self.use_podman:
+            print("Podman nor Docker available: Singularity backend requires one or the other to be available")
             return
 
         self.is_active = True
-
-        print("Podman is available: {}".format(self.use_podman))
-        print("Docker is available: {}".format(self.use_docker))
 
         self.config_dir = os.path.join(os.path.expanduser('~'), '.e4s-alc')
         self.images_dir = os.path.join(self.config_dir, "singularity_images")
@@ -105,6 +103,7 @@ class SingularityController(PodmanController, DockerController):
             os.makedirs(self.tar_dir)
 
     def set_parent(self, arg_parent):
+        print("Using {} backend as image prebuilder for singularity".format(arg_parent))
         if arg_parent == "docker":
             self.parent = DockerController
             self.client = self.client_docker
