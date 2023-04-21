@@ -21,7 +21,7 @@ classifiers = [
     "Natural Language :: English",
     "Programming Language :: Python :: 3",
 ]
-dependencies = ['docker', 'podman', 'prettytable', 'python-dateutil', 'datetime', 'requests']
+dependencies = ['docker', 'podman', 'spython', 'prettytable', 'python-dateutil', 'datetime', 'requests']
 dynamic = ["version"]
 
 [project.urls]
