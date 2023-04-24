@@ -41,6 +41,8 @@ class SingularityController(PodmanController, DockerController):
         self.lacks_backend = False
         self.use_docker = True
         self.use_podman = True
+        self.client_podman = None
+        self.docker_podman = None
 
         # Check if the python libraries are imported
         if not has_docker and not has_podman:
@@ -107,12 +109,15 @@ class SingularityController(PodmanController, DockerController):
 
     def set_parent(self, arg_parent):
         print("Using {} backend as image prebuilder for singularity".format(arg_parent))
-        if arg_parent == "docker":
+        if arg_parent == "docker" and self.client_docker:
             self.parent = DockerController
             self.client = self.client_docker
-        else:
+        elif arg_parent == "podman" and self.client_podman:
             self.parent = PodmanController
             self.client = self.client_podman
+        else:
+            print("Selected backend for the singularity images prebuilding is not available, did you try to specify the backend for this using '-P'?")
+            exit(1)
 
     
     def read_image(self, image):
