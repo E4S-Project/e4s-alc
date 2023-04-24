@@ -41,6 +41,10 @@ class AddModel(Model):
                 if file_args['tarball']:
                     args.tarball = file_args['tarball']
 
+            args.spack = True
+            if 'spack' in file_args:
+                if not file_args['spack']:
+                    args.spack = False
 
         if args.copy:
             for item in args.copy:
@@ -54,6 +58,12 @@ class AddModel(Model):
                 host_path, image_path = host_image_path
                 self.controller.mount_and_copy(host_path, image_path)
 
+        if self.backend == "singularity":
+            self.controller.set_parent(args.parent)
+
+        self.controller.read_image(args.name)
+        self.controller.add_system_package_commands(args.os_package)
+
         if args.tarball:
             for item in args.tarball:
                 if ':' not in item:
@@ -66,10 +76,10 @@ class AddModel(Model):
                 host_path, image_path = host_image_path
                 self.controller.expand_tarball(host_path, image_path)
 
-        if self.backend == "singularity":
-            self.controller.set_parent(args.parent)
+        if args.spack:
+            self.controller.install_spack()
 
-        self.controller.read_image(args.name)
-        self.controller.add_system_package_commands(args.os_package)
-        self.controller.add_spack_package_commands(args.package)
+        if args.package:
+            self.controller.add_spack_package_commands(args.package)
+
         self.controller.execute_build(args.name)
