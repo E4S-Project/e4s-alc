@@ -168,10 +168,11 @@ class SingularityController(PodmanController, DockerController):
             t.add_row([image, creation_date, human_readable_size(image_dict.get(image).st_size)])
         print(t)
 
-    def delete_image(self, name, force):
-        image_path = self.images_dir + "/" + name
+    def delete_image(self, names, force):
+        images_path = [self.images_dir + "/" + name for name in names]
         try:
-            os.remove(image_path)
+            for image_path in images_path:
+                os.remove(image_path)
         except FileNotFoundError as err:
             print("{} not found".format(image_path))
             raise SystemExit(err) from err

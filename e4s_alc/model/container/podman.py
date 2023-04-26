@@ -233,16 +233,17 @@ class PodmanController(Controller):
             t.add_row([image_name, image_tag, image.short_id, creation_date, human_readable_size(image.attrs.get('Size'))])
         print(t)
     
-    def delete_image(self, name, force):
+    def delete_image(self, names, force):
         try:
-            self.client.images.remove(name, force=force)
+            for name in names:
+                self.client.images.remove(name, force=force)
         except requests.exceptions.HTTPError as err:
             error_string = "Image deletion has failed:"
             error_code = err.response.status_code
             if error_code == 404:
-                error_string += " image not found with name."
+                error_string += " image not found with name {}.".format(name)
             elif 409:
-                error_string += " image used by container. Use '-f' to force remove, or remove container using 'alc delete -c $CONTAINER_ID'."
+                error_string += " image {} used by container. Use '-f' to force remove, or remove container using 'alc delete -c $CONTAINER_ID'.".format(name)
             print(error_string)
             raise SystemExit(err) from err
 

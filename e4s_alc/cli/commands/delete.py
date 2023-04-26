@@ -16,7 +16,7 @@ class Delete(AbstractCommand):
     def _construct_parser(self):
         usage = '%s delete [options]' % self.command      
         self.parser.usage = usage
-        self.parser.add_argument('-n', '--name', metavar='', help='Name of the image to delete')
+        self.parser.add_argument('-n', '--name', nargs='+', metavar='', help='Name of the images to delete')
         self.parser.add_argument('-c','--container', metavar='', help='ID of the container to delete')
         self.parser.add_argument('-f', '--force', help='Attempt to force the deletion', action='store_true')
         self.parser.add_argument('--prune-images', help='Delete unused images', action='store_true')
