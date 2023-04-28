@@ -6,6 +6,7 @@ class AddModel(Model):
         super().__init__(module_name='AddModel')
 
     def main(self, args):
+        args.spack = False
         if not self.backend:
             print('No backend set. Run \'e4s-alc init\'.')
             exit(1)
@@ -80,6 +81,8 @@ class AddModel(Model):
             self.controller.install_spack()
 
         if args.package:
+            if args.spack==False:
+                self.controller.install_spack()
             self.controller.add_spack_package_commands(args.package)
 
         self.controller.execute_build(args.name)
