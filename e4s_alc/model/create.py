@@ -87,4 +87,7 @@ class CreateModel(Model):
         if args.package:
             self.controller.add_spack_package_commands(args.package)
 
+        if args.yaml:
+            self.controller.add_spack_environment_commands(args.yaml)
+
         self.controller.execute_build(args.name)
