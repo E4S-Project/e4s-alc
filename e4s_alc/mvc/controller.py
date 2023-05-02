@@ -138,6 +138,11 @@ class Controller():
         for package in packages:
             self.commands.append('spack install --yes-to-all {}'.format(package))
 
+    def add_spack_environment_commands(self, file_path):
+        # Create environment set up command with user-given yaml file
+        self.commands.append('spack env create userenv {}'.format(file_path))
+        self.commands.append('spack env activate userenv')
+        self.commands.append('spack install')
 
     def install_spack(self):
         #TODO
