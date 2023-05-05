@@ -72,14 +72,22 @@ class CreateModel(Model):
         if args.tarball:
             for item in args.tarball:
                 if ':' not in item:
-                    print('Invalid tarball format. Use {host-tarball-path}:{image-tarball-path}')
+                    print('Invalid tarball format. Use {host-tarball-path/tarball-url}:{image-tarball-path}')
                     exit(1)
-                host_image_path = item.split(':')
-                if len(host_image_path) != 2:
-                    print('Invalid tarball format. Use {host-tarball-path}:{image-tarball-path}')
-                    exit(1)
-                host_path, image_path = host_image_path
-                self.controller.expand_tarball(host_path, image_path)
+
+                if item.startswith('http'):
+                    item_split = item.split(':')
+                    url_path = ':'.join(item_split[:2])
+                    image_path = item_split[2]
+                    self.controller.expand_tarball(url_path, image_path)
+
+                else:
+                    host_image_path = item.split(':')
+                    if len(host_image_path) != 2:
+                        print('Invalid tarball format. Use {host-tarball-path}:{image-tarball-path}')
+                        exit(1)
+                    host_path, image_path = host_image_path
+                    self.controller.expand_tarball(host_path, image_path)
 
         if args.spack:
             self.controller.install_spack()

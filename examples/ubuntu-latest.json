@@ -1,0 +1,5 @@
+{
+    "image": "ubuntu:latest",
+    "name": "e4s-alc-ubuntu-latest-example",
+    "spack": false
+}

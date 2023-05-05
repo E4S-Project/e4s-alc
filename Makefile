@@ -101,3 +101,8 @@ install: $(PYTHON_EXE)
 	$(PYTHON) -m pip install -q --compile .
 	$(MKDIR) $(INSTALL_BIN_DIR)
 	ln -fs $(CONDA_BIN)/e4s-alc $(INSTALL_BIN_DIR)/e4s-alc
+
+install-dev: $(PYTHON_EXE)
+	$(PYTHON) -m pip install -q --editable .
+	$(MKDIR) $(INSTALL_BIN_DIR)
+	ln -fs $(CONDA_BIN)/e4s-alc $(INSTALL_BIN_DIR)/e4s-alc
