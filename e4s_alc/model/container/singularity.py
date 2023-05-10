@@ -151,10 +151,8 @@ class SingularityController(PodmanController, DockerController):
         else:
             podmanSaveToTar = subprocess.Popen(['podman', 'save', '--format=oci-archive', '-o', self.tar_dir + '/' + name + '.tar', 'localhost/' + name]).wait()
             Client.build(recipe="oci-archive://" + self.tar_dir + '/' + name + ".tar", build_folder=self.images_dir, image= name + ".sif", sudo=False)
-            print("To access spack installed packages in the container instance, either update the path using the following command:")
+            print("To access spack installed packages in the container instance, update the path using the following command:")
             print("'export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/spack/bin'")
-            print("or run the container with the following flags:")
-            print("'--norc --noprofile'")
 
 
     def list_images(self, name=None, inter=False):
