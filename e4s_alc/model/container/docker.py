@@ -102,7 +102,7 @@ class DockerController(Controller):
             self.environment[item_name] = item_value
 
     
-    def execute_build(self, name):
+    def execute_build(self, name, changes=None):
         # Create environment for container
         env = {
             'PYTHONUNBUFFERED': '1',
@@ -149,7 +149,7 @@ class DockerController(Controller):
             exit(1)
 
         # Commit new image
-        container.commit(name)
+        container.commit(name, changes=changes)
 
         # Stop the running container
         container.stop()

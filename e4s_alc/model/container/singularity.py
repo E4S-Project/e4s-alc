@@ -137,7 +137,8 @@ class SingularityController(PodmanController, DockerController):
 
 
     def execute_build(self, name):
-        self.parent.execute_build(self, name)
+        changes = 'ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/spack/bin'
+        self.parent.execute_build(self, name, changes)
 
         # Build the singularity image
         self.build_to_sif(name)
