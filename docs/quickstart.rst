@@ -80,6 +80,7 @@ Inspecting available images
 After creating an image, you can view the images that were created using this backend with the **list** command:
 
 .. code::
+
    $ e4s-alc create -i ubuntu -n my-ubuntu-image
    $ e4s-alc list
    +-----------------+--------+--------------+----------------------+------------+
