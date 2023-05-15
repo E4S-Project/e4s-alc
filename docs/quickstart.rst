@@ -9,7 +9,7 @@ The CLI tool is called **e4s-alc**. Before it can create/modify an image, it fir
  * Docker
  * Singularity
    
-Initialising the backend
+Initializing the backend
 -------------------------
 
 .. code::
@@ -22,7 +22,7 @@ Initialising the backend
    name = e4s-alc
    backend = singularity
 
-When initialising **e4s-alc**, it will check for an installation of the desired backend on the local system, which is needed to create an image towards that backend.
+When initializing **e4s-alc**, it will check for an installation of the desired backend on the local system, which is needed to create an image towards that backend.
 
 .. admonition:: Default
 
@@ -31,7 +31,7 @@ When initialising **e4s-alc**, it will check for an installation of the desired 
 Creating an image
 ----------------------
 
-Once a backend is setup through the **e4s-alc**'s initialisation, it can be use to create images seamlessly. An image to pull must be provided, as well as a name. Spack will be automatically installed (except if explicitely disabled through "--no-spack" flag), and Spack packages as well as OS packages can be installed.
+Once a backend is setup through the **e4s-alc**'s initialization, it can be use to create images seamlessly. An image to pull must be provided, as well as a name. Spack will be automatically installed (except if explicitely disabled through "--no-spack" flag), and Spack packages as well as OS packages can be installed.
 
 Also, the command line instructions can be fed through a json file.
 
@@ -74,4 +74,19 @@ or
 
     $ e4s-alc create -f test.json
 
+Inspecting available images
+---------------------------
 
+After creating an image, you can view the images that were created using this backend with the **list** command:
+
+.. code::
+   $ e4s-alc create -i ubuntu -n my-ubuntu-image
+   $ e4s-alc list
+   +-----------------+--------+--------------+----------------------+------------+
+   |       Name      |  Tag   |      Id      |       Created        |    Size    |
+   +-----------------+--------+--------------+----------------------+------------+
+   | my-ubuntu-image | latest | 70ee2ea5dc24 | 05/15/2023, 20:16:49 | 604.99 MiB |
+   |      ubuntu     | latest | 3b418d7b466a | 04/25/2023, 17:30:49 | 74.21 MiB  |
+   +-----------------+--------+--------------+----------------------+------------+
+
+You can then use the image as you wish using the backend technology it was created with.
