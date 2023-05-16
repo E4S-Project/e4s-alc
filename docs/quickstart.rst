@@ -24,7 +24,7 @@ Initializing the backend
 
 When initializing **e4s-alc**, it will check for an installation of the desired backend on the local system, which is needed to create an image towards that backend.
 
-.. admonition:: Default
+.. admonition:: Note
 
    If no backend is specified, the default used backend will be Docker.
 
@@ -99,7 +99,7 @@ After creating images, they can be listed with the **list** command:
    |      ubuntu     | latest | 3b418d7b466a | 04/25/2023, 17:30:49 | 74.21 MiB  |
    +-----------------+--------+--------------+----------------------+------------+
 
-.. admonition:: Default
+.. admonition:: Note
 
    Only the images created from the currently initialised backend will be shown. To list images from another backend, you should first run :code:`e4s-alc init -b other_backend`
 
