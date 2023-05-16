@@ -74,10 +74,19 @@ or
 
     $ e4s-alc create -f test.json
 
-Inspecting available images
+Adding to an image
+------------------
+
+Once an image is created (through **e4s-alc** or not), it can be updated with new os-packages and/or spack packages through a new call:
+
+.. code::
+
+   $ e4s-alc add -n my-ubuntu-image -p kokkos -a neovim
+
+Listing available images
 ---------------------------
 
-After creating an image, you can view the images that were created using this backend with the **list** command:
+After creating images, they can be listed with the **list** command:
 
 .. code::
 
@@ -90,4 +99,28 @@ After creating an image, you can view the images that were created using this ba
    |      ubuntu     | latest | 3b418d7b466a | 04/25/2023, 17:30:49 | 74.21 MiB  |
    +-----------------+--------+--------------+----------------------+------------+
 
-You can then use the image as you wish using the backend technology it was created with.
+.. admonition:: Default
+
+   Only the images created from the currently initialised backend will be shown. To list images from another backend, you should first run :code:`e4s-alc init -b other_backend`
+
+Deleting images
+---------------
+
+Images can also be removed by using the **delete** command:
+
+.. code::
+
+   $ e4s-alc list
+   +-----------------+--------+--------------+----------------------+------------+
+   |       Name      |  Tag   |      Id      |       Created        |    Size    |
+   +-----------------+--------+--------------+----------------------+------------+
+   | my-ubuntu-image | latest | 70ee2ea5dc24 | 05/15/2023, 20:16:49 | 604.99 MiB |
+   |      ubuntu     | latest | 3b418d7b466a | 04/25/2023, 17:30:49 | 74.21 MiB  |
+   +-----------------+--------+--------------+----------------------+------------+
+   $ e4s-alc delete -n ubuntu
+   $ e4s-alc list
+   +-----------------+--------+--------------+----------------------+------------+
+   |       Name      |  Tag   |      Id      |       Created        |    Size    |
+   +-----------------+--------+--------------+----------------------+------------+
+   | my-ubuntu-image | latest | 70ee2ea5dc24 | 05/15/2023, 20:16:49 | 604.99 MiB |
+   +-----------------+--------+--------------+----------------------+------------+
