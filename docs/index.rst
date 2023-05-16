@@ -13,3 +13,7 @@ Supporting the biggest container technologies in HPC like Docker, Podman and Sin
    :hidden:
 
    quickstart
+   installation
+   supported_backends
+   commands/index
+   authors
