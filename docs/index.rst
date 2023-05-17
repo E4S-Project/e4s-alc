@@ -15,5 +15,5 @@ Supporting the biggest container technologies in HPC like Docker, Podman and Sin
    quickstart
    installation
    supported_backends
-   commands/index
+   reference/index
    authors
