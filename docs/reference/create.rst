@@ -8,7 +8,7 @@ Usage
 
 .. code-block::
 
-   e4s-alc create [options]
+   e4s-alc create [ OPTIONS ]
 
 Options
 ------

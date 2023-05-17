@@ -1,4 +1,4 @@
-**Add** - Add to an image
+**add** - Add to an image
 =====================
 
 Add packages, tarballs and/or directories to an available image.
@@ -8,7 +8,7 @@ Usage
 
 .. code-block::
 
-   e4s-alc add [options]
+   e4s-alc add [ OPTIONS ]
 
 Options
 ------
