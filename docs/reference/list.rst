@@ -13,5 +13,5 @@ Usage
 Options
 ----
 
--n , --name     The name of a specific image to show
--a, --all       Includes intermediate images
+-n , --name         The name of a specific image to show
+-a, --all           Includes intermediate images

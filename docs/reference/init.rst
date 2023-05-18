@@ -14,7 +14,6 @@ Options
 ------
 
 -b, --backend     Backend for containers
--h, --help
 
 .. admonition:: Default behavior
    If no backend is specified through the **backend** flag, then docker will be used as the backend to be selected.

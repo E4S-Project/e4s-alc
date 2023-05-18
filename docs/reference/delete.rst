@@ -14,11 +14,11 @@ Options
 
 Either the **name** parameter, **prune-images** parameter or **prune-container** parameter is required 
 
--n, --name            Name of the images to delete, or list of images to delete
--c , --container      ID of the container to delete
--f, --force           Attempt to force the deletion
---prune-images        Delete unused images [docker]
---prune-containers    Delete stopped containers [docker, podman]
+-n, --name              Name of the images to delete, or list of images to delete
+-c , --container        ID of the container to delete
+-f, --force             Attempt to force the deletion
+--prune-images          Delete unused images [docker]
+--prune-containers      Delete stopped containers [docker, podman]
 
 Description
 ---------
