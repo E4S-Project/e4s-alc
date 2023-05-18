@@ -7,6 +7,7 @@ Usage
 ----
 
 .. code::
+
    $ e4s-alc delete [ OPTIONS ]
 
 Options
