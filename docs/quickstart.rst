@@ -1,4 +1,4 @@
-.. _qstart:
+.. _qstart
 
 ===========
 Quick start
@@ -31,7 +31,7 @@ When initializing **e4s-alc**, it will check for an installation of the desired 
 Creating an image
 ----------------------
 
-Once a backend is setup through the **e4s-alc**'s initialization, it can be use to create images seamlessly. An image to pull must be provided, as well as a name. Spack will be automatically installed (except if explicitely disabled through "--no-spack" flag), and Spack packages as well as OS packages can be installed.
+Once a backend is setup through the **e4s-alc**'s initialization, it can be use to create images seamlessly. An image to pull must be provided, as well as a name. Spack will be automatically installed (except if explicitely disabled through :code:`--no-spack` flag), and Spack packages as well as OS packages can be installed.
 
 Also, the command line instructions can be fed through a json file.
 
