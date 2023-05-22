@@ -16,4 +16,5 @@ Supporting the biggest container technologies in HPC like Docker, Podman and Sin
    installation
    reference/index
    backends/index
+   configuration_file
    authors
