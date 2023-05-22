@@ -1,7 +1,7 @@
 Docker
 =====
 
-The Docker backend is currently supported through this `python package <https://pypi.org/project/docker/>`_.
+The Docker backend is currently supported through this `python package <https://pypi.org/project/docker/>`_. You can find it's documentation through this `link <https://docker-py.readthedocs.io/en/stable/>`_ and it's source code `here <https://github.com/docker/docker-py>`_.
 
 Description
 ------
