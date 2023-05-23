@@ -17,4 +17,5 @@ Supporting the biggest container technologies in HPC like Docker, Podman and Sin
    reference/index
    backends/index
    configuration_file
+   how_it_works
    authors
