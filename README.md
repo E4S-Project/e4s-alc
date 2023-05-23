@@ -8,6 +8,7 @@ Backends supported:
 
 - <img src="https://www.docker.com/wp-content/uploads/2022/03/horizontal-logo-monochromatic-white.png" width="100" height="30"> Docker ✅
 - <img src="https://github.com/containers/podman/raw/main/logo/podman-logo-source.svg" width="100" height="30"> Podman ✅
+- <img src="https://sylabs.io/wp-content/uploads/2022/03/singularity-logo-round.svg" width="100" height="30"> Singularity ✅
 
 
 # E4S-ALC
