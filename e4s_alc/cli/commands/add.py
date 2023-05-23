@@ -40,8 +40,18 @@ class Add(AbstractCommand):
             print()
             exit(1)
 
+    def check_modifies(self, args):
+        if not (args.package or args.os_package or args.copy or args.tarball or args.file):
+            print("Error: This command doesn't apply any modifications the image.")
+            print()
+            self.parser.print_help()
+            print()
+            exit(1)
+
+
     def main(self, args):
         self.check_correct_args(args)
+        self.check_modifies(args)
         self.model.main(args)
 
 AbstractCommand.commands['add'] = Add(AddModel)
