@@ -6,6 +6,13 @@ from dateutil import parser
 import requests
 from e4s_alc.mvc.controller import Controller
 
+has_docker=False
+try:
+    import docker
+    has_docker=True
+except ImportError:
+    pass
+
 def human_readable_size(size, decimal_places=2):
     for unit in ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB']:
         if abs(size) < 1024.0 or unit == 'PiB':
@@ -18,9 +25,7 @@ class DockerController(Controller):
         super().__init__('DockerController')
 
         # Try to import the python library
-        try:
-            import docker
-        except ImportError:
+        if not has_docker:
             print('Failed to find Docker python library')
             return
 
