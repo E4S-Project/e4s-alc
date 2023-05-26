@@ -19,6 +19,7 @@ class Delete(AbstractCommand):
         self.parser.add_argument('-n', '--name', nargs='+', metavar='', help='Name of the images to delete')
         self.parser.add_argument('-c','--container', metavar='', help='ID of the container to delete')
         self.parser.add_argument('-f', '--force', help='Attempt to force the deletion', action='store_true')
+        self.parser.add_argument('--id', nargs='+', metavar='', help='IDs of the images to delete')
         self.parser.add_argument('--prune-images', help='Delete unused images', action='store_true')
         self.parser.add_argument('--prune-containers', help='Delete stopped containers', action='store_true')
         self.parser.add_argument('-h', '--help', help='\b\b\b\b',action='store_true')
@@ -30,15 +31,15 @@ class Delete(AbstractCommand):
             print()
             exit(0)
 
-        if not (args.name  or args.container or args.prune_images or args.prune_containers):
-            print('Error: Arguments \'-n/--name\' or \'-p/--prune\' or \'-c/--prune-containers\' is required.')
+        if not (args.name or args.container or args.prune_images or args.prune_containers or args.id):
+            print('Error: Arguments \'-n/--name\' or \'--prune-images\' or \'-c\' or \'--prune-containers\' or \'--id\' is required.')
             print()
             self.parser.print_help()
             print()
             exit(1)
 
-        if args.name and (args.prune_images or args.prune_containers):
-            print('Error: Arguments \'-n/--name\' and \'--prune-images\' and \'--prune-containers\' can\'t be used together.')
+        if args.name and (args.prune_images or args.prune_containers) and args.id:
+            print('Error: Arguments \'-n/--name\' and \'--prune-images\' and \'--prune-containers\' and \'--id\' can\'t be used together.')
             print()
             self.parser.print_help()
             print()
