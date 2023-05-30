@@ -46,8 +46,9 @@ class PodmanController(Controller):
                                  stderr=subprocess.PIPE)
             process_out, process_err = process.communicate()
             if process_err:
-                print('Failed to connect to Podman client')
-                return
+                if b"level=error" in process_err:
+                    print('Failed to connect to Podman client')
+                    return
 
             process_out_dict = json.loads(process_out.decode('utf-8'))
             uri = 'unix://{}'.format(process_out_dict['host']['remoteSocket']['path'])
