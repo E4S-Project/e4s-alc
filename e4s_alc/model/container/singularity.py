@@ -70,7 +70,8 @@ class SingularityController(PodmanController, DockerController):
                                  stderr=subprocess.PIPE)
             process_out, process_err = process.communicate()
             if process_err:
-                print('Failed to connect to Podman client')
+                if b"level=error" in process_err:
+                    print('Failed to connect to Podman client')
 
 
             process_out_dict = json.loads(process_out.decode('utf-8'))
