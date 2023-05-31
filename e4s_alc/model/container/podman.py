@@ -274,3 +274,22 @@ class PodmanController(Controller):
                 print("\nSpace Reclaimed:")
                 print(human_readable_size(deleted['SpaceReclaimed'], 2))
                 self.print_line()
+
+    def prune_images(self):
+        print("Pruning images is not yet supported by e4s-alc.")
+#        entered_value = input("WARNING: All dangling images will be deleted, are you sure you want to proceed?[y/N]\n")
+#        if entered_value in ['y', 'Y', 'yes']:
+#            try:
+#                deleted = self.client.images.prune()
+#            except podman.errors.APIError as err:
+#                raise SystemExit(err) from err
+#            if not deleted["ImagesDeleted"]:
+#                print("No images were deleted: no dangling images found.")
+#            else:
+#                self.print_line()
+#                print("Pruned images:\n")
+#                for item in deleted['ImagesDeleted']:
+#                    print(item)
+#                print("\nSpace Reclaimed:")
+#                print(human_readable_size(deleted['SpaceReclaimed'], 2))
+#                self.print_line()
