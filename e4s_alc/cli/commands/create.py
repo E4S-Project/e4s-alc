@@ -19,8 +19,8 @@ class Create(AbstractCommand):
         self.parser.usage = usage
         self.parser.add_argument('-i', '--image', metavar='\b', help='The image name and the tag <image:tag>')
         self.parser.add_argument('-n', '--name', metavar='\b', help='The name of the newly created image')
-        self.parser.add_argument('-p', '--package', metavar='\b', help='The name of a Spack package to install', action='append', default=[])
-        self.parser.add_argument('-a', '--os-package', metavar='\b', help='The name of an OS Package to install', action='append', default=[])
+        self.parser.add_argument('-p', '--package', nargs='+', metavar='\b', help='The name of a Spack package to install', default=[])
+        self.parser.add_argument('-a', '--os-package', nargs='+', metavar='\b', help='The name of an OS Package to install', action='append', default=[])
         self.parser.add_argument('-c', '--copy', metavar='\b', help='Directory to copy into the image', action='append', default=[])
         self.parser.add_argument('-t', '--tarball', metavar='\b', help='Tarball to expand in the image', action='append', default=[])
         self.parser.add_argument('-f', '--file', metavar='\b', help='The file used to create a new image')
