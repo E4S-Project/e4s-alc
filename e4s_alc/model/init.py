@@ -1,5 +1,8 @@
 from e4s_alc.mvc.model import Model
 from e4s_alc.model.container import * 
+from e4s_alc import logger
+
+LOGGER = logger.get_logger(__name__)
 
 class InitModel(Model):
     def __init__(self):
@@ -9,7 +12,7 @@ class InitModel(Model):
         # Check for container runtime
         for backend, controller in SUPPORTED_BACKENDS.items():
             if self.check_working_backend(backend, controller):
-                print('Found {}!'.format(backend))
+                LOGGER.warning('Found {}!'.format(backend))
                 self.set_backend(backend)
                 return True
         return False
