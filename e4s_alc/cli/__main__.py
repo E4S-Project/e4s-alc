@@ -2,7 +2,7 @@ import os
 import sys
 import e4s_alc
 import argparse
-from e4s_alc import E4S_ALC_VERSION, E4S_ALC_URL, E4S_ALC_SCRIPT
+from e4s_alc import logger, E4S_ALC_VERSION, E4S_ALC_URL, E4S_ALC_SCRIPT
 from e4s_alc.cli.cli_view import NoSubparsersMetavarFormatter
 from e4s_alc.cli.command import AbstractCommand
 import e4s_alc.cli.commands
@@ -55,6 +55,12 @@ class MainCommand(AbstractCommand):
         if args.version:
             print(__version__)
             return 0
+
+        logger.set_log_level(logger.LOG_LEVEL)
+        if args.quiet:
+            logger.set_log_level("ERROR")
+        if args.verbose:
+            logger.set_log_level("DEBUG")
 
         command = args.command
         AbstractCommand.commands[command].main(args)
