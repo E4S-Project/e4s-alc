@@ -12,7 +12,7 @@ class InitModel(Model):
         # Check for container runtime
         for backend, controller in SUPPORTED_BACKENDS.items():
             if self.check_working_backend(backend, controller):
-                LOGGER.warning('Found {}!'.format(backend))
+                LOGGER.debug('Found {}!'.format(backend))
                 self.set_backend(backend)
                 return True
         return False
