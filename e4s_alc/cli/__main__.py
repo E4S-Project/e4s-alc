@@ -39,8 +39,10 @@ class MainCommand(AbstractCommand):
             command.add_subparser(subparsers)
 
         parser.add_argument('-V', '--version', help='Show programs version number and exit.', action='store_true')
-        parser.add_argument('-q', '--quiet', help='Suppress all output except error messages.', action='store_true')
-        parser.add_argument('-v', '--verbose', help='Show debugging messages.', action='store_true')
+
+        verbosity_group = parser.add_mutually_exclusive_group()
+        verbosity_group.add_argument('-q', '--quiet', help='Suppress all output except error messages.', default=argparse.SUPPRESS, action='store_const', const='ERROR')
+        verbosity_group.add_argument('-v', '--verbose', help='Show debugging messages.', default=argparse.SUPPRESS, action='store_const', const='DEBUG')
 
         return parser 
 
@@ -56,11 +58,9 @@ class MainCommand(AbstractCommand):
             print(__version__)
             return 0
 
-        logger.set_log_level(logger.LOG_LEVEL)
-        if args.quiet:
-            logger.set_log_level("ERROR")
-        if args.verbose:
-            logger.set_log_level("DEBUG")
+        quiet = getattr(args, 'quiet', logger.LOG_LEVEL)
+        verbose = getattr(args, 'verbose', quiet)
+        logger.set_log_level(verbose)
 
         command = args.command
         AbstractCommand.commands[command].main(args)
