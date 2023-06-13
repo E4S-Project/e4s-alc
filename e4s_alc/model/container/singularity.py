@@ -8,6 +8,9 @@ from datetime import datetime
 from e4s_alc.model.container.podman import PodmanController
 from e4s_alc.model.container.docker import DockerController
 from e4s_alc.mvc.controller import Controller
+from e4s_alc import logger
+
+LOGGER = logger.get_logger(__name__)
 
 has_docker=False
 try:
@@ -46,14 +49,14 @@ class SingularityController(PodmanController, DockerController):
 
         # Check if the python libraries are imported
         if not has_docker and not has_podman:
-            print('Failed to find Podman and Docker python library')
+            LOGGER.debug('Failed to find Podman and Docker python library')
             self.lacks_backend = True
         if not has_singularity:
-            print('Failed to find Singularity python library')
+            LOGGER.debug('Failed to find Singularity python library')
             self.lacks_backend = True
 
         if self.lacks_backend:
-            print("Missing package podman, docker or spython: either one of podman and docker is also needed to manipulate singularity images with e4s-alc")
+            LOGGER.error("Missing package podman, docker or spython: either one of podman and docker is also needed to manipulate singularity images with e4s-alc")
             return
 
         # Try to turn on API with podman 3
@@ -61,7 +64,7 @@ class SingularityController(PodmanController, DockerController):
             server_process = subprocess.Popen(['podman', 'system', 'service', '-t', '0'])
             atexit.register(server_process.terminate)
         except:
-            print('Failed to connect to podman API.')
+            LOGGER.debug('Failed to connect to podman API.')
 
         # Try to connect with the podman runtime
         try:
@@ -71,7 +74,7 @@ class SingularityController(PodmanController, DockerController):
             process_out, process_err = process.communicate()
             if process_err:
                 if b"level=error" in process_err:
-                    print('Failed to connect to Podman client')
+                    LOGGER.debug('Failed to connect to Podman client')
 
 
             process_out_dict = json.loads(process_out.decode('utf-8'))
@@ -82,18 +85,18 @@ class SingularityController(PodmanController, DockerController):
             self.use_podman = False
             pass
         except podman.errors.exceptions.APIError:
-            print('Failed to connect to Podman client')
+            LOGGER.debug('Failed to connect to Podman client')
             self.use_podman = False
 
         # Try to connect with the docker runtime     
         try:
             self.client_docker = docker.from_env(timeout=600)
         except docker.errors.DockerException:
-            print('Failed to connect to Docker client') 
+            LOGGER.debug('Failed to connect to Docker client') 
             self.use_docker = False
         
         if not self.use_docker and not self.use_podman:
-            print("Podman nor Docker available: Singularity backend requires one or the other to be available")
+            LOGGER.error("Podman nor Docker available: Singularity backend requires one or the other to be available")
             return
 
         self.is_active = True
@@ -109,7 +112,7 @@ class SingularityController(PodmanController, DockerController):
             os.makedirs(self.tar_dir)
 
     def set_parent(self, arg_parent):
-        print("Using {} backend as image prebuilder for singularity".format(arg_parent))
+        LOGGER.info("Using {} backend as image prebuilder for singularity".format(arg_parent))
         if arg_parent == "docker" and self.client_docker:
             self.parent = DockerController
             self.client = self.client_docker
@@ -117,7 +120,7 @@ class SingularityController(PodmanController, DockerController):
             self.parent = PodmanController
             self.client = self.client_podman
         else:
-            print("Selected backend for the singularity images prebuilding is not available, did you try to specify the backend for this using '-P'?")
+            LOGGER.warning("Selected backend for the singularity images prebuilding is not available, did you try to specify the backend for this using '-P'?")
             exit(1)
 
     
@@ -176,5 +179,5 @@ class SingularityController(PodmanController, DockerController):
             for image_path in images_path:
                 os.remove(image_path)
         except FileNotFoundError as err:
-            print("{} not found".format(image_path))
+            LOGGER.error("{} not found".format(image_path))
             raise SystemExit(err) from err

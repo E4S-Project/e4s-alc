@@ -7,6 +7,9 @@ import requests
 from prettytable import PrettyTable
 from datetime import datetime
 from e4s_alc.mvc.controller import Controller
+from e4s_alc import logger
+
+LOGGER = logger.get_logger(__name__)
 
 has_podman=False
 try:
@@ -28,7 +31,7 @@ class PodmanController(Controller):
 
         # Try to import podman
         if not has_podman:
-            print('Failed to find Podman python library')
+            LOGGER.debug('Failed to find Podman python library')
             return
 
         # Try to turn on API with podman 3
@@ -36,7 +39,7 @@ class PodmanController(Controller):
             server_process = subprocess.Popen(['podman', 'system', 'service', '-t', '0'])
             atexit.register(server_process.terminate)
         except:
-            print('Failed to connect to podman API.')
+            LOGGER.debug('Failed to connect to podman API.')
             return
 
         # Try to connect to podman client
@@ -47,7 +50,7 @@ class PodmanController(Controller):
             process_out, process_err = process.communicate()
             if process_err:
                 if b"level=error" in process_err:
-                    print('Failed to connect to Podman client')
+                    LOGGER.warning('Failed to connect to Podman client')
                     return
 
             process_out_dict = json.loads(process_out.decode('utf-8'))
@@ -55,7 +58,7 @@ class PodmanController(Controller):
 
             self.client = podman.PodmanClient(base_url=uri)
         except podman.errors.exceptions.APIError:
-            print('Failed to connect to Podman client')
+            LOGGER.warning('Failed to connect to Podman client')
             return
         
         self.is_active = True
@@ -64,7 +67,7 @@ class PodmanController(Controller):
         if ':' in self.image:
             image_chunks = self.image.split(':')
             if len(image_chunks) != 2:
-                print('Error processing image \'{}\'.'.format(self.image))
+                LOGGER.warning('Error processing image \'{}\'.'.format(self.image))
             self.image_os, self.image_tag = image_chunks
         else:
             self.image_os, self.image_tag = self.image, 'latest'
@@ -77,7 +80,7 @@ class PodmanController(Controller):
         if ':' in self.image:
             image_chunks = self.image.split(':')
             if len(image_chunks) != 2:
-                print('Error processing image \'{}\'.'.format(self.image))
+                LOGGER.warning('Error processing image \'{}\'.'.format(self.image))
             self.image_os, self.image_tag = image_chunks
         else:
             self.image_os, self.image_tag = self.image, 'latest'
@@ -87,10 +90,10 @@ class PodmanController(Controller):
             image_data = self.client.images.pull(self.image_os, self.image_tag)
             self.image = image_data.attrs['RepoTags'][0]
         except podman.errors.ImageNotFound:
-            print('Image was not found.')
+            LOGGER.warning('Image was not found.')
             exit(1)
         except podman.errors.NotFound:
-            print('Image was not found.')
+            LOGGER.warning('Image was not found.')
             exit(1)
 
     def find_image(self, image):
@@ -100,7 +103,7 @@ class PodmanController(Controller):
         try:
             self.client.images.get(image)
         except podman.errors.ImageNotFound:
-            print('Image was not found.')
+            LOGGER.warning('Image was not found.')
             exit(1)
 
     def parse_os_release(self):
@@ -207,8 +210,8 @@ class PodmanController(Controller):
 
         except Exception as e:
             raise e
-            print(e)
-            print('Stopping container...')
+            LOGGER.error(e)
+            LOGGER.info('Stopping container...')
             container.stop()
             exit(1)
 
@@ -245,7 +248,7 @@ class PodmanController(Controller):
                 error_string += " image not found with name {}.".format(name)
             elif 409:
                 error_string += " image {} used by container. Use '-f' to force remove, or remove container using 'alc delete -c $CONTAINER_ID'.".format(name)
-            print(error_string)
+            LOOGER.error(error_string)
             raise SystemExit(err) from err
 
     def delete_container(self, ID, force):
@@ -254,7 +257,7 @@ class PodmanController(Controller):
             current.remove(force=force)
         except podman.errors.APIError as err:
             error_string = "Container deletion has failed:"
-            print(error_string)
+            LOGGER.error(error_string)
             raise SystemExit(err) from err
 
     def prune_containers(self):
@@ -265,15 +268,13 @@ class PodmanController(Controller):
             except podman.errors.APIError as err:
                 raise SystemExit(err) from err
             if not deleted["ContainersDeleted"]:
-                print("No containers were deleted: no stopped containers found.")
+                LOGGER.info("No containers were deleted: no stopped containers found.")
             else:
-                self.print_line()
-                print("Pruned containers:\n")
+                LOGGER.info("Pruned containers:\n")
                 for item in deleted['ContainersDeleted']:
-                    print(item)
-                print("\nSpace Reclaimed:")
-                print(human_readable_size(deleted['SpaceReclaimed'], 2))
-                self.print_line()
+                    LOGGER.info(item)
+                LOGGER.info("\nSpace Reclaimed:")
+                LOGGER.info(human_readable_size(deleted['SpaceReclaimed'], 2))
 
     def prune_images(self):
         print("Pruning images is not yet supported by e4s-alc.")
