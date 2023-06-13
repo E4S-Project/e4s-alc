@@ -2,6 +2,9 @@ import os
 from e4s_alc import E4S_ALC_VERSION, E4S_ALC_URL, E4S_ALC_SCRIPT
 from e4s_alc.model.delete import DeleteModel
 from e4s_alc.cli.command import AbstractCommand
+from e4s_alc import logger
+
+LOGGER = logger.get_logger(__name__)
 
 HELP_PAGE_FMT = "'%(command)s' page to be written."
 
@@ -32,14 +35,14 @@ class Delete(AbstractCommand):
             exit(0)
 
         if not (args.name or args.container or args.prune_images or args.prune_containers or args.id):
-            print('Error: Arguments \'-n/--name\' or \'--prune-images\' or \'-c\' or \'--prune-containers\' or \'--id\' is required.')
+            LOGGER.error('Arguments \'-n/--name\' or \'--prune-images\' or \'-c\' or \'--prune-containers\' or \'--id\' is required.')
             print()
             self.parser.print_help()
             print()
             exit(1)
 
         if args.name and (args.prune_images or args.prune_containers) and args.id:
-            print('Error: Arguments \'-n/--name\' and \'--prune-images\' and \'--prune-containers\' and \'--id\' can\'t be used together.')
+            LOGGER.error('Arguments \'-n/--name\' and \'--prune-images\' and \'--prune-containers\' and \'--id\' can\'t be used together.')
             print()
             self.parser.print_help()
             print()

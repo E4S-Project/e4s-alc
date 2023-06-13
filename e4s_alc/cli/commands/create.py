@@ -2,6 +2,9 @@ import os
 from e4s_alc import E4S_ALC_VERSION, E4S_ALC_URL, E4S_ALC_SCRIPT
 from e4s_alc.model.create import CreateModel
 from e4s_alc.cli.command import AbstractCommand
+from e4s_alc import logger
+
+LOGGER = logger.get_logger(__name__)
 
 HELP_PAGE_FMT = "'%(command)s' page to be written."
 
@@ -36,14 +39,14 @@ class Create(AbstractCommand):
             exit(0)
 
         if not (args.image or args.name or args.file):
-            print('Error: Arguments \'-i/--image\' and \'-n/--name\' or \'-f/--file\' are required.')
+            LOGGER.error('Arguments \'-i/--image\' and \'-n/--name\' or \'-f/--file\' are required.')
             print()
             self.parser.print_help()
             print()
             exit(1)
 
         if (args.image or args.name) and args.file:
-            print('Error: Argument \'-f/--file\' cannot be used with argument \'-i/--image\' or \'-n/--name\'.')
+            LOGGER.error('Argument \'-f/--file\' cannot be used with argument \'-i/--image\' or \'-n/--name\'.')
             print()
             self.parser.print_help()
             print()
@@ -51,7 +54,7 @@ class Create(AbstractCommand):
 
         if (args.image or args.name) and not (args.image and args.name):
             print()
-            print('Error: Arguments \'-i/--image\' and \'-n/--name\' are both required.')
+            LOGGER.error('Arguments \'-i/--image\' and \'-n/--name\' are both required.')
             self.parser.print_help()
             print()
             exit(1)

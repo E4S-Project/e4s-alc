@@ -1,5 +1,8 @@
 import os
 import configparser
+from e4s_alc import logger
+
+LOGGER = logger.get_logger(__name__)
 
 class Model():
     def __init__(self, module_name):
@@ -47,7 +50,7 @@ class Model():
 
     def set_backend(self, backend):
         self.update_configuration_file('backend', backend)
-        print('Setting {} as backend!'.format(backend))
+        LOGGER.info('Setting {} as backend!'.format(backend))
         return True
 
     def check_working_backend(self, backend, controller):

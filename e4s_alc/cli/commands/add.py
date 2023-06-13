@@ -2,6 +2,9 @@ import os
 from e4s_alc import E4S_ALC_VERSION, E4S_ALC_URL, E4S_ALC_SCRIPT
 from e4s_alc.model.add import AddModel
 from e4s_alc.cli.command import AbstractCommand
+from e4s_alc import logger
+
+LOGGER = logger.get_logger(__name__)
 
 HELP_PAGE_FMT = "'%(command)s' page to be written."
 
@@ -34,7 +37,7 @@ class Add(AbstractCommand):
             exit(0)
 
         if not (args.name or args.file):
-            print('Error: Argument \'-n/--name\' is required.')
+            LOGGER.error('Argument \'-n/--name\' is required.')
             print()
             self.parser.print_help()
             print()
@@ -42,7 +45,7 @@ class Add(AbstractCommand):
 
     def check_modifies(self, args):
         if not (args.package or args.os_package or args.copy or args.tarball or args.file):
-            print("Error: This command doesn't apply any modifications the image.")
+            LOGGER.error("This command doesn't apply any modifications the image.")
             print()
             self.parser.print_help()
             print()
