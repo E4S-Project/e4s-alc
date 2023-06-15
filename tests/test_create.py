@@ -18,13 +18,21 @@ class CreateTests(unittest.TestCase):
         controller.init_image('ubuntu')
         self.assertIn('ubuntu', controller.image_os)
         self.assertIn('latest', controller.image_tag)
+        
+        controller.delete_image(['ubuntu'], True)
 
- #   Commented out because this creates a image in the docker client and e4s-alc doesn't support
- #   deleting images
- #
- #   @unittest.skipIf('docker' not in sys.modules, "Docker not available") 
- #   def test_create_ubuntu_docker_spack(self):
- #       controller = DockerController()
- #       controller.init_image('ubuntu')
- #       controller.install_spack()
- #       controller.execute_build("unittesting")
+    @unittest.skipIf('docker' not in sys.modules, "Docker not available") 
+    def test_create_ubuntu_docker(self):
+        controller = DockerController()
+        controller.init_image('ubuntu')
+        controller.execute_build("unittesting")
+        controller.delete_image(['ubuntu', 'unittesting'], True)
+    
+    @unittest.skipIf('docker' not in sys.modules, "Docker not available") 
+    def test_create_ubuntu_docker_spack(self):
+        controller = DockerController()
+        controller.init_image('ubuntu')
+        controller.add_ubuntu_package_commands('')
+        controller.install_spack()
+        controller.execute_build("unittesting")
+        controller.delete_image(['ubuntu', 'unittesting'], True)
