@@ -62,7 +62,7 @@ class AddModel(Model):
                 host_path, image_path = host_image_path
                 self.controller.mount_and_copy(host_path, image_path)
 
-        if self.backend == "singularity":
+        if self.backend == "singularity" and args.parent:
             self.controller.set_parent(args.parent)
 
         self.controller.read_image(args.name)
