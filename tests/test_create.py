@@ -25,7 +25,7 @@ class DockerCreateTests(unittest.TestCase):
         with self.assertRaises(SystemExit) as system_exit:
             cli_main_cmd.main(['create'])
 
-    @unittest.skipIf('docker' not in sys.modules, "Docker not available") 
+    @unittest.skipIf('docker' not in sys.modules, "Docker not available")
     def test_init_ubuntu_docker(self):
         controller = DockerController()
         controller.init_image('ubuntu')
@@ -33,14 +33,14 @@ class DockerCreateTests(unittest.TestCase):
         self.assertIn('latest', controller.image_tag)
         controller.delete_image(['ubuntu'], True)
 
-    @unittest.skipIf('docker' not in sys.modules, "Docker not available") 
+    @unittest.skipIf('docker' not in sys.modules, "Docker not available")
     def test_create_ubuntu_docker(self):
         controller = DockerController()
         controller.init_image('ubuntu')
         controller.execute_build("unittesting")
         controller.delete_image(['ubuntu', 'unittesting'], True)
 
-    @unittest.skipIf('docker' not in sys.modules, "Docker not available") 
+    @unittest.skipIf('docker' not in sys.modules, "Docker not available")
     def test_create_ubuntu_docker_spack(self):
         controller = DockerController()
         controller.init_image('ubuntu')
@@ -60,7 +60,7 @@ class PodmanCreateTests(unittest.TestCase):
         with self.assertRaises(SystemExit) as system_exit:
             cli_main_cmd.main(['create'])
 
-    @unittest.skipIf('podman' not in sys.modules, "Podman not available") 
+    @unittest.skipIf('podman' not in sys.modules, "Podman not available")
     def test_init_ubuntu_podman(self):
         controller = PodmanController()
         controller.init_image('ubuntu')
@@ -68,14 +68,14 @@ class PodmanCreateTests(unittest.TestCase):
         self.assertIn('latest', controller.image_tag)
         controller.delete_image(['ubuntu'], True)
 
-    @unittest.skipIf('podman' not in sys.modules, "Podman not available") 
+    @unittest.skipIf('podman' not in sys.modules, "Podman not available")
     def test_create_ubuntu_podman(self):
         controller = PodmanController()
         controller.init_image('ubuntu')
         controller.execute_build("unittesting")
         controller.delete_image(['ubuntu', 'unittesting'], True)
 
-    @unittest.skipIf('podman' not in sys.modules, "Podman not available") 
+    @unittest.skipIf('podman' not in sys.modules, "Podman not available")
     def test_create_ubuntu_podman_spack(self):
         controller = PodmanController()
         controller.init_image('ubuntu')
@@ -95,24 +95,38 @@ class SingularityCreateTests(unittest.TestCase):
         with self.assertRaises(SystemExit) as system_exit:
             cli_main_cmd.main(['create'])
 
-    @unittest.skipIf('spython' not in sys.modules, "Singularity not available") 
+    @unittest.skipIf('spython' not in sys.modules, "Singularity not available")
     def test_init_ubuntu_singularity(self):
         controller = SingularityController()
         controller.init_image('ubuntu')
         self.assertIn('ubuntu', controller.image_os)
         self.assertIn('latest', controller.image_tag)
 
-    @unittest.skipIf('spython' not in sys.modules, "Singularity not available") 
+    @unittest.skipIf('spython' not in sys.modules, "Singularity not available")
+    @unittest.skipIf('docker' not in sys.modules, "Docker not available")
     def test_create_ubuntu_singularity(self):
+        controller = SingularityController()
+        controller.init_image('ubuntu')
+        controller.parent = DockerController
+        controller.client = controller.client_docker
+        controller.execute_build("unittesting")
+        controller.delete_image(['unittesting.sif'], True)
+
+    @unittest.skipIf('spython' not in sys.modules, "Singularity not available")
+    @unittest.skipIf('podman' not in sys.modules, "Podman not available")
+    def test_create_ubuntu_singularity_podman(self):
         controller = SingularityController()
         controller.init_image('ubuntu')
         controller.execute_build("unittesting")
         controller.delete_image(['unittesting.sif'], True)
 
-    @unittest.skipIf('spython' not in sys.modules, "Singularity not available") 
+    @unittest.skipIf('spython' not in sys.modules, "Singularity not available")
+    @unittest.skipIf('docker' not in sys.modules, "Docker not available")
     def test_create_ubuntu_singularity_spack(self):
         controller = SingularityController()
         controller.init_image('ubuntu')
+        controller.parent = DockerController
+        controller.client = controller.client_docker
         controller.add_ubuntu_package_commands('')
         controller.install_spack()
         self.assertIsNone(controller.execute_build("unittesting"))
