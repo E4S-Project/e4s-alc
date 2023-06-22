@@ -44,8 +44,6 @@ class SingularityController(PodmanController, DockerController):
         self.lacks_backend = False
         self.use_docker = True
         self.use_podman = True
-        self.client_podman = None
-        self.docker_podman = None
         self.parent = PodmanController
 
         # Check if the python libraries are imported
