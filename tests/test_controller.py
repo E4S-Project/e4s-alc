@@ -1,10 +1,10 @@
 import unittest
 from e4s_alc.mvc.controller import Controller
-from e4s_alc import logger
+from e4s_alc import logger, E4S_ALC_HOME
 
 logger.set_log_level("FATAL")
 
-ASSETS_DIRECTORY = "./tests/assets/"
+ASSETS_DIRECTORY = E4S_ALC_HOME + "/tests/assets/"
 
 class ControllerTests(unittest.TestCase):
 
