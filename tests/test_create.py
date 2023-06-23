@@ -37,7 +37,7 @@ class DockerCreateTests(unittest.TestCase):
     def test_create_ubuntu_docker(self):
         controller = DockerController()
         controller.init_image('ubuntu')
-        controller.execute_build("unittesting")
+        self.assertIsNone(controller.execute_build("unittesting"))
         controller.delete_image(['ubuntu', 'unittesting'], True)
 
     @unittest.skipIf('docker' not in sys.modules, "Docker not available")
@@ -72,7 +72,7 @@ class PodmanCreateTests(unittest.TestCase):
     def test_create_ubuntu_podman(self):
         controller = PodmanController()
         controller.init_image('ubuntu')
-        controller.execute_build("unittesting")
+        self.assertIsNone(controller.execute_build("unittesting"))
         controller.delete_image(['ubuntu', 'unittesting'], True)
 
     @unittest.skipIf('podman' not in sys.modules, "Podman not available")
@@ -109,7 +109,7 @@ class SingularityCreateTests(unittest.TestCase):
         controller.init_image('ubuntu')
         controller.parent = DockerController
         controller.client = controller.client_docker
-        controller.execute_build("unittesting")
+        self.assertIsNone(controller.execute_build("unittesting"))
         controller.delete_image(['unittesting.sif'], True)
 
     @unittest.skipIf('spython' not in sys.modules, "Singularity not available")
@@ -117,7 +117,7 @@ class SingularityCreateTests(unittest.TestCase):
     def test_create_ubuntu_singularity_podman(self):
         controller = SingularityController()
         controller.init_image('ubuntu')
-        controller.execute_build("unittesting")
+        self.assertIsNone(controller.execute_build("unittesting"))
         controller.delete_image(['unittesting.sif'], True)
 
     @unittest.skipIf('spython' not in sys.modules, "Singularity not available")
