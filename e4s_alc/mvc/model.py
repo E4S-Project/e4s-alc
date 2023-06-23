@@ -21,8 +21,10 @@ class Model():
         config.read(self.config_file)
         if 'DEFAULT' not in config:
             self.create_configuration_file()
+            config.read(self.config_file)
         if 'backend' not in config['DEFAULT']:
             self.create_configuration_file()
+            config.read(self.config_file)
 
         backend = config.get('DEFAULT', 'backend')
         if backend == 'None':
