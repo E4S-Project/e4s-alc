@@ -14,7 +14,7 @@ import spython
 
 logger.set_log_level("FATAL")
 
-class DockerCreateTests(unittest.TestCase):
+class DockerTests(unittest.TestCase):
     def setUp(self):
         initCommand = InitModel()
         args = types.SimpleNamespace() 
@@ -48,6 +48,49 @@ class DockerCreateTests(unittest.TestCase):
         controller.install_spack()
         self.assertIsNone(controller.execute_build("unittesting"))
         controller.delete_image(['ubuntu', 'unittesting'], True)
+
+    @unittest.skipIf('docker' not in sys.modules, "Docker not available")
+    def test_find_image(self):
+        controller = DockerController()
+        controller_2 = DockerController()
+        controller.pull_image('ubuntu')
+        controller_2.find_image("ubuntu")
+        self.assertEqual(controller_2.image, "ubuntu")
+        controller.delete_image(['ubuntu'], True)
+        with self.assertRaises(SystemExit) as system_exit:
+            controller_2.find_image("ubuntuifkajsh")
+
+    @unittest.skipIf('docker' not in sys.modules, "Docker not available")
+    def test_pull_image(self):
+        controller = DockerController()
+        self.assertIsNone(controller.pull_image('ubuntu'))
+        controller.delete_image(['ubuntu'], True)
+        with self.assertRaises(SystemExit) as system_exit:
+            controller.pull_image('ubuntuikljafhsdlkfjs')
+
+    @unittest.skipIf('docker' not in sys.modules, "Docker not available")
+    def test_delete_image(self):
+        controller = DockerController()
+        controller.pull_image('ubuntu')
+        with self.assertRaises(SystemExit) as system_exit:
+            controller.delete_image(['ubuntufklashdjfkl'], True)
+        self.assertIsNone(controller.delete_image(['ubuntu'], True))
+
+    @unittest.skipIf('docker' not in sys.modules, "Docker not available")
+    def test_parse_os_release(self):
+        controller = DockerController()
+        controller.pull_image('ubuntu:18.04')
+        controller.parse_os_release()
+        self.assertEqual(controller.os_release['PRETTY_NAME'], 'Ubuntu 18.04.6 LTS')
+        controller.delete_image(['ubuntu:18.04'], True)
+
+    @unittest.skipIf('docker' not in sys.modules, "Docker not available")
+    def test_parse_environment(self):
+        controller = DockerController()
+        controller.pull_image('ubuntu:18.04')
+        controller.parse_environment()
+        self.assertEqual(controller.environment['PATH'], '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin')
+        controller.delete_image(['ubuntu:18.04'], True)
 
 class PodmanCreateTests(unittest.TestCase):
     def setUp(self):
