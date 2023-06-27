@@ -88,6 +88,9 @@ class PodmanController(Controller):
         # Try to pull the image if it exists
         try:
             image_data = self.client.images.pull(self.image_os, self.image_tag)
+            if image_data.attrs == {}:
+                LOGGER.warning('Image was not found.')
+                exit(1)
             self.image = image_data.attrs['RepoTags'][0]
         except podman.errors.ImageNotFound:
             LOGGER.warning('Image was not found.')
@@ -248,7 +251,7 @@ class PodmanController(Controller):
                 error_string += " image not found with name {}.".format(name)
             elif 409:
                 error_string += " image {} used by container. Use '-f' to force remove, or remove container using 'alc delete -c $CONTAINER_ID'.".format(name)
-            LOOGER.error(error_string)
+            LOGGER.error(error_string)
             raise SystemExit(err) from err
 
     def delete_container(self, ID, force):
