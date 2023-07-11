@@ -8,7 +8,7 @@ from datetime import datetime
 from e4s_alc.model.container.podman import PodmanController
 from e4s_alc.model.container.docker import DockerController
 from e4s_alc.mvc.controller import Controller
-from e4s_alc import logger
+from e4s_alc import logger, E4S_ALC_CONFIG_DIR
 
 LOGGER = logger.get_logger(__name__)
 
@@ -45,6 +45,17 @@ class SingularityController(PodmanController, DockerController):
         self.use_docker = True
         self.use_podman = True
         self.parent = PodmanController
+
+        self.config_dir = E4S_ALC_CONFIG_DIR
+        self.images_dir = os.path.join(self.config_dir, "singularity_images")
+        self.tar_dir = os.path.join(self.config_dir, "podman_tarballs")
+
+        if not os.path.exists(self.images_dir):
+            os.makedirs(self.images_dir)
+
+        if not os.path.exists(self.tar_dir):
+            os.makedirs(self.tar_dir)
+
 
         # Check if the python libraries are imported
         if not has_docker and not has_podman:
@@ -100,16 +111,6 @@ class SingularityController(PodmanController, DockerController):
             return
 
         self.is_active = True
-
-        self.config_dir = os.path.join(os.path.expanduser('~'), '.e4s-alc')
-        self.images_dir = os.path.join(self.config_dir, "singularity_images")
-        self.tar_dir = os.path.join(self.config_dir, "podman_tarballs")
-
-        if not os.path.exists(self.images_dir):
-            os.makedirs(self.images_dir)
-
-        if not os.path.exists(self.tar_dir):
-            os.makedirs(self.tar_dir)
 
     def set_parent(self, arg_parent):
         if arg_parent == "docker" and self.client_docker:
