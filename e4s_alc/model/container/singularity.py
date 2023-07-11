@@ -8,7 +8,7 @@ from datetime import datetime
 from e4s_alc.model.container.podman import PodmanController
 from e4s_alc.model.container.docker import DockerController
 from e4s_alc.mvc.controller import Controller
-from e4s_alc import logger, E4S_ALC_CONFIG_DIR
+from e4s_alc import logger
 
 LOGGER = logger.get_logger(__name__)
 
@@ -46,7 +46,6 @@ class SingularityController(PodmanController, DockerController):
         self.use_podman = True
         self.parent = PodmanController
 
-        self.config_dir = E4S_ALC_CONFIG_DIR
         self.images_dir = os.path.join(self.config_dir, "singularity_images")
         self.tar_dir = os.path.join(self.config_dir, "podman_tarballs")
 

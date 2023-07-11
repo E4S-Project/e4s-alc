@@ -2,6 +2,8 @@ import os
 import json
 import urllib
 
+from e4s_alc import E4S_ALC_CONFIG_DIR
+
 def is_url(string):
     try:
         result = urllib.parse.urlparse(string)
@@ -31,6 +33,8 @@ class Controller():
         self.environment = {}
         self.commands = []
         self.mounts = []
+
+        self.config_dir = E4S_ALC_CONFIG_DIR
 
 
     def read_args_file(self, file_path):
@@ -75,6 +79,11 @@ class Controller():
         # Add command to copy directory from mounted volume to image
         self.commands.append('cp -r /tmp{} {}'.format(image_path, image_path))
 
+    def spack_yaml_configuration(self, path):
+        self.yamls_dir = self.config_dir + "/spack_yamls"
+        if not os.path.exists(self.yamls_dir):
+            os.makedirs(self.yamls_dir)
+        self.mount_and_copy(self.yamls_dir, "/spack_yamls")
 
     def expand_tarball(self, host_path, image_path):
         if is_url(host_path):
