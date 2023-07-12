@@ -17,15 +17,19 @@ class Add(AbstractCommand):
         self.parser_help = 'Add to an existing image'
 
     def _construct_parser(self):
-        usage = '%s add [options]' % self.command 
-        
+        usage = '%s add [options]' % self.command
+
         self.parser.usage = usage
+
+        yaml_or_package = self.parser.add_mutually_exclusive_group()
+        yaml_or_package.add_argument('-p', '--package', nargs='+', metavar='\b', help='The name of a Spack package to install', default=[])
+        yaml_or_package.add_argument('-y', '--yaml', metavar='\b', help='The yaml file used to specify spack packages to install')
+        yaml_or_package.add_argument('-f', '--file', metavar='\b', help='The file used to create a new image')
+
         self.parser.add_argument('-n', '--name', metavar='\b', help='The name of the image to add to')
-        self.parser.add_argument('-p', '--package', nargs='+', metavar='\b', help='The name of a Spack package to install', default=[])
         self.parser.add_argument('-a', '--os-package', nargs='+', metavar='\b', help='The name of an OS Package to install', default=[])
         self.parser.add_argument('-c', '--copy', metavar='\b', help='Directory to copy into the image', action='append', default=[])
         self.parser.add_argument('-t', '--tarball', metavar='\b', help='Tarball to expand in the image', action='append', default=[])
-        self.parser.add_argument('-f', '--file', metavar='\b', help='The file used to add to a image')
         self.parser.add_argument('-P', '--parent', metavar='\b', help='Specific to singularity backend, choose which backend to use between Podman and Docker ["podman", "docker"] to add to the image', choices=['docker', 'podman'])
         self.parser.add_argument('-h', '--help', action='store_true')
 
@@ -44,7 +48,7 @@ class Add(AbstractCommand):
             exit(1)
 
     def check_modifies(self, args):
-        if not (args.package or args.os_package or args.copy or args.tarball or args.file):
+        if not (args.package or args.os_package or args.copy or args.tarball or args.file or args.yaml):
             LOGGER.error("This command doesn't apply any modifications the image.")
             print()
             self.parser.print_help()

@@ -26,6 +26,7 @@ class Create(AbstractCommand):
         yaml_or_package.add_argument('-y', '--yaml', metavar='\b', help='The yaml file used to specify spack packages to install')
         yaml_or_package.add_argument('-f', '--file', metavar='\b', help='The file used to create a new image')
         yaml_or_package.add_argument('-ns', '--no-spack', help='\b\b\b\bChoose to install spack', action='store_false', dest='spack')
+
         self.parser.add_argument('-i', '--image', metavar='\b', help='The image name and the tag <image:tag>')
         self.parser.add_argument('-n', '--name', metavar='\b', help='The name of the newly created image')
         self.parser.add_argument('-a', '--os-package', nargs='+', metavar='\b', help='The name of an OS Package to install', default=[])
