@@ -4,7 +4,6 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "e4s-alc"
-version = "0.0.2"
 authors = [
     {name = "Cameron Durbin", email = "cfd@uoregon.edu"},
 ]
@@ -22,7 +21,7 @@ classifiers = [
     "Natural Language :: English",
     "Programming Language :: Python :: 3",
 ]
-dependencies = []
+dependencies = ['pyyaml']
 dynamic = ["version"]
 
 [project.urls]

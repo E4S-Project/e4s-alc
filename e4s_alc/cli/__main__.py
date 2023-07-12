@@ -1,8 +1,8 @@
 import argparse
-from commands.create import CreateCommand
-from commands.build import BuildCommand
-from commands.template import TemplateCommand
-from cli_view import NoSubparsersMetavarFormatter
+from e4s_alc.cli.commands.create import CreateCommand
+from e4s_alc.cli.commands.build import BuildCommand
+from e4s_alc.cli.commands.template import TemplateCommand
+from e4s_alc.cli.cli_view import NoSubparsersMetavarFormatter
 
 class MainCommand():
     """A class represents the main command of the CLI application."""
