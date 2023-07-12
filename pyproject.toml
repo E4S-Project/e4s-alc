@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "e4s-alc"
+version = "0.0.2"
 authors = [
     {name = "Cameron Durbin", email = "cfd@uoregon.edu"},
-    {name = "Frederick Deny", email = "fdeny@uoregon.edu"},
 ]
-description = "Build containers quickly with Spack integration."
+description = "Build Dockerfiles quickly with Spack integration."
 readme = "README.md"
 requires-python = ">=3.7"
 keywords = ["containers", "hpc", "libraries", "linux"]
@@ -22,7 +22,7 @@ classifiers = [
     "Natural Language :: English",
     "Programming Language :: Python :: 3",
 ]
-dependencies = ['docker', 'podman', 'spython', 'prettytable', 'python-dateutil']
+dependencies = []
 dynamic = ["version"]
 
 [project.urls]
@@ -33,6 +33,3 @@ packages = ["e4s_alc"]
 
 [project.scripts]
 e4s-alc = "e4s_alc.cli.entry:main"
-
-[tool.setuptools_scm]
-write_to = "e4s_alc/version.py"

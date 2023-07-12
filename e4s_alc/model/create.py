@@ -1,85 +1,243 @@
-from e4s_alc.mvc.model import Model
-from e4s_alc.model.container import *
+import os
+import sys
+import shutil
+import logging
+from e4s_alc.model import Model
+from e4s_alc.conf import get_modules_conf
+
+logger = logging.getLogger('core')
 
 class CreateModel(Model):
-    def __init__(self):
-        super().__init__(module_name='CreateModel')
+    def __init__(self, arg_namespace):
+        logger.info("Initializing CreateModel")
+        super().__init__(module_name=self.__class__.__name__, arg_namespace=arg_namespace)
 
-    def main(self, args):
-        if not self.backend:
-            print('No backend set. Run \'e4s-alc init\'.')
-            exit(1)
+    def debug_line(self, line):
+        line = logger_line = line.replace('\n', '').replace('\t', '').replace('\\', '')
+        logger.debug(f"Adding line: {logger_line}")
 
-        if self.backend not in SUPPORTED_BACKENDS:
-            print('Backend \'{}\' not supported.'.format(self.backend))
-            exit(1)
+    # Instruction adding
+    def add_line(self, line, indent=True):
+        self.debug_line(line)
+        if indent:
+            self.instructions.append(f'\t{line}')
+        else:
+            self.instructions.append(line)
 
-        if not self.check_working_backend(self.backend, SUPPORTED_BACKENDS[self.backend]):
-            print('Failed to connect to \'{}\' client'.format(self.backend))
-            exit(1)
+    def add_line_break(self):
+        logger.debug("Adding line break")
+        self.instructions.append('\n')
 
-        if args.file:
-            file_args = self.controller.read_args_file(args.file)
-            if 'name' not in file_args:
-                print('Input file must include a name')
-                exit(1)
-            args.name = file_args['name']
+    # Base group
+    def add_base_image(self):
+        logger.debug("Adding base image")
+        self.add_line(f'FROM {self.image_registry}{self.base_image} AS base-stage\n\n', indent=False)
 
-            if 'image' not in file_args:
-                print('Input file must include an image')
-                exit(1)
-            args.image = file_args['image']
+    def add_local_files(self):
+        if self.local_files:
+            logger.debug("Adding local files")
+            self.add_line('# Add files from host to container\n')
+            for file in self.local_files:
+                format_file_spaces = ' '.join(file.split())
+                src_file, dest_file = format_file_spaces.split(' ')
+                self.add_line(f'ADD {src_file} {dest_file}\n')
+            self.add_line_break()
 
-            if 'spack-packages' in file_args:
-                if file_args['spack-packages']:
-                    args.package = file_args['spack-packages']
+    def add_env_variables(self):
+        if self.env_vars:
+            logger.debug("Adding environment variables")
+            self.add_line('# Set up the environment\n')
+            self.env_vars.extend(['DEBIAN_FRONTEND=noninteractive', 'PATH=/spack/bin:$PATH'])
+            for env_var in self.env_vars:
+                self.add_line(f'ENV {env_var}\n')
+            self.add_line_break()
 
-            if 'os-packages' in file_args:
-                if file_args['os-packages']:
-                    args.os_package = file_args['os-packages']
+    def add_initial_commands(self):
+        if self.initial_commands:
+            logger.debug("Adding initial commands")
+            self.add_line('# Run commands after pulling the image\n')
+            for command in self.initial_commands:
+                self.add_line(f'RUN {command}\n')
+            self.add_line_break()
 
-            if 'copy' in file_args:
-                if file_args['copy']:
-                    args.copy = file_args['copy']
+    def add_post_base_stage_commands(self):
+        if self.post_base_stage_commands:
+            logger.debug("Adding post base stage commands")
+            self.add_line('# Run commands at the end of the base stage\n')
+            for command in self.post_base_stage_commands:
+                self.add_line(f'RUN {command}\n')
+            self.add_line_break()
 
-            if 'tarball' in file_args:
-                if file_args['tarball']:
-                    args.tarball = file_args['tarball']
+    # System group
+    def add_certificates(self):
+        logger.debug("Adding certificates")
+        cert_locations = self.controller.get_certificate_locations(self.certificates)
+        if cert_locations:
+            self.add_line('# Add certificates\n')
+            for cert, new_cert in cert_locations:
+                self.add_line(f'ADD {cert} {new_cert}\n')
+            update_command = self.controller.get_update_certificate_command()
+            self.add_line(f'RUN {update_command}\n\n')
 
-            args.spack = True
-            if 'spack' in file_args:
-                if not file_args['spack']:
-                    args.spack = False
+    def add_os_package_commands(self):
+        logger.debug("Adding os package commands")
+        os_package_commands = self.controller.get_os_package_commands(self.os_packages)
+        if os_package_commands:
+            self.add_line('# Install OS packages\n')
+            for command in os_package_commands:
+                self.add_line(f'RUN {command}\n')
+            self.add_line_break()
 
-        if args.copy:
-            for item in args.copy:
-                if ':' not in item:
-                    print('Invalid copy format. Use {host-path}:{image-path}')
-                    exit(1)
-                host_image_path = item.split(':')
-                if len(host_image_path) != 2:
-                    print('Invalid copy format. Use {host-path}:{image-path}')
-                    exit(1)
-                host_path, image_path = host_image_path
-                self.controller.mount_and_copy(host_path, image_path)
+    def add_pre_system_stage_commands(self):
+        if self.pre_system_stage_commands:
+            logger.debug("Adding pre system stage commands")
+            self.add_line('# Run commands at the beginning of the system stage\n')
+            for command in self.pre_system_stage_commands:
+                self.add_line(f'RUN {command}\n')
+            self.add_line_break()
 
-        self.controller.init_image(args.image)
-        self.controller.add_system_package_commands(args.os_package)
+    def add_post_system_stage_commands(self):
+        if self.post_system_stage_commands:
+            logger.debug("Adding post system stage commands")
+            self.add_line('# Run commands at the end of the system stage\n')
+            for command in self.post_system_stage_commands:
+                self.add_line(f'RUN {command}\n')
+            self.add_line_break()
 
-        if args.tarball:
-            for item in args.tarball:
-                if ':' not in item:
-                    print('Invalid tarball format. Use {host-tarball-path}:{image-tarball-path}')
-                    exit(1)
-                host_image_path = item.split(':')
-                if len(host_image_path) != 2:
-                    print('Invalid tarball format. Use {host-tarball-path}:{image-tarball-path}')
-                    exit(1)
-                host_path, image_path = host_image_path
-                self.controller.expand_tarball(host_path, image_path)
+    # Spack group
+    def add_spack(self):
+        logger.debug("Adding spack")
+        spack_url = f'https://github.com/spack/spack/releases/download/v{self.spack_version}/spack-{self.spack_version}.tar.gz'
 
-        if args.spack:
-            self.controller.install_spack()
-            self.controller.add_spack_package_commands(args.package)
+        spack_install_commands = [
+            f'curl -L {spack_url} -o /spack.tar.gz',
+            'gzip -d /spack.tar.gz && tar -xf /spack.tar && rm /spack.tar',
+            f'mv /spack-{self.spack_version} /spack && . /spack/share/spack/setup-env.sh',
+            'echo export PATH=/spack/bin:$PATH >> ~/.bashrc'
+        ]
 
-        self.controller.execute_build(args.name)
+        self.add_line(f'# Install Spack version {self.spack_version}\n')
+        for command in spack_install_commands:
+            self.add_line(f'RUN {command}\n')
+        self.add_line_break()
+
+    def add_spack_packages(self):
+        if self.spack_packages:
+            logger.debug("Adding spack packages")
+            self.add_line('# Install Spack packages\n')
+            for package in self.spack_packages:
+                self.add_line(f'RUN spack install {package}\n')
+            self.add_line_break()
+
+    def add_pre_spack_stage_commands(self):
+        if self.pre_spack_stage_commands:
+            logger.debug("Adding pre spack stage commands")
+            self.add_line('# Run commands at the beginning of the Spack stage\n')
+            for command in self.pre_spack_stage_commands:
+                self.add_line(f'RUN {command}\n')
+            self.add_line_break()
+
+    def add_post_spack_install_commands(self):
+        if self.post_spack_install_commands:
+            logger.debug("Adding post spack install commands")
+            self.add_line('# Run commands after installing Spack\n')
+            for command in self.post_spack_install_commands:
+                self.add_line(f'RUN {command}\n')
+            self.add_line_break()
+
+    def add_post_spack_stage_commands(self):
+        if self.post_spack_stage_commands:
+            logger.debug("Adding post spack stage commands")
+            self.add_line('# Run commands at the end of the Spack stage\n')
+            for command in self.post_spack_stage_commands:
+                self.add_line(f'RUN {command}\n')
+            self.add_line_break()
+
+    def copy_conf_file(self):
+        logger.debug("Copying conf file")
+        file_path = get_modules_conf()
+        conf_dir_path = os.path.join(os.getcwd(), 'conf')
+
+        if not os.path.exists(conf_dir_path):
+            os.makedirs(conf_dir_path)
+
+        file_name = os.path.basename(file_path)
+        dest_path = os.path.join(conf_dir_path, file_name)
+        shutil.copy(file_path, dest_path)
+
+    def add_setup_env(self):
+        logger.debug("Adding setup env")
+        if not self.spack_install:
+            self.add_line('# Entrypoint of the image\n')
+            self.add_line(f'ENTRYPOINT ["exec /bin/bash"]\n')
+            return
+
+        self.add_line('# Setup spack and modules environment\n')
+        for command in self.controller.get_env_setup_commands():
+            self.add_line(f'RUN {command}\n')
+        self.add_line_break()
+
+        self.add_line('# Add module yaml conf file\n')
+        self.copy_conf_file()
+        self.add_line(f'ADD conf/modules.yaml /spack/etc/spack/modules.yaml\n')
+        self.add_line_break()
+
+        self.add_line('# Setup env at entrypoint of the image\n')
+        fixed_start = '["/bin/bash", "-c", "'
+        command = self.controller.get_env_source_command()
+        fixed_end = ' && exec /bin/bash"]'
+        self.add_line(f'ENTRYPOINT {fixed_start}{command}{fixed_end}\n')
+
+    def export_to_makefile(self):
+        logger.info("Exporting to makefile")
+        with open('Dockerfile', 'w') as f:
+            for instruction in self.instructions:
+                f.write(instruction)
+
+    # Add stages
+    def create_base_stage(self):
+        logger.info("Creating base stage")
+        self.add_line('# Base Stage\n', indent=False)
+        self.add_base_image()
+        self.add_initial_commands()
+        self.add_local_files()
+        self.add_env_variables()
+        self.add_post_base_stage_commands()
+
+    def create_system_stage(self):
+        logger.info("Creating system stage")
+        self.add_line('# System Stage\n', indent=False)
+        self.add_line(f'FROM base-stage AS system-stage\n\n', indent=False)
+        self.add_pre_system_stage_commands()
+        self.add_os_package_commands()
+        self.add_certificates()
+        self.add_post_system_stage_commands()
+
+    def create_spack_stage(self):
+        logger.info("Creating spack stage")
+        self.add_line('# Spack Stage\n', indent=False)
+        self.add_line(f'FROM system-stage AS spack-stage\n\n', indent=False)
+        self.add_pre_spack_stage_commands()
+        self.add_spack()
+        self.add_post_spack_install_commands()
+        self.add_spack_packages()
+        self.add_post_spack_stage_commands()
+
+    def create_finalize_stage(self):
+        logger.info("Creating finalize stage")
+        self.add_line('# Finalize Stage\n', indent=False)
+        if self.spack_install:
+            self.add_line(f'FROM spack-stage AS finalize-stage\n\n', indent=False)
+        else:
+            self.add_line(f'FROM system-stage AS finalize-stage\n\n', indent=False)
+
+        self.add_setup_env()
+        self.export_to_makefile()
+
+    def create(self):
+        logger.info("Creating stages")
+        self.create_base_stage()
+        self.create_system_stage()
+        if self.spack_install:
+            self.create_spack_stage()
+        self.create_finalize_stage()
