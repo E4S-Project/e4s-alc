@@ -20,15 +20,17 @@ class Create(AbstractCommand):
         usage = '%s create [options]' % self.command 
        
         self.parser.usage = usage
+
+        yaml_or_package = self.parser.add_mutually_exclusive_group()
+        yaml_or_package.add_argument('-p', '--package', nargs='+', metavar='\b', help='The name of a Spack package to install', default=[])
+        yaml_or_package.add_argument('-y', '--yaml', metavar='\b', help='The yaml file used to specify spack packages to install')
+        yaml_or_package.add_argument('-f', '--file', metavar='\b', help='The file used to create a new image')
+        yaml_or_package.add_argument('-ns', '--no-spack', help='\b\b\b\bChoose to install spack', action='store_false', dest='spack')
         self.parser.add_argument('-i', '--image', metavar='\b', help='The image name and the tag <image:tag>')
         self.parser.add_argument('-n', '--name', metavar='\b', help='The name of the newly created image')
-        self.parser.add_argument('-p', '--package', nargs='+', metavar='\b', help='The name of a Spack package to install', default=[])
         self.parser.add_argument('-a', '--os-package', nargs='+', metavar='\b', help='The name of an OS Package to install', default=[])
         self.parser.add_argument('-c', '--copy', metavar='\b', help='Directory to copy into the image', action='append', default=[])
         self.parser.add_argument('-t', '--tarball', metavar='\b', help='Tarball to expand in the image', action='append', default=[])
-        self.parser.add_argument('-f', '--file', metavar='\b', help='The file used to create a new image')
-        self.parser.add_argument('-y', '--yaml', metavar='\b', help='The yaml file used to specify spack packages to install')
-        self.parser.add_argument('-ns', '--no-spack', help='\b\b\b\bChoose to install spack', action='store_false', dest='spack')
         self.parser.add_argument('-P', '--parent', metavar='\b',help='Specific to singularity backend, choose which backend to use between Podman and Docker ["podman", "docker"] to prebuild the image', choices=['docker', 'podman'])
         self.parser.add_argument('-h', '--help', help='\b\b\b\b',action='store_true')
 
