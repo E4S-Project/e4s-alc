@@ -7,12 +7,12 @@ E4S à la Carte is a practical tool designed to facilitate the generation of Doc
 ## Table of Contents
 
 - [Overview](##Overview)
- - [Crafting a YAML file](#Crafting-a-YAML-file)
-  - [The Base Group](#The-Base-Group)
-  - [The System Group](#The-System-Group)
-  - [The Spack Group](#The-Spack-Group)
-  - [Template](#Template)
- - [Generated Dockerfile](#Generated-Dockerfile)
+  - [Crafting a YAML file](#Crafting-a-YAML-file)
+    - [The Base Group](#The-Base-Group)
+    - [The System Group](#The-System-Group)
+    - [The Spack Group](#The-Spack-Group)
+    - [Template](#Template)
+  - [Generated Dockerfile](#Generated-Dockerfile)
 
 ## Overview
 
