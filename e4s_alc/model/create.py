@@ -66,9 +66,6 @@ class CreateModel(Model):
                 host_path, image_path = host_image_path
                 self.controller.mount_and_copy(host_path, image_path)
 
-        if args.yaml:
-            self.controller.spack_yaml_configuration(args.yaml)
-
         if self.backend == "singularity" and args.parent:
             self.controller.set_parent(args.parent)
 
@@ -97,6 +94,9 @@ class CreateModel(Model):
 
         if args.spack:
             self.controller.install_spack()
+
+        if args.yaml:
+            self.controller.spack_yaml_configuration(args.yaml)
 
         if args.package:
             self.controller.add_spack_package_commands(args.package)

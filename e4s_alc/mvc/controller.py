@@ -84,6 +84,8 @@ class Controller():
         if not os.path.exists(self.yamls_dir):
             os.makedirs(self.yamls_dir)
         self.mount_and_copy(self.yamls_dir, "/spack_yamls")
+        self.commands.append('spack env create alc-env /spack_yamls/{}'.format(path))
+        self.commands.append('eval `spack env activate --sh alc-env`; spack install')
 
     def expand_tarball(self, host_path, image_path):
         if is_url(host_path):
