@@ -6,6 +6,8 @@ from e4s_alc.model.container.podman import PodmanController
 from e4s_alc.model.container.singularity import SingularityController
 from e4s_alc.model.init import InitModel
 import types
+from subprocess import Popen, PIPE
+
 from e4s_alc import logger
 
 import docker
@@ -44,7 +46,11 @@ class DockerTests(unittest.TestCase):
         controller.init_image('ubuntu')
         controller.add_ubuntu_package_commands('')
         controller.install_spack()
+        controller.add_spack_package_commands(['zlib'])
         self.assertIsNone(controller.execute_build("unittesting"))
+        p = Popen(["docker", "run", "--env", "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/spack/bin", "unittesting", "spack", "find"], stdout=PIPE)
+        stdout, _ = p.communicate()
+        self.assertIn(b'zlib@', stdout)
         controller.delete_image(['ubuntu', 'unittesting'], True)
 
     @unittest.skipIf('docker' not in sys.modules, "Docker not available")
