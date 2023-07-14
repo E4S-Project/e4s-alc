@@ -15,6 +15,7 @@ E4S à la Carte is a practical tool designed to facilitate the generation of Doc
     - [Example YAML file](#Example-YAML-file)
   - [Generated Dockerfile](#Generated-Dockerfile)
 
+--------
 ## Overview
 
 The `e4s-alc` tool is designed to facilitate the process of crafting Dockerfiles. This tool leverages `.yaml` files as input to generate Dockerfiles.
@@ -29,6 +30,7 @@ The `.yaml` file, which serves as the input, is segmented into three categories:
 
 Each of these groups manages resource allocation, variables, executables, files, and packages related to their group.
 
+--------
 #### The Base Group
 
 Parameters of the base group define the setup of the image and consist of the following: 
@@ -40,6 +42,7 @@ Parameters of the base group define the setup of the image and consist of the fo
 * `add-files` - Specifies the local files to be added in the image.
 * `post-base-stage-commands` - Includes a set of commands executed at the end of the Base Stage of the Dockerfile build.
 
+--------
 #### The System Group
 
 The system group gathers crucial binaries required for Spack as well as user-specific projects.
@@ -48,6 +51,7 @@ The system group gathers crucial binaries required for Spack as well as user-spe
 * `os-packages` - A set of OS packages to be included in the image. Note: `e4s-alc` auto-includes some OS packages for Spack's usability.
 * `post-system-stage-commands` - A set of commands executed at the end of the System Stage of the Dockerfile build.
 
+--------
 #### The Spack Group
 
 Spack group parameters deal with Spack installation and package inclusion for your image.
@@ -60,6 +64,7 @@ Spack group parameters deal with Spack installation and package inclusion for yo
 * `spack-packages` - A set of Spack packages to be installed into the image.
 * `post-spack-stage-commands` - A set of commands that execute towards the end of the Spack Stage of the Dockerfile build.
 
+--------
 #### Template
 
 A template `.yaml` can be generated with the command:
@@ -124,6 +129,7 @@ The template is also described here:
    ```
 </details>
 
+--------
 #### Example YAML file
 
 Here is an example `.yaml` file. This input file creates a Dockerfile using a Rhel8 base image. It installs gcc@11.2 and installs kokkos using gcc@11.2. Notice how I've chosen to exclude parameters to fit my build. This is one of the example yaml files in the `examples` directory.
@@ -153,6 +159,7 @@ gcc/11.2.0  kokkos/4.0.01
 [root@c5ad0d45ba1d /]# module load kokkos
 ```
 
+--------
 ### Generated Dockerfile
 
 The generated Dockerfile consists of 4 stages. The 4 stages are:
@@ -161,5 +168,6 @@ The generated Dockerfile consists of 4 stages. The 4 stages are:
 * Spack Stage
 * Finalize Stage
 
+--------
 #### Base Stage
 
