@@ -131,7 +131,7 @@ The template is also described here:
 --------
 #### Example YAML file
 
-Here is an example `.yaml` file. This input file creates a Dockerfile using a Rhel8 base image. It installs gcc@11.2 and installs kokkos using gcc@11.2. Notice how I've chosen to exclude parameters to fit my build. This is one of the example yaml files in the `examples` directory.
+Here is an example `.yaml` file. This input file creates a Dockerfile using a Rhel8 base image. It installs gcc@11.2 and installs kokkos using gcc@11.2. Notice how I've chosen to exclude parameters to fit my build. This is one of the example `.yaml` files in the `examples` directory.
 
 ```
 # rhel8-gcc11.2-kokkos.yaml
@@ -148,7 +148,20 @@ spack-packages:
   - kokkos
 ```
 
-Using `e4s-alc create -f rhel8-gcc11.2-kokkos.yaml && podman build .` to build the image, I run the image in interactive mode and inspect the install:
+I build the Dockerfile and image with:
+
+```
+e4s-alc create -f rhel8-gcc11.2-kokkos.yaml
+podman build .
+``` 
+
+or
+
+```
+e4s-alc build -f rhel8-gcc11.2-kokkos.yaml
+```
+
+Then, I run the image in interactive mode and inspect the install:
 
 ```
 [root@c5ad0d45ba1d /]# module avail
