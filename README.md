@@ -71,56 +71,57 @@ The template is also described here:
 
 <details>
   <summary>Template</summary>
-```
-######## Base group ########
-backend:
-registry:
-image:
 
-initial-commands:
-  -
-
-env-variables: 
-  -
-
-add-files: 
-  -
-
-post-base-stage-commands:
-  -
-
-######## System group ########
-pre-system-stage-commands: 
-  -
-
-certificates:
-  -
-
-os-packages: 
-  -
-
-post-system-stage-commands: 
-  -
-
-####### Spack group #######
-spack: True
-
-pre-spack-stage-commands:
-  -
-
-spack-version:
-
-post-spack-install-commands: 
-  -
-
-spack-env-file:
-spack-compiler:
-spack-packages: 
-  -
-
-post-spack-stage-commands: 
-  -
-```
+   ```
+   ######## Base group ########
+   backend:
+   registry:
+   image:
+   
+   initial-commands:
+     -
+   
+   env-variables: 
+     -
+   
+   add-files: 
+     -
+   
+   post-base-stage-commands:
+     -
+   
+   ######## System group ########
+   pre-system-stage-commands: 
+     -
+   
+   certificates:
+     -
+   
+   os-packages: 
+     -
+   
+   post-system-stage-commands: 
+     -
+   
+   ####### Spack group #######
+   spack: True
+   
+   pre-spack-stage-commands:
+     -
+   
+   spack-version:
+   
+   post-spack-install-commands: 
+     -
+   
+   spack-env-file:
+   spack-compiler:
+   spack-packages: 
+     -
+   
+   post-spack-stage-commands: 
+     -
+   ```
 </details>
 
 #### Example YAML file
