@@ -121,7 +121,7 @@ post-spack-stage-commands:
 
 #### Example YAML file
 
-Here is an example `.yaml` file. This input file creates a Dockerfile using a Rhel8 base image. It adds a project to the image, installs git, and installs gcc@11.2 and installs kokkos using gcc@11.2. Notice how I've chosen to exclude parameters to fit my build.
+Here is an example `.yaml` file. This input file creates a Dockerfile using a Rhel8 base image. It installs gcc@11.2 and installs kokkos using gcc@11.2. Notice how I've chosen to exclude parameters to fit my build.
 
 ```
 # rhel8-gcc11.2-kokkos.yaml
@@ -135,28 +135,12 @@ initial-commands:
   - cat /etc/os-release > /system_info.txt
   - uname -a >> /system_info.txt
 
-env-variables:
-  - PROJECT_ROOT=/my_project
-
-add-files:
-  - project /my_project
-
-######## System group ########
-os-packages:
-  - git
-
-post-system-stage-commands:
-  - git --version > git_test.txt
-
 ####### Spack group #######
 spack: True
 spack-version: latest
 spack-compiler: gcc@11.2
 spack-packages:
   - kokkos
-
-post-spack-install-commands:
-  - spack --version > spack_test.txt
 
 post-spack-stage-commands:
   - spack find >> spack_test.txt
