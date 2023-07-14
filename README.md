@@ -15,7 +15,6 @@ E4S à la Carte is a practical tool designed to facilitate the generation of Doc
     - [Example YAML file](#Example-YAML-file)
   - [Generated Dockerfile](#Generated-Dockerfile)
 
---------
 ## Overview
 
 The `e4s-alc` tool is designed to facilitate the process of crafting Dockerfiles. This tool leverages `.yaml` files as input to generate Dockerfiles.
