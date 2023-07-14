@@ -121,7 +121,7 @@ post-spack-stage-commands:
 
 #### Example YAML file
 
-Here is an example `.yaml` file. This input file creates a Dockerfile using a Rhel8 base image. It installs gcc@11.2 and installs kokkos using gcc@11.2. Notice how I've chosen to exclude parameters to fit my build.
+Here is an example `.yaml` file. This input file creates a Dockerfile using a Rhel8 base image. It installs gcc@11.2 and installs kokkos using gcc@11.2. Notice how I've chosen to exclude parameters to fit my build. This is one of the example yaml files in the `examples` directory.
 
 ```
 # rhel8-gcc11.2-kokkos.yaml
@@ -131,22 +131,14 @@ backend: podman
 registry: registry.access.redhat.com
 image: ubi8/ubi
 
-initial-commands:
-  - cat /etc/os-release > /system_info.txt
-  - uname -a >> /system_info.txt
-
 ####### Spack group #######
-spack: True
 spack-version: latest
 spack-compiler: gcc@11.2
 spack-packages:
   - kokkos
-
-post-spack-stage-commands:
-  - spack find >> spack_test.txt
 ```
 
-Using `e4s-alc create -f rhel8-gcc11.2-kokkos.yaml && podman build .` to build the image. I run the image in interactive mode and inspect the install:
+Using `e4s-alc create -f rhel8-gcc11.2-kokkos.yaml && podman build .` to build the image, I run the image in interactive mode and inspect the install:
 
 ```
 [root@c5ad0d45ba1d /]# module avail
