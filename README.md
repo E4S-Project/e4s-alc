@@ -68,56 +68,60 @@ e4s-alc template
 ```
 
 The template is also described here:
-```
-######## Base group ########
-backend:
-registry:
-image:
 
-initial-commands:
-  -
+<details>
+  <summary>Template</summary>
+	```
+	######## Base group ########
+	backend:
+	registry:
+	image:
 
-env-variables: 
-  -
+	initial-commands:
+	  -
 
-add-files: 
-  -
+	env-variables: 
+	  -
 
-post-base-stage-commands:
-  -
+	add-files: 
+	  -
 
-######## System group ########
-pre-system-stage-commands: 
-  -
+	post-base-stage-commands:
+	  -
 
-certificates:
-  -
+	######## System group ########
+	pre-system-stage-commands: 
+	  -
 
-os-packages: 
-  -
+	certificates:
+	  -
 
-post-system-stage-commands: 
-  -
+	os-packages: 
+	  -
 
-####### Spack group #######
-spack: True
+	post-system-stage-commands: 
+	  -
 
-pre-spack-stage-commands:
-  -
+	####### Spack group #######
+	spack: True
 
-spack-version:
+	pre-spack-stage-commands:
+	  -
 
-post-spack-install-commands: 
-  -
+	spack-version:
 
-spack-env-file:
-spack-compiler:
-spack-packages: 
-  -
+	post-spack-install-commands: 
+	  -
 
-post-spack-stage-commands: 
-  -
-```
+	spack-env-file:
+	spack-compiler:
+	spack-packages: 
+	  -
+
+	post-spack-stage-commands: 
+	  -
+	```
+</details>
 
 #### Example YAML file
 
