@@ -105,6 +105,31 @@ class CreateModel(Model):
             self.add_line_break()
 
     # Spack group
+    def copy_conf_file(self):
+        logger.debug("Copying conf file")
+        file_path = get_modules_conf()
+        conf_dir_path = os.path.join(os.getcwd(), 'conf')
+
+        if not os.path.exists(conf_dir_path):
+            os.makedirs(conf_dir_path)
+
+        file_name = os.path.basename(file_path)
+        dest_path = os.path.join(conf_dir_path, file_name)
+        shutil.copy(file_path, dest_path)
+
+    def add_setup_env(self):
+        logger.debug("Adding setup env")
+
+        self.add_line('# Setup spack and modules environment\n')
+        for command in self.controller.get_env_setup_commands():
+            self.add_line(f'RUN {command}\n')
+        self.add_line_break()
+
+        self.add_line('# Add module yaml conf file\n')
+        self.copy_conf_file()
+        self.add_line(f'ADD conf/modules.yaml /spack/etc/spack/modules.yaml\n')
+        self.add_line_break()
+
     def add_spack(self):
         logger.debug("Adding spack")
         spack_url = f'https://github.com/spack/spack/releases/download/v{self.spack_version}/spack-{self.spack_version}.tar.gz'
@@ -120,6 +145,23 @@ class CreateModel(Model):
         for command in spack_install_commands:
             self.add_line(f'RUN {command}\n')
         self.add_line_break()
+
+    def add_spack_compiler(self):
+        if self.spack_compiler:
+            logger.debug("Adding spack compiler")
+            self.add_line('# Installing Spack compiler\n')
+            
+            spack_compiler_commands = [
+                'spack compiler find',
+                f'spack install {self.spack_compiler}',
+                'spack module tcl refresh -y',
+                f'source /etc/profile.d/setup-env.sh && spack load {self.spack_compiler} && spack compiler find',
+                f'spack config add "packages:all:compiler:[{self.spack_compiler}]"'
+            ]
+
+            for command in spack_compiler_commands:
+                self.add_line(f'RUN {command}\n')
+            self.add_line_break()
 
     def add_spack_packages(self):
         if self.spack_packages:
@@ -153,34 +195,11 @@ class CreateModel(Model):
                 self.add_line(f'RUN {command}\n')
             self.add_line_break()
 
-    def copy_conf_file(self):
-        logger.debug("Copying conf file")
-        file_path = get_modules_conf()
-        conf_dir_path = os.path.join(os.getcwd(), 'conf')
-
-        if not os.path.exists(conf_dir_path):
-            os.makedirs(conf_dir_path)
-
-        file_name = os.path.basename(file_path)
-        dest_path = os.path.join(conf_dir_path, file_name)
-        shutil.copy(file_path, dest_path)
-
-    def add_setup_env(self):
-        logger.debug("Adding setup env")
+    def add_entrypoint(self):
         if not self.spack_install:
             self.add_line('# Entrypoint of the image\n')
             self.add_line(f'ENTRYPOINT ["exec /bin/bash"]\n')
             return
-
-        self.add_line('# Setup spack and modules environment\n')
-        for command in self.controller.get_env_setup_commands():
-            self.add_line(f'RUN {command}\n')
-        self.add_line_break()
-
-        self.add_line('# Add module yaml conf file\n')
-        self.copy_conf_file()
-        self.add_line(f'ADD conf/modules.yaml /spack/etc/spack/modules.yaml\n')
-        self.add_line_break()
 
         self.add_line('# Setup env at entrypoint of the image\n')
         fixed_start = '["/bin/bash", "-c", "'
@@ -219,7 +238,9 @@ class CreateModel(Model):
         self.add_line(f'FROM system-stage AS spack-stage\n\n', indent=False)
         self.add_pre_spack_stage_commands()
         self.add_spack()
+        self.add_setup_env()
         self.add_post_spack_install_commands()
+        self.add_spack_compiler()
         self.add_spack_packages()
         self.add_post_spack_stage_commands()
 
@@ -231,7 +252,7 @@ class CreateModel(Model):
         else:
             self.add_line(f'FROM system-stage AS finalize-stage\n\n', indent=False)
 
-        self.add_setup_env()
+        self.add_entrypoint()
         self.export_to_makefile()
 
     def create(self):

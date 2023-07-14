@@ -52,6 +52,7 @@ class CreateCommand(AbstractCommand):
         spack_group_args = self.parser.add_argument_group('Spack Stage Arguments', spack_group_desc)
         spack_group_args.add_argument('-s', '--spack', help='Choose to install spack', default=True, dest='spack')
         spack_group_args.add_argument('-sv', '--spack-version', help='The version of a Spack to install')
+        spack_group_args.add_argument('-sc', '--spack-compiler', help='The Spack compiler that will be installed and will build Spack packages')
         spack_group_args.add_argument('-se', '--spack-env-file', help='The path to a Spack env file')
         spack_group_args.add_argument('-p', '--spack-package', help='The name of a Spack package to install', action='append', default=[], dest='spack-packages')
         spack_group_args.add_argument('--pre-spack-stage-command', help='Commands to run at the beginning of the spack stage', action='append', default=[], dest='pre-spack-install-commands')

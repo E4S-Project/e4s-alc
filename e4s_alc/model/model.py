@@ -32,8 +32,9 @@ class Model():
         # Spack group
         self.spack_install = None
         self.spack_version = None
-        self.spack_packages = None
         self.spack_env_file = None
+        self.spack_compiler = None
+        self.spack_packages = None
         self.pre_spack_stage_commands = None
         self.post_spack_install_commands = None
         self.post_spack_stage_commands = None
@@ -63,7 +64,7 @@ class Model():
 
         # Base group
         self.backend = args.get('backend', self.discover_backend())
-        self.base_image = args.get('image', None)
+        self.base_image = args.get('image', None) or self.raise_argument_error('image')
         self.image_registry = self.none_to_blank(args.get('registry', ''))
         if self.image_registry:
             if not self.image_registry.endswith('/'):
@@ -83,7 +84,11 @@ class Model():
         # Spack group
         self.spack_install = self.string_to_bool(args.get('spack', True))
         self.spack_version = args.get('spack-version', self.discover_latest_spack_version())
+        if self.spack_version == 'latest':
+            self.spack_version = self.discover_latest_spack_version()
+
         self.spack_env_file = args.get('spack-env-file', None)
+        self.spack_compiler = args.get('spack-compiler', None)
         self.spack_packages = self.remove_nones(args.get('spack-packages', []))
         self.pre_spack_stage_commands = self.remove_nones(args.get('pre-spack-stage-commands', []))
         self.post_spack_install_commands = self.remove_nones(args.get('post-spack-install-commands', []))
@@ -133,3 +138,7 @@ class Model():
         output = subprocess.check_output(full_command, shell=True)
         version_number = output.decode('utf-8').strip().replace('v', '')
         return version_number 
+
+    def raise_argument_error(self, argument):
+        print(f'ERROR: add raise here {argument}')
+        exit(1)

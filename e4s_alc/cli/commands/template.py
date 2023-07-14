@@ -44,7 +44,7 @@ registry:
 image:
 
 initial-commands:
-  - echo "Initial commands"
+  -
 
 env-variables: 
   -
@@ -53,11 +53,11 @@ add-files:
   -
 
 post-base-stage-commands:
-  - echo "Post base stage commands"
+  -
 
 ######## System group ########
 pre-system-stage-commands: 
-  - echo "Pre system stage commands"
+  -
 
 certificates:
   -
@@ -66,21 +66,23 @@ os-packages:
   -
 
 post-system-stage-commands: 
-  - echo "Command after installing system packages and before installing Spack"
+  -
 
 ####### Spack group #######
 spack: True
+
+pre-spack-stage-commands:
+  -
+
 spack-version:
+
+post-spack-install-commands: 
+  -
+
 spack-env-file: 
+spack-compiler:
 spack-packages: 
   -
 
-pre-spack-stage-commands:
-  - echo "Pre spack stage commands"
-
-post-spack-install-commands: 
-  - echo "Post spack install commands"
-
 post-spack-stage-commands: 
-  - echo "Post spack stage commands"
-"""
+  -"""

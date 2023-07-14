@@ -55,6 +55,7 @@ Spack group parameters deal with Spack installation and package inclusion for yo
 * `spack-version` - Specifies the version of Spack to install in the `X.Y.Z` format representing major, minor, and point release versions. Default is the latest Spack version.
 * `post-spack-install-commands` - A set of commands that execute after Spack installation.
 * `spack-env-file` - The local `.yaml` file used to build out Spack environments.
+* `spack-compiler` - The Spack compiler to be installed for building the specified Spack packages.
 * `spack-packages` - A set of Spack packages to be installed into the image.
 * `post-spack-stage-commands` - A set of commands that execute towards the end of the Spack Stage of the Dockerfile build.
 
@@ -108,12 +109,65 @@ spack-version:
 post-spack-install-commands: 
   -
 
-spack-env-file: 
+spack-env-file:
+spack-compiler:
 spack-packages: 
   -
 
 post-spack-stage-commands: 
   -
+```
+
+#### Example YAML file
+
+Here is an example `.yaml` file. This input file creates a Dockerfile using a Rhel8 base image. It adds a project to the image, installs git, and installs gcc@11.2 and installs kokkos using gcc@11.2. Notice how I've chosen to exclude parameters to fit my build.
+
+```
+# rhel8-gcc11.2-kokkos.yaml
+######## Base group ########
+backend: podman
+registry: registry.access.redhat.com
+image: ubi8/ubi
+
+initial-commands:
+  - cat /etc/os-release > /system_info.txt
+  - uname -a >> /system_info.txt
+
+env-variables:
+  - PROJECT_ROOT=/my_project
+
+add-files:
+  - project /my_project
+
+######## System group ########
+os-packages:
+  - git
+
+post-system-stage-commands:
+  - git --version > git_test.txt
+
+####### Spack group #######
+spack: True
+spack-version: latest
+spack-compiler: gcc@11.2
+spack-packages:
+  - kokkos
+
+post-spack-install-commands:
+  - spack --version > spack_test.txt
+
+post-spack-stage-commands:
+  - spack find >> spack_test.txt
+```
+
+Using `e4s-alc create -f rhel8-gcc11.2-kokkos.yaml && podman build .` to build the image. I run the image in interactive mode and inspect the install:
+
+```
+[root@c5ad0d45ba1d /]# module avail
+---------------------------------------------------------- /modulefiles/linux-rhel8-power9le ----------------------------------------------------------
+gcc/11.2.0  kokkos/4.0.01  
+[root@c5ad0d45ba1d /]# module load gcc
+[root@c5ad0d45ba1d /]# module load kokkos
 ```
 
 ### Generated Dockerfile
