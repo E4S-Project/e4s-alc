@@ -12,6 +12,7 @@ E4S à la Carte is a practical tool designed to facilitate the generation of Doc
     - [The System Group](#The-System-Group)
     - [The Spack Group](#The-Spack-Group)
     - [Template](#Template)
+    - [Example YAML file](#Example-YAML-file)
   - [Generated Dockerfile](#Generated-Dockerfile)
 
 ## Overview
@@ -124,6 +125,7 @@ Here is an example `.yaml` file. This input file creates a Dockerfile using a Rh
 
 ```
 # rhel8-gcc11.2-kokkos.yaml
+
 ######## Base group ########
 backend: podman
 registry: registry.access.redhat.com
@@ -164,7 +166,7 @@ Using `e4s-alc create -f rhel8-gcc11.2-kokkos.yaml && podman build .` to build t
 
 ```
 [root@c5ad0d45ba1d /]# module avail
----------------------------------------------------------- /modulefiles/linux-rhel8-power9le ----------------------------------------------------------
+----------------------------- /modulefiles/linux-rhel8-power9le -----------------------------------
 gcc/11.2.0  kokkos/4.0.01  
 [root@c5ad0d45ba1d /]# module load gcc
 [root@c5ad0d45ba1d /]# module load kokkos
