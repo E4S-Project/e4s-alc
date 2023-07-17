@@ -1,5 +1,7 @@
 import sys
+import os
 import unittest
+from e4s_alc import E4S_ALC_HOME
 from e4s_alc.cli.__main__ import COMMAND as cli_main_cmd
 from e4s_alc.model.container.docker import DockerController
 from e4s_alc.model.container.podman import PodmanController
@@ -47,6 +49,20 @@ class DockerTests(unittest.TestCase):
         controller.add_ubuntu_package_commands('')
         controller.install_spack()
         controller.add_spack_package_commands(['zlib'])
+        self.assertIsNone(controller.execute_build("unittesting"))
+        p = Popen(["docker", "run", "--env", "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/spack/bin", "unittesting", "spack", "find"], stdout=PIPE)
+        stdout, _ = p.communicate()
+        self.assertIn(b'zlib@', stdout)
+        controller.delete_image(['ubuntu', 'unittesting'], True)
+
+    @unittest.skipIf('docker' not in sys.modules, "Docker not available")
+    def test_create_ubuntu_docker_spack_yaml(self):
+        controller = DockerController()
+        controller.init_image('ubuntu')
+        controller.add_ubuntu_package_commands('')
+        controller.install_spack()
+        spack_yamls_dir = E4S_ALC_HOME + '/tests/assets/spack_yamls'
+        controller.spack_yaml_configuration("test_spack.yaml", spack_yamls_dir=spack_yamls_dir)
         self.assertIsNone(controller.execute_build("unittesting"))
         p = Popen(["docker", "run", "--env", "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/spack/bin", "unittesting", "spack", "find"], stdout=PIPE)
         stdout, _ = p.communicate()

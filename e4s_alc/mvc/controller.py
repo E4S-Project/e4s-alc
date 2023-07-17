@@ -79,8 +79,11 @@ class Controller():
         # Add command to copy directory from mounted volume to image
         self.commands.append('cp -r /tmp{} {}'.format(image_path, image_path))
 
-    def spack_yaml_configuration(self, path):
-        self.yamls_dir = self.config_dir + "/spack_yamls"
+    def spack_yaml_configuration(self, path, spack_yamls_dir=None):
+        if spack_yamls_dir is not None:
+            self.yamls_dir = spack_yamls_dir
+        else:
+            self.yamls_dir = self.config_dir + "/spack_yamls"
         if not os.path.exists(self.yamls_dir):
             os.makedirs(self.yamls_dir)
         self.mount_and_copy(self.yamls_dir, "/spack_yamls")
