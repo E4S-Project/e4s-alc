@@ -7,19 +7,63 @@ E4S à la Carte is a practical tool designed to facilitate the generation of Doc
 ## Table of Contents
 
 - [Overview](##Overview)
-  - [Crafting a YAML file](#Crafting-a-YAML-file)
+- [Installation](#Installation)
+- [Usage](#Usage)
+- [Crafting a YAML file](#Crafting-a-YAML-file)
     - [The Base Group](#The-Base-Group)
     - [The System Group](#The-System-Group)
     - [The Spack Group](#The-Spack-Group)
     - [Template](#Template)
     - [Example YAML file](#Example-YAML-file)
-  - [Generated Dockerfile](#Generated-Dockerfile)
 
 ## Overview
 
 The `e4s-alc` tool is designed to facilitate the process of crafting Dockerfiles. This tool leverages `.yaml` files as input to generate Dockerfiles.
 
-<a name="desc"></a>
+## Installation
+
+Installing `e4s-alc` is simple.
+
+Clone the project:
+```
+git clone https://github.com/E4S-Project/e4s-alc.git
+```
+
+Run `make`:
+```
+cd e4s-alc && make
+```
+
+## Usage
+
+`e4s-alc` has 3 basic commands:
+* `create` - Used to create a Dockerfile
+* `build` - Used to create and build a Dockerfile
+* `template` - Used to generate a template `.yaml` file
+
+While you are able to use `e4s-alc create` and `e4s-alc build` as a command line tool, it is recommended that you use a `.yaml` file.
+
+To create a Dockerfile, run:
+```
+e4s-alc create -f example.yaml
+```
+
+This will place a Dockerfile and `conf` directory in the current working directory. Do not remove the `conf` directory because this plays a role in the build of the container.
+
+To create a Docker and immediately begin building the container, run:
+```
+e4s-alc build -f example.yaml
+```
+
+This is the same as running `e4s-alc create -f example.yaml && {docker/podman} build .`
+
+To create a template `.yaml` file to work off, run:
+```
+e4s-alc template
+```
+
+This will print a template `.yaml` file using `e4s-alc` syntax.
+
 ### Crafting a YAML file
 
 The `.yaml` file, which serves as the input, is segmented into three categories: 
@@ -170,16 +214,3 @@ gcc/11.2.0  kokkos/4.0.01
 [root@c5ad0d45ba1d /]# module load gcc
 [root@c5ad0d45ba1d /]# module load kokkos
 ```
-
---------
-### Generated Dockerfile
-
-The generated Dockerfile consists of 4 stages. The 4 stages are:
-* Base Stage
-* System Stage
-* Spack Stage
-* Finalize Stage
-
---------
-#### Base Stage
-

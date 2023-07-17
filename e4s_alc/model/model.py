@@ -2,7 +2,7 @@ import os
 import yaml
 import subprocess
 import logging
-from e4s_alc.util import BackendMissingError
+from e4s_alc.util import BackendMissingError, YAMLNotFoundError
 from e4s_alc.controller.controller import Controller
 
 logger = logging.getLogger('core')
@@ -45,6 +45,10 @@ class Model():
     def read_arguments_from_file(self, file_path):
         logger.info("Reading arguments from file")
         abs_file_path = os.path.abspath(file_path)
+
+        if not os.path.isfile(abs_file_path):
+            raise YAMLNotFoundError(abs_file_path)
+
         with open(abs_file_path, 'r') as file:
             if file_path.endswith('.yaml'):
                 data = yaml.safe_load(file)
@@ -52,7 +56,6 @@ class Model():
                 print('Invalid file format. Please provide .yaml file format. Run `e4s-alc template` to generate a template .yaml file.')
                 exit(1)
         return data
-
 
     def read_arguments(self, arg_namespace):
         logger.info("Reading arguments")

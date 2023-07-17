@@ -73,15 +73,15 @@ class Controller():
         logger.info("Getting environment setup commands")
         commands = [
             f'echo "spack module tcl refresh -y" >> {self.setup_script}',
-            f'echo "source /etc/profile.d/modules.sh" >> {self.setup_script}',
-            f'echo "source /spack/share/spack/setup-env.sh" >> {self.setup_script}',
+            f'echo ". /etc/profile.d/modules.sh" >> {self.setup_script}',
+            f'echo ". /spack/share/spack/setup-env.sh" >> {self.setup_script}',
             f'echo "export MODULEPATH=\$(echo \$MODULEPATH | cut -d\':\' -f1)" >> {self.setup_script}'
         ]
         return commands
 
     def get_env_source_command(self):
         logger.info("Getting command to source environment setup script")
-        command = f'source {self.setup_script}'
+        command = f'. {self.setup_script}'
         return command
 
     def build(self):
