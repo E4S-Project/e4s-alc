@@ -174,7 +174,7 @@ class SingularityController(PodmanController, DockerController):
         print(t)
 
     def delete_image(self, names, force):
-        images_path = [self.images_dir + "/" + name for name in names]
+        images_path = [self.images_dir + "/" + name + ".sif" for name in names]
         try:
             for image_path in images_path:
                 os.remove(image_path)

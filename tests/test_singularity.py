@@ -44,7 +44,7 @@ class SingularityTests(unittest.TestCase):
         controller.parent = DockerController
         controller.client = controller.client_docker
         self.assertIsNone(controller.execute_build("unittesting"))
-        controller.delete_image(['unittesting.sif'], True)
+        controller.delete_image(['unittesting'], True)
         controller.parent.delete_image(controller, ['unittesting'], True)
         controller.parent.delete_image(controller, ['ubuntu'], True)
 
@@ -54,7 +54,7 @@ class SingularityTests(unittest.TestCase):
         controller = SingularityController()
         controller.init_image('ubuntu')
         self.assertIsNone(controller.execute_build("unittesting"))
-        controller.delete_image(['unittesting.sif'], True)
+        controller.delete_image(['unittesting'], True)
         controller.parent.delete_image(controller, ['unittesting'], True)
         controller.parent.delete_image(controller, ['ubuntu'], True)
 
@@ -68,7 +68,7 @@ class SingularityTests(unittest.TestCase):
         controller.add_ubuntu_package_commands('')
         controller.install_spack()
         self.assertIsNone(controller.execute_build("unittesting"))
-        controller.delete_image(['unittesting.sif'], True)
+        controller.delete_image(['unittesting'], True)
         controller.parent.delete_image(controller, ['unittesting'], True)
         controller.parent.delete_image(controller, ['ubuntu'], True)
 
@@ -89,7 +89,7 @@ class SingularityTests(unittest.TestCase):
         stdout, _ = p.communicate()
         self.assertIn(b'zlib@', stdout)
         self.assertIn(b'tcl@', stdout)
-        controller.delete_image(['unittesting.sif'], True)
+        controller.delete_image(['unittesting'], True)
         controller.parent.delete_image(controller, ['unittesting'], True)
         controller.parent.delete_image(controller, ['ubuntu'], True)
 
