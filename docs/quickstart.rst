@@ -40,8 +40,7 @@ Also, the command line instructions can be fed through a json file.
     $ e4s-alc create \
         --image centos:8 \
         --name my-centos-image \
-        -p py-numpy \
-        -p autodiff
+        -p py-numpy autodiff
 
 or
 
@@ -74,6 +73,18 @@ or
 
     $ e4s-alc create -f test.json
 
+If you have a spack environment file (spack.yaml), you can provide it to **e4s-alc** by placing it in the **e4s-alc user directory** subdirectory named **spack_yamls**. Then, when creating an image (or adding to an image), specify the file's name through the **-y/--yaml** flag to have the environment installed:
+
+.. code::
+
+   $ ls ~/.e4s-alc/spack_yamls/
+   spack.yaml  test_spack.yaml
+
+   $ e4s-alc create \
+   --image ubuntu:22.04 \
+   --name spack_environment_image \
+   --yaml spack.yaml
+
 Adding to an image
 ------------------
 
@@ -82,6 +93,8 @@ Once an image is created (through **e4s-alc** or not), it can be updated with ne
 .. code::
 
    $ e4s-alc add -n my-ubuntu-image -p kokkos -a neovim
+
+If you want to use a spack environment file to add to an image, it is supported and done the same way than for the image creation.
 
 Listing available images
 ---------------------------
