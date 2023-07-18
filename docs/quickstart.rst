@@ -73,7 +73,8 @@ or
 
     $ e4s-alc create -f test.json
 
-If you have a spack environment file (spack.yaml), you can provide it to **e4s-alc** by placing it in the **e4s-alc user directory** subdirectory named **spack_yamls**. Then, when creating an image (or adding to an image), specify the file's name through the **-y/--yaml** flag to have the environment installed:
+If you have a spack environment file (spack.yaml), you can provide it to **e4s-alc** by placing it in the :ref:`**e4s-alc user directory**` subdirectory named **spack_yamls**. Then, when creating an image (or adding to an image), specify the file's name through the **-y/--yaml** flag to have the environment installed:
+
 
 .. code::
 
