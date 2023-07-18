@@ -5,9 +5,10 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "e4s-alc"
 authors = [
-    {name = "Cameron Durbin", email = "cdurbin@uoregon.edu"},
+    {name = "Cameron Durbin", email = "cfd@uoregon.edu"},
+    {name = "Frederick Deny", email = "fdeny@uoregon.edu"},
 ]
-description = "Build docker containers quickly with Spack integration."
+description = "Build containers quickly with Spack integration."
 readme = "README.md"
 requires-python = ">=3.7"
 keywords = ["containers", "hpc", "libraries", "linux"]
