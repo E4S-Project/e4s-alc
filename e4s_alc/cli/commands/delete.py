@@ -2,6 +2,9 @@ import os
 from e4s_alc import E4S_ALC_VERSION, E4S_ALC_URL, E4S_ALC_SCRIPT
 from e4s_alc.model.delete import DeleteModel
 from e4s_alc.cli.command import AbstractCommand
+from e4s_alc import logger
+
+LOGGER = logger.get_logger(__name__)
 
 HELP_PAGE_FMT = "'%(command)s' page to be written."
 
@@ -16,9 +19,10 @@ class Delete(AbstractCommand):
     def _construct_parser(self):
         usage = '%s delete [options]' % self.command      
         self.parser.usage = usage
-        self.parser.add_argument('-n', '--name', metavar='', help='Name of the image to delete')
+        self.parser.add_argument('-n', '--name', nargs='+', metavar='', help='Name of the images to delete')
         self.parser.add_argument('-c','--container', metavar='', help='ID of the container to delete')
         self.parser.add_argument('-f', '--force', help='Attempt to force the deletion', action='store_true')
+        self.parser.add_argument('--id', nargs='+', metavar='', help='IDs of the images to delete')
         self.parser.add_argument('--prune-images', help='Delete unused images', action='store_true')
         self.parser.add_argument('--prune-containers', help='Delete stopped containers', action='store_true')
         self.parser.add_argument('-h', '--help', help='\b\b\b\b',action='store_true')
@@ -30,15 +34,15 @@ class Delete(AbstractCommand):
             print()
             exit(0)
 
-        if not (args.name  or args.container or args.prune_images or args.prune_containers):
-            print('Error: Arguments \'-n/--name\' or \'-p/--prune\' or \'-c/--prune-containers\' is required.')
+        if not (args.name or args.container or args.prune_images or args.prune_containers or args.id):
+            LOGGER.error('Arguments \'-n/--name\' or \'--prune-images\' or \'-c\' or \'--prune-containers\' or \'--id\' is required.')
             print()
             self.parser.print_help()
             print()
             exit(1)
 
-        if args.name and (args.prune_images or args.prune_containers):
-            print('Error: Arguments \'-n/--name\' and \'--prune-images\' and \'--prune-containers\' can\'t be used together.')
+        if args.name and (args.prune_images or args.prune_containers) and args.id:
+            LOGGER.error('Arguments \'-n/--name\' and \'--prune-images\' and \'--prune-containers\' and \'--id\' can\'t be used together.')
             print()
             self.parser.print_help()
             print()

@@ -2,7 +2,7 @@ import os
 import sys
 import e4s_alc
 import argparse
-from e4s_alc import E4S_ALC_VERSION, E4S_ALC_URL, E4S_ALC_SCRIPT
+from e4s_alc import logger, E4S_ALC_VERSION, E4S_ALC_URL, E4S_ALC_SCRIPT
 from e4s_alc.cli.cli_view import NoSubparsersMetavarFormatter
 from e4s_alc.cli.command import AbstractCommand
 import e4s_alc.cli.commands
@@ -39,8 +39,10 @@ class MainCommand(AbstractCommand):
             command.add_subparser(subparsers)
 
         parser.add_argument('-V', '--version', help='Show programs version number and exit.', action='store_true')
-        parser.add_argument('-q', '--quiet', help='Suppress all output except error messages.', action='store_true')
-        parser.add_argument('-v', '--verbose', help='Show debugging messages.', action='store_true')
+
+        verbosity_group = parser.add_mutually_exclusive_group()
+        verbosity_group.add_argument('-q', '--quiet', help='Suppress all output except error messages.', default=argparse.SUPPRESS, action='store_const', const='ERROR')
+        verbosity_group.add_argument('-v', '--verbose', help='Show debugging messages.', default=argparse.SUPPRESS, action='store_const', const='DEBUG')
 
         return parser 
 
@@ -55,6 +57,10 @@ class MainCommand(AbstractCommand):
         if args.version:
             print(__version__)
             return 0
+
+        quiet = getattr(args, 'quiet', logger.LOG_LEVEL)
+        verbose = getattr(args, 'verbose', quiet)
+        logger.set_log_level(verbose)
 
         command = args.command
         AbstractCommand.commands[command].main(args)

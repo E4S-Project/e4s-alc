@@ -6,6 +6,18 @@ import subprocess
 from prettytable import PrettyTable
 from datetime import datetime
 from e4s_alc.model.container.podman import PodmanController
+from e4s_alc.model.container.docker import DockerController
+from e4s_alc.mvc.controller import Controller
+from e4s_alc import logger
+
+LOGGER = logger.get_logger(__name__)
+
+has_docker=False
+try:
+    import docker
+    has_docker=True
+except ImportError:
+    pass
 has_podman=False
 try:
     import podman
@@ -26,52 +38,14 @@ def human_readable_size(size, decimal_places=2):
         size /= 1024.0
     return f"{size:.{decimal_places}f} {unit}"
 
-class SingularityController(PodmanController):
+class SingularityController(PodmanController, DockerController):
     def __init__(self):
-        super(PodmanController, self).__init__('SingularityController')
+        Controller.__init__(self, 'SingularityController')
         self.lacks_backend = False
+        self.use_docker = True
+        self.use_podman = True
+        self.parent = PodmanController
 
-        # Check if the python libraries are imported
-        if not has_podman:
-            print('Failed to find Podman python library')
-            self.lacks_backend = True
-        if not has_singularity:
-            print('Failed to find Singularity python library')
-            self.lacks_backend = True
-
-        if self.lacks_backend:
-            print("Missing package podman or spython: podman is also needed to manipulate singularity images with e4s-alc")
-            return
-
-        # Try to turn on API with podman 3
-        try:
-            server_process = subprocess.Popen(['podman', 'system', 'service', '-t', '0'])
-            atexit.register(server_process.terminate)
-        except:
-            print('Failed to connect to podman API.')
-            return
-
-        # Try to connect with the docker runtime
-        try:
-            process = subprocess.Popen(['podman', 'info', '--format', 'json'],
-                                 stdout=subprocess.PIPE, 
-                                 stderr=subprocess.PIPE)
-            process_out, process_err = process.communicate()
-            if process_err:
-                print('Failed to connect to Podman client')
-                return
-
-            process_out_dict = json.loads(process_out.decode('utf-8'))
-            uri = 'unix://{}'.format(process_out_dict['host']['remoteSocket']['path'])
-
-            self.client = podman.PodmanClient(base_url=uri)
-        except podman.errors.exceptions.APIError:
-            print('Failed to connect to Podman client')
-            return
-        
-        self.is_active = True
-
-        self.config_dir = os.path.join(os.path.expanduser('~'), '.e4s-alc')
         self.images_dir = os.path.join(self.config_dir, "singularity_images")
         self.tar_dir = os.path.join(self.config_dir, "podman_tarballs")
 
@@ -82,73 +56,107 @@ class SingularityController(PodmanController):
             os.makedirs(self.tar_dir)
 
 
-    def execute_build(self, name):
-        # Create environment for container
-        env = {
-            'PYTHONUNBUFFERED': '1',
-            'DEBIAN_FRONTEND': 'noninteractive',
-            'PATH': '{}:/spack/bin'.format(self.environment['PATH'])
-        }
+        # Check if the python libraries are imported
+        if not has_docker and not has_podman:
+            LOGGER.debug('Failed to find Podman and Docker python library')
+            self.lacks_backend = True
+        if not has_singularity:
+            LOGGER.debug('Failed to find Singularity python library')
+            self.lacks_backend = True
 
-        mounts = []
-        for mount in self.mounts:
-            mount_src, mount_dest = mount.split(':')
-            mount = {
-                'type': 'bind',
-                'source': mount_src,
-                'target': mount_dest,
-                'read_only': True
-            }
-            mounts.append(mount)
+        if self.lacks_backend:
+            LOGGER.error("Missing package podman, docker or spython: either one of podman and docker is also needed to manipulate singularity images with e4s-alc")
+            return
 
-        # Create a running detached container
-        container = self.client.containers.run(self.image, detach=True, tty=True, mounts=mounts)
-
+        # Try to turn on API with podman 3
         try:
-            # Iterate through each command and execute
-            for command in self.commands:
-                self.print_line()
-                print('Command: ', command)
-                self.print_line()
+            server_process = subprocess.Popen(['podman', 'system', 'service', '-t', '0'])
+            atexit.register(server_process.terminate)
+        except:
+            LOGGER.debug('Failed to connect to podman API.')
 
-                # Execute
-                rv, stream = container.exec_run(
-                    'bash -c \"{}\"'.format(command),
-                    stream=True,
-                    environment=env
-                )
+        # Try to connect with the podman runtime
+        try:
+            process = subprocess.Popen(['podman', 'info', '--format', 'json'],
+                                 stdout=subprocess.PIPE, 
+                                 stderr=subprocess.PIPE)
+            process_out, process_err = process.communicate()
+            if process_err:
+                if b"level=error" in process_err:
+                    LOGGER.debug('Failed to connect to Podman client')
 
-                # Create capture group for printing output.
-                # In the future, a printing module will be used.
-                pattern = re.compile(r"(\[|\[\.+|\.)$")
 
-                # Print to screen
-                print()
-                for chunk in stream:
-                    print(chr(chunk), end='') 
-                print()
+            process_out_dict = json.loads(process_out.decode('utf-8'))
+            uri = 'unix://{}'.format(process_out_dict['host']['remoteSocket']['path'])
 
-        except Exception as e:
-            raise e
-            print(e)
-            print('Stopping container...')
-            container.stop()
+            self.client_podman = podman.PodmanClient(base_url=uri)
+            self.client = self.client_podman
+        except FileNotFoundError:
+            self.use_podman = False
+            pass
+        except podman.errors.exceptions.APIError:
+            LOGGER.debug('Failed to connect to Podman client')
+            self.use_podman = False
+
+        # Try to connect with the docker runtime     
+        try:
+            self.client_docker = docker.from_env(timeout=600)
+        except docker.errors.DockerException:
+            LOGGER.debug('Failed to connect to Docker client') 
+            self.use_docker = False
+        
+        if not self.use_docker and not self.use_podman:
+            LOGGER.error("Podman nor Docker available: Singularity backend requires one or the other to be available")
+            return
+
+        self.is_active = True
+
+    def set_parent(self, arg_parent):
+        if arg_parent == "docker" and self.client_docker:
+            self.parent = DockerController
+            self.client = self.client_docker
+        elif arg_parent == "podman" and self.client_podman:
+            self.parent = PodmanController
+            self.client = self.client_podman
+        else:
+            LOGGER.warning("Selected backend for the singularity images prebuilding is not available, did you try to specify the backend for this using '-P'?")
             exit(1)
+        LOGGER.info("Using {} backend as image prebuilder for singularity".format(arg_parent))
+
+    
+    def read_image(self, image):
+        self.parent.find_image(self, image)
+        
+        self.parent.parse_os_release(self)
+        
+        self.parent.parse_environment(self)
 
 
-        # Commit new image
-        container.commit(name)
+    def init_image(self, image):
+        self.parent.pull_image(self, image)
+        
+        self.parent.parse_os_release(self)
+        
+        self.parent.parse_environment(self)
 
-        # Stop the running container
-        container.stop()
 
+    def execute_build(self, name):
+        changes = 'ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/spack/bin'
+        self.parent.execute_build(self, name, changes)
+
+        # Build the singularity image
+        self.build_to_sif(name)
+
+
+    def build_to_sif(self, name):
         if not self.image_tag:
             self.image_tag = self.parse_image_name(self.image)[1]
+        if self.parent == DockerController:
+            Client.build(recipe="docker-daemon://" + name + ":" + self.image_tag, build_folder=self.images_dir, image= name + ".sif", sudo=False)
+        else:
+            podmanSaveToTar = subprocess.Popen(['podman', 'save', '--format=oci-archive', '-o', self.tar_dir + '/' + name + '.tar', 'localhost/' + name]).wait()
+            Client.build(recipe="oci-archive://" + self.tar_dir + '/' + name + ".tar", build_folder=self.images_dir, image= name + ".sif", sudo=False)
 
-        
-        podmanSaveToTar = subprocess.Popen(['podman', 'save', '--format=oci-archive', '-o', self.tar_dir + '/' + name + '.tar', 'localhost/' + name]).wait()
-
-        Client.build(recipe="oci-archive://" + self.tar_dir + '/' + name + ".tar", build_folder=self.images_dir, image= name + ".sif", sudo=False)
 
     def list_images(self, name=None, inter=False):
         contentIterator = os.scandir(self.images_dir)
@@ -165,10 +173,11 @@ class SingularityController(PodmanController):
             t.add_row([image, creation_date, human_readable_size(image_dict.get(image).st_size)])
         print(t)
 
-    def delete_image(self, name, force):
-        image_path = self.images_dir + "/" + name
+    def delete_image(self, names, force):
+        images_path = [self.images_dir + "/" + name for name in names]
         try:
-            os.remove(image_path)
+            for image_path in images_path:
+                os.remove(image_path)
         except FileNotFoundError as err:
-            print("{} not found".format(image_path))
+            LOGGER.error("{} not found".format(image_path))
             raise SystemExit(err) from err

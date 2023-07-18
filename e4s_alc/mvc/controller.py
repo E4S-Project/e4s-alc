@@ -1,5 +1,24 @@
 import os
 import json
+import urllib
+
+from e4s_alc import E4S_ALC_CONFIG_DIR
+
+def is_url(string):
+    try:
+        result = urllib.parse.urlparse(string)
+        return all([result.scheme, result.netloc])
+    except ValueError:
+        return False
+
+def is_valid_url(url):
+    if is_url(url):
+        try:
+            response = urllib.request.urlopen(url)
+            return response.status < 400
+        except urllib.error.HTTPError:
+            return False
+    return False
 
 class Controller():
     def __init__(self, module_name):
@@ -14,6 +33,8 @@ class Controller():
         self.environment = {}
         self.commands = []
         self.mounts = []
+
+        self.config_dir = E4S_ALC_CONFIG_DIR
 
 
     def read_args_file(self, file_path):
@@ -58,20 +79,42 @@ class Controller():
         # Add command to copy directory from mounted volume to image
         self.commands.append('cp -r /tmp{} {}'.format(image_path, image_path))
 
+    def spack_yaml_configuration(self, path, spack_yamls_dir=None):
+        if spack_yamls_dir is not None:
+            self.yamls_dir = spack_yamls_dir
+        else:
+            self.yamls_dir = self.config_dir + "/spack_yamls"
+        if not os.path.exists(self.yamls_dir):
+            os.makedirs(self.yamls_dir)
+        self.mount_and_copy(self.yamls_dir, "/spack_yamls")
+        self.commands.append('spack env create alc-env /spack_yamls/{}'.format(path))
+        self.commands.append('eval `spack env activate --sh alc-env`; spack install')
 
     def expand_tarball(self, host_path, image_path):
-        abs_host_path = os.path.abspath(host_path)
-        if image_path[0] != '/':
-            image_path = '/' + image_path
+        if is_url(host_path):
+            if is_valid_url(host_path):
+                filename = os.path.basename(host_path)
+                self.commands.append('curl -O {}'.format(host_path))
+                self.commands.append('tar xf {} -C {}'.format(filename, image_path))
+                self.commands.append('mv {} /tmp/{}'.format(filename, filename))
 
-        # Add items to mount list
-        host_body, file_tail = os.path.split(abs_host_path)
-        host_body_parent, host_body_dir =  os.path.split(host_body)
-        mount_item = '{}:/tmp/{}'.format(host_body, host_body_dir)
-        self.mounts.append(mount_item)
+            else:
+                print('Error: Tarball URL is not a valid URL')
+                exit(1)
 
-        # Add command to open the tarball into the specified path
-        self.commands.append('tar xf /tmp/{}/{} -C {}'.format(host_body_dir, file_tail, image_path))
+        else:
+            abs_host_path = os.path.abspath(host_path)
+            if image_path[0] != '/':
+                image_path = '/' + image_path
+
+            # Add items to mount list
+            host_body, file_tail = os.path.split(abs_host_path)
+            host_body_parent, host_body_dir =  os.path.split(host_body)
+            mount_item = '{}:/tmp/{}'.format(host_body, host_body_dir)
+            self.mounts.append(mount_item)
+
+            # Add command to open the tarball into the specified path
+            self.commands.append('tar xf /tmp/{}/{} -C {}'.format(host_body_dir, file_tail, image_path))
 
 
     def add_ubuntu_package_commands(self, os_packages):
@@ -136,7 +179,7 @@ class Controller():
     def add_spack_package_commands(self, packages):
         # Create installation command for each package
         for package in packages:
-            self.commands.append('spack install {}'.format(package))
+            self.commands.append('spack install --yes-to-all {}'.format(package))
 
 
     def install_spack(self):

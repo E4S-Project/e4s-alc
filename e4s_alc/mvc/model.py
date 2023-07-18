@@ -1,10 +1,13 @@
 import os
 import configparser
+from e4s_alc import logger, E4S_ALC_CONFIG_DIR
+
+LOGGER = logger.get_logger(__name__)
 
 class Model():
     def __init__(self, module_name):
         self.module_name = module_name
-        self.config_dir = os.path.join(os.path.expanduser('~'), '.e4s-alc')
+        self.config_dir = E4S_ALC_CONFIG_DIR
         self.config_file_name = 'config.ini'
         self.config_file = os.path.join(self.config_dir, self.config_file_name)
         self.backend = self.read_backend_configuration()
@@ -18,8 +21,10 @@ class Model():
         config.read(self.config_file)
         if 'DEFAULT' not in config:
             self.create_configuration_file()
+            config.read(self.config_file)
         if 'backend' not in config['DEFAULT']:
             self.create_configuration_file()
+            config.read(self.config_file)
 
         backend = config.get('DEFAULT', 'backend')
         if backend == 'None':
@@ -47,7 +52,7 @@ class Model():
 
     def set_backend(self, backend):
         self.update_configuration_file('backend', backend)
-        print('Setting {} as backend!'.format(backend))
+        LOGGER.info('Setting {} as backend!'.format(backend))
         return True
 
     def check_working_backend(self, backend, controller):

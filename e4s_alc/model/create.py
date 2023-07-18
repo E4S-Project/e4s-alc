@@ -1,5 +1,8 @@
 from e4s_alc.mvc.model import Model
 from e4s_alc.model.container import *
+from e4s_alc import logger
+
+LOGGER = logger.get_logger(__name__)
 
 class CreateModel(Model):
     def __init__(self):
@@ -7,26 +10,26 @@ class CreateModel(Model):
 
     def main(self, args):
         if not self.backend:
-            print('No backend set. Run \'e4s-alc init\'.')
+            LOGGER.info('No backend set. Run \'e4s-alc init\'.')
             exit(1)
 
         if self.backend not in SUPPORTED_BACKENDS:
-            print('Backend \'{}\' not supported.'.format(self.backend))
+            LOGGER.info('Backend \'{}\' not supported.'.format(self.backend))
             exit(1)
 
         if not self.check_working_backend(self.backend, SUPPORTED_BACKENDS[self.backend]):
-            print('Failed to connect to \'{}\' client'.format(self.backend))
+            LOGGER.info('Failed to connect to \'{}\' client'.format(self.backend))
             exit(1)
 
         if args.file:
             file_args = self.controller.read_args_file(args.file)
             if 'name' not in file_args:
-                print('Input file must include a name')
+                LOGGER.info('Input file must include a name')
                 exit(1)
             args.name = file_args['name']
 
             if 'image' not in file_args:
-                print('Input file must include an image')
+                LOGGER.info('Input file must include an image')
                 exit(1)
             args.image = file_args['image']
 
@@ -54,14 +57,17 @@ class CreateModel(Model):
         if args.copy:
             for item in args.copy:
                 if ':' not in item:
-                    print('Invalid copy format. Use {host-path}:{image-path}')
+                    LOGGER.info('Invalid copy format. Use {host-path}:{image-path}')
                     exit(1)
                 host_image_path = item.split(':')
                 if len(host_image_path) != 2:
-                    print('Invalid copy format. Use {host-path}:{image-path}')
+                    LOGGER.info('Invalid copy format. Use {host-path}:{image-path}')
                     exit(1)
                 host_path, image_path = host_image_path
                 self.controller.mount_and_copy(host_path, image_path)
+
+        if self.backend == "singularity" and args.parent:
+            self.controller.set_parent(args.parent)
 
         self.controller.init_image(args.image)
         self.controller.add_system_package_commands(args.os_package)
@@ -69,17 +75,30 @@ class CreateModel(Model):
         if args.tarball:
             for item in args.tarball:
                 if ':' not in item:
-                    print('Invalid tarball format. Use {host-tarball-path}:{image-tarball-path}')
+                    LOGGER.info('Invalid tarball format. Use {host-tarball-path/tarball-url}:{image-tarball-path}')
                     exit(1)
-                host_image_path = item.split(':')
-                if len(host_image_path) != 2:
-                    print('Invalid tarball format. Use {host-tarball-path}:{image-tarball-path}')
-                    exit(1)
-                host_path, image_path = host_image_path
-                self.controller.expand_tarball(host_path, image_path)
+
+                if item.startswith('http'):
+                    item_split = item.split(':')
+                    url_path = ':'.join(item_split[:2])
+                    image_path = item_split[2]
+                    self.controller.expand_tarball(url_path, image_path)
+
+                else:
+                    host_image_path = item.split(':')
+                    if len(host_image_path) != 2:
+                        LOGGER.info('Invalid tarball format. Use {host-tarball-path}:{image-tarball-path}')
+                        exit(1)
+                    host_path, image_path = host_image_path
+                    self.controller.expand_tarball(host_path, image_path)
 
         if args.spack:
             self.controller.install_spack()
+
+        if args.yaml:
+            self.controller.spack_yaml_configuration(args.yaml)
+
+        if args.package:
             self.controller.add_spack_package_commands(args.package)
 
         self.controller.execute_build(args.name)

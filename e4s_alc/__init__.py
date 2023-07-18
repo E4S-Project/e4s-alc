@@ -21,9 +21,11 @@ if not sys.version_info[0:2] in REQUIRED_PYTHON_VERSIONS:
         EXPECTED = ' or '.join([(str(x) + '.' + str(y)) for (x, y) in REQUIRED_PYTHON_VERSIONS])
         #TODO implement wrong version of python error
 
-E4S_ALC_HOME = os.path.realpath(os.path.abspath(os.environ.get('__E4S_ALC_HOME__', os.path.join(os.path.dirname(__file__), '..', '..'))))
+E4S_ALC_HOME = os.path.realpath(os.path.abspath(os.environ.get('__E4S_ALC_HOME__', os.path.join(os.path.dirname(__file__), '..'))))
 
 E4S_ALC_SCRIPT = os.environ.get('__E4S_ALC_SCRIPT__', sys.argv[0] or 'e4s-alc')
+
+E4S_ALC_CONFIG_DIR = os.path.join(os.path.expanduser('~'), '.e4s-alc')
 
 USER_PREFIX = os.path.realpath(os.path.abspath(os.environ.get('__E4S_ALC_USER_PREFIX__',
                                                               os.path.join(os.path.expanduser('~'),
