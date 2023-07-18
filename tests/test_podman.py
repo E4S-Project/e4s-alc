@@ -62,6 +62,7 @@ class PodmanTests(unittest.TestCase):
         p = Popen(["podman", "run", "--env", "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/spack/bin", "unittesting", "spack", "find"], stdout=PIPE)
         stdout, _ = p.communicate()
         self.assertIn(b'zlib@', stdout)
+        self.assertIn(b'tcl@', stdout)
         controller.delete_image(['ubuntu', 'unittesting'], True)
 
     @unittest.skipIf('podman' not in sys.modules, "Podman not available")

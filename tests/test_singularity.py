@@ -88,6 +88,7 @@ class SingularityTests(unittest.TestCase):
         p = Popen(["singularity", "exec", "--env", "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/spack/bin", "{}".format(image_path), "spack", "find"], stdout=PIPE)
         stdout, _ = p.communicate()
         self.assertIn(b'zlib@', stdout)
+        self.assertIn(b'tcl@', stdout)
         controller.delete_image(['unittesting.sif'], True)
         controller.parent.delete_image(controller, ['unittesting'], True)
         controller.parent.delete_image(controller, ['ubuntu'], True)
