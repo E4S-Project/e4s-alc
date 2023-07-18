@@ -1,4 +1,4 @@
-.. _UserDir
+.. _UserDir:
 
 ==================
 User Directory
@@ -7,7 +7,7 @@ User Directory
 **e4s-alc** uses a user directory to store user specific data. This article describes the different directories withing it.
 
 Configuration File
------------------
+------------------
 
 **config.ini** is a simple configuration file that currently simply holds the value for the backend currently in use eg:
 
@@ -20,7 +20,7 @@ Configuration File
    backend = docker
 
 Spack Environment Files
-----------------------
+-----------------------
 
 **spack_yamls** holds the spack environment files. If you want to use a yaml file configuring a spack environment to configure an image, you need to copy that file into this directory and then specify the file name using the command line interface at image creation or addition.
 
