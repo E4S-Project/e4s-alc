@@ -17,7 +17,7 @@ class Init(AbstractCommand):
         usage = '%s init [options]' % self.command 
         
         self.parser.usage = usage
-        self.parser.add_argument('-b', '--backend', metavar='\b', help='Backend for containers')
+        self.parser.add_argument('-b', '--backend', metavar='\b', help='Backend for containers, currently supported options: singularity, podman, docker')
         self.parser.add_argument('-h', '--help', action='store_true')
 
     def check_correct_args(self, args):
