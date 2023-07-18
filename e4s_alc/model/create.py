@@ -121,6 +121,14 @@ class CreateModel(Model):
             self.add_line(f'RUN {command}\n')
         self.add_line_break()
 
+    def add_spack_mirrors(self):
+        if self.spack_mirrors:
+            logger.debug("Adding spack mirrors")
+            self.add_line('# Add Spack mirrors\n')
+            for mirror in self.spack_mirrors:
+                self.add_line(f'RUN spack mirror add {mirror} {mirror}\n')
+            self.add_line('RUN spack buildcache keys --install --trust\n')
+            self.add_line_break()
 
     def copy_conf_file(self):
         logger.debug("Copying conf file")
@@ -133,7 +141,6 @@ class CreateModel(Model):
         file_name = os.path.basename(file_path)
         dest_path = os.path.join(conf_dir_path, file_name)
         shutil.copy(file_path, dest_path)
-
 
     def add_setup_env(self):
         logger.debug("Adding setup env")
@@ -188,9 +195,14 @@ class CreateModel(Model):
                     version_suffix = f'@{version}' if version else ''
                     self.spack_compiler += f'{version_suffix}+flang'
 
+            
+            signature_check = ''
+            if not self.spack_check_signature:
+                signature_check = '--no-check-signature '
+
             spack_compiler_commands = [
                 'spack compiler find',
-                f'spack install {self.spack_compiler}',
+                f'spack install {signature_check}{self.spack_compiler}',
                 'spack module tcl refresh -y 1> /dev/null',
                 f'. /etc/profile.d/setup-env.sh && spack load {self.spack_compiler} && spack compiler find',
                 'spack compiler rm "gcc@"$(/usr/bin/gcc -dumpversion)',
@@ -204,9 +216,14 @@ class CreateModel(Model):
     def add_spack_packages(self):
         if self.spack_packages:
             logger.debug("Adding spack packages")
+
+            signature_check = ''
+            if not self.spack_check_signature:
+                signature_check = '--no-check-signature '
+
             self.add_line('# Install Spack packages\n')
             for package in self.spack_packages:
-                self.add_line(f'RUN spack install {package}\n')
+                self.add_line(f'RUN spack install {signature_check}{package}\n')
             self.add_line_break()
 
     def add_pre_spack_stage_commands(self):
@@ -260,6 +277,7 @@ class CreateModel(Model):
         self.add_line(f'FROM system-stage AS spack-stage\n\n', indent=False)
         self.add_pre_spack_stage_commands()
         self.add_spack()
+        self.add_spack_mirrors()
         self.add_setup_env()
         self.add_post_spack_install_commands()
         self.add_spack_compiler()
@@ -267,7 +285,10 @@ class CreateModel(Model):
             self.add_spack_env_install()
         else:
             self.add_spack_packages()
-        self.add_line('RUN spack compiler find')
+
+        self.add_line('# Update compiler list\n')
+        self.add_line('RUN spack compiler find\n')
+        self.add_line_break()
         self.add_post_spack_stage_commands()
 
     def create_finalize_stage(self):

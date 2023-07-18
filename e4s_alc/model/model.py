@@ -32,6 +32,8 @@ class Model():
         # Spack group
         self.spack_install = None
         self.spack_version = None
+        self.spack_mirrors = None
+        self.spack_check_signature = None
         self.spack_env_file = None
         self.spack_compiler = None
         self.spack_packages = None
@@ -89,6 +91,9 @@ class Model():
         self.spack_version = args.get('spack-version', self.discover_latest_spack_version())
         if self.spack_version == 'latest':
             self.spack_version = self.discover_latest_spack_version()
+
+        self.spack_mirrors = self.remove_nones(args.get('spack-mirrors', []))
+        self.spack_check_signature = self.string_to_bool(args.get('spack-check-signature', True))
 
         self.spack_env_file = args.get('spack-env-file', None)
         self.spack_compiler = args.get('spack-compiler', None)

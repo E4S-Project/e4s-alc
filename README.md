@@ -101,6 +101,8 @@ Spack group parameters deal with Spack installation and package inclusion for yo
 * `spack` - A boolean to decide if Spack should be included in the image. If set to `False`, the Spack Stage is bypassed. Default is `True`.
 * `pre-spack-stage-commands` - A set of commands that execute at the start of the Spack Stage of the Dockerfile build.
 * `spack-version` - Specifies the version of Spack to install in the `X.Y.Z` format representing major, minor, and point release versions. Default is the latest Spack version.
+* `spack-mirrors` - A set of Spack mirrors that will be used to build Spack packages.
+* `spack-check-signatures` - A boolean to decide if Spack should check for signatures when installing Spack packages. Default is `True`.
 * `post-spack-install-commands` - A set of commands that execute after Spack installation.
 * `spack-env-file` - The local `.yaml` file used to build out Spack environments.
 * `spack-compiler` - The Spack compiler to be installed for building the specified Spack packages.
