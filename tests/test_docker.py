@@ -1,5 +1,4 @@
 import sys
-import os
 import unittest
 from e4s_alc import E4S_ALC_HOME
 from e4s_alc.cli.__main__ import COMMAND as cli_main_cmd
