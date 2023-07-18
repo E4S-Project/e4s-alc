@@ -25,6 +25,8 @@ E4S_ALC_HOME = os.path.realpath(os.path.abspath(os.environ.get('__E4S_ALC_HOME__
 
 E4S_ALC_SCRIPT = os.environ.get('__E4S_ALC_SCRIPT__', sys.argv[0] or 'e4s-alc')
 
+E4S_ALC_CONFIG_DIR = os.path.join(os.path.expanduser('~'), '.e4s-alc')
+
 USER_PREFIX = os.path.realpath(os.path.abspath(os.environ.get('__E4S_ALC_USER_PREFIX__',
                                                               os.path.join(os.path.expanduser('~'),
                                                                            '.local', 'e4s-alc'))))

@@ -18,6 +18,7 @@ Only the **name** and **image** arguments are required, or they can be replaced 
 -i, --image         The image name and the tag <image:tag>
 -n, --name          The name of the image to add to
 -p, --package       The name of a Spack package to install
+-y, --yaml          The yaml file used to specify a spack environment to install
 -a, --os-package    The name of an OS Package to install
 -c, --copy          Directory to copy into the image
 -t, --tarball       Tarball to expand in the image

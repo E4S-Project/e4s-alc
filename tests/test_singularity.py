@@ -1,11 +1,14 @@
 import sys
 import unittest
+from e4s_alc import E4S_ALC_HOME
 from e4s_alc.cli.__main__ import COMMAND as cli_main_cmd
 from e4s_alc.model.container.docker import DockerController
 from e4s_alc.model.container.podman import PodmanController
 from e4s_alc.model.container.singularity import SingularityController
 from e4s_alc.model.init import InitModel
 import types
+from subprocess import Popen, PIPE
+
 from e4s_alc import logger
 
 import docker
@@ -65,6 +68,27 @@ class SingularityTests(unittest.TestCase):
         controller.add_ubuntu_package_commands('')
         controller.install_spack()
         self.assertIsNone(controller.execute_build("unittesting"))
+        controller.delete_image(['unittesting.sif'], True)
+        controller.parent.delete_image(controller, ['unittesting'], True)
+        controller.parent.delete_image(controller, ['ubuntu'], True)
+
+    @unittest.skipIf('spython' not in sys.modules, "Singularity not available")
+    @unittest.skipIf('docker' not in sys.modules, "Docker not available")
+    def test_create_ubuntu_singularity_spack_yaml(self):
+        controller = SingularityController()
+        controller.init_image('ubuntu')
+        controller.parent = DockerController
+        controller.client = controller.client_docker
+        controller.add_ubuntu_package_commands('')
+        controller.install_spack()
+        spack_yamls_dir = E4S_ALC_HOME + '/tests/assets/spack_yamls'
+        controller.spack_yaml_configuration("test_spack.yaml", spack_yamls_dir=spack_yamls_dir)
+        self.assertIsNone(controller.execute_build("unittesting"))
+        image_path = controller.config_dir + "/singularity_images/unittesting.sif"
+        p = Popen(["singularity", "exec", "--env", "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/spack/bin", "{}".format(image_path), "spack", "find"], stdout=PIPE)
+        stdout, _ = p.communicate()
+        self.assertIn(b'zlib@', stdout)
+        self.assertIn(b'tcl@', stdout)
         controller.delete_image(['unittesting.sif'], True)
         controller.parent.delete_image(controller, ['unittesting'], True)
         controller.parent.delete_image(controller, ['ubuntu'], True)

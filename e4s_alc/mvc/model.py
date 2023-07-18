@@ -1,13 +1,13 @@
 import os
 import configparser
-from e4s_alc import logger
+from e4s_alc import logger, E4S_ALC_CONFIG_DIR
 
 LOGGER = logger.get_logger(__name__)
 
 class Model():
     def __init__(self, module_name):
         self.module_name = module_name
-        self.config_dir = os.path.join(os.path.expanduser('~'), '.e4s-alc')
+        self.config_dir = E4S_ALC_CONFIG_DIR
         self.config_file_name = 'config.ini'
         self.config_file = os.path.join(self.config_dir, self.config_file_name)
         self.backend = self.read_backend_configuration()
