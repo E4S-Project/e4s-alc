@@ -67,7 +67,12 @@ class SingularityTests(unittest.TestCase):
         controller.client = controller.client_docker
         controller.add_ubuntu_package_commands('')
         controller.install_spack()
+        controller.add_spack_package_commands(['zlib'])
         self.assertIsNone(controller.execute_build("unittesting"))
+        image_path = controller.config_dir + "/singularity_images/unittesting.sif"
+        p = Popen(["singularity", "exec", "--env", "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/spack/bin", "{}".format(image_path), "spack", "find"], stdout=PIPE)
+        stdout, _ = p.communicate()
+        self.assertIn(b'zlib@', stdout)
         controller.delete_image(['unittesting'], True)
         controller.parent.delete_image(controller, ['unittesting'], True)
         controller.parent.delete_image(controller, ['ubuntu'], True)

@@ -35,13 +35,6 @@ class DockerTests(unittest.TestCase):
         controller.delete_image(['ubuntu'], True)
 
     @unittest.skipIf('docker' not in sys.modules, "Docker not available")
-    def test_create_ubuntu_docker(self):
-        controller = DockerController()
-        controller.init_image('ubuntu')
-        self.assertIsNone(controller.execute_build("unittesting"))
-        controller.delete_image(['ubuntu', 'unittesting'], True)
-
-    @unittest.skipIf('docker' not in sys.modules, "Docker not available")
     def test_create_ubuntu_docker_spack(self):
         controller = DockerController()
         controller.init_image('ubuntu')
