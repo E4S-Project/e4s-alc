@@ -40,3 +40,8 @@ class RhelImage(Image):
         for cert in certificates:
             locations.append((cert, self.cert_location))
         return locations
+
+    def get_entrypoint_commands(self, setup_script):
+        commands = ['/bin/bash']
+        return commands
+

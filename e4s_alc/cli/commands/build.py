@@ -52,6 +52,7 @@ class BuildCommand(AbstractCommand):
         spack_group_args.add_argument('-sv', '--spack-version', metavar='', help='The version of a Spack to install')
         spack_group_args.add_argument('-sm', '--spack-mirrors', help='The Spack mirror URL/Paths for Spack package caches.', default=[], dest='spack-mirrors')
         spack_group_args.add_argument('-ss', '--spack-check-signature', help='Check for Spack package signature when installing packages from mirror', default=True)
+        spack_group_args.add_argument('-me', '--modules-env-file', help='The path to a modules.yaml environment file')
         spack_group_args.add_argument('-sc', '--spack-compiler', help='The Spack compiler that will be installed and will build Spack packages')
         spack_group_args.add_argument('-se', '--spack-env-file', metavar='', help='The path to a Spack env file')
         spack_group_args.add_argument('-p', '--spack-package', metavar='', help='The name of a Spack package to install', action='append', default=[], dest='spack-packages')

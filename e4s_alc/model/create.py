@@ -131,7 +131,7 @@ class CreateModel(Model):
             self.add_line_break()
 
     def copy_conf_file(self):
-        logger.debug("Copying conf file")
+        logger.debug("Copying modules.yaml conf file")
         file_path = get_modules_conf()
         conf_dir_path = os.path.join(os.getcwd(), 'conf')
 
@@ -150,9 +150,12 @@ class CreateModel(Model):
             self.add_line(f'RUN {command}\n')
         self.add_line_break()
 
-        self.add_line('# Add module yaml conf file\n')
-        self.copy_conf_file()
-        self.add_line(f'ADD conf/modules.yaml /spack/etc/spack/modules.yaml\n')
+        self.add_line('# Add modules.yaml file\n')
+        if self.modules_env_file:
+            self.add_line(f'ADD {self.modules_env_file} /spack/etc/spack/modules.yaml\n')
+        else:
+            self.copy_conf_file()
+            self.add_line(f'ADD conf/modules.yaml /spack/etc/spack/modules.yaml\n')
         self.add_line_break()
 
 
@@ -166,10 +169,14 @@ class CreateModel(Model):
 
 
     def add_spack_env_install(self):
+        signature_check = ''
+        if not self.spack_check_signature:
+            signature_check = '--no-check-signature'
+
         logger.debug("Adding spack env install commands")
         self.add_line('# Add Spack env file\n')
         self.add_line(f'ADD {self.spack_env_file} /spack.yaml\n')
-        self.add_line('RUN spack --env . install\n')
+        self.add_line(f'RUN spack --env / install {signature_check}\n')
         self.add_line_break()
 
     def add_spack_compiler(self):
@@ -243,8 +250,10 @@ class CreateModel(Model):
             self.add_line_break()
 
     def add_entrypoint(self):
+        logger.debug("Adding entrypoint")
         self.add_line('# Entrypoint of the image\n')
-        self.add_line('ENTRYPOINT ["/bin/bash"]\n')
+        command = self.controller.get_entrypoint_command()
+        self.add_line(f'ENTRYPOINT [{command}]\n')
 
     def export_to_makefile(self):
         logger.info("Exporting to makefile")

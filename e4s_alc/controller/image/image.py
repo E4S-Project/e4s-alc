@@ -33,4 +33,4 @@ class Image():
 
     def wrap_packages(self, packages):
         logger.debug("Textwrapping packages")
-        return textwrap.fill(packages, width=50).replace('\n', ' \\\n\t\t')
+        return textwrap.fill(packages, width=70, break_long_words=False, break_on_hyphens=False).replace('\n', ' \\\n\t\t')

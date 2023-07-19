@@ -77,8 +77,9 @@ pre-spack-stage-commands:
 spack-version:
 spack-mirrors:
   -
-spack-check-signature: True
 
+spack-check-signature: True
+modules-env-file: 
 post-spack-install-commands: 
   -
 

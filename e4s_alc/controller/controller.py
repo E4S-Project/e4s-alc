@@ -79,10 +79,10 @@ class Controller():
         ]
         return commands
 
-    def get_env_source_command(self):
-        logger.info("Getting command to source environment setup script")
-        command = f'. {self.setup_script}'
-        return command
+    def get_entrypoint_command(self):
+        logger.info("Getting entrypoint command")
+        commands = self.image.get_entrypoint_commands(self.setup_script)
+        return '"' + '", "'.join(commands) + '"'
 
     def build(self):
         logger.info("Building Dockerfile with backend")

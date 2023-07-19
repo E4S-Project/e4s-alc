@@ -8,7 +8,7 @@ class UbuntuImage(Image):
         super().__init__(os_release)
         logger.info(" Initializing UbuntuImage")
         self.packages = [
-            'build-essential', 'ca-certificates', 'coreutils', 'curl',
+            'build-essential', 'ca-certificates', 'coreutils', 'curl', 'file',
             'environment-modules', 'gfortran', 'git', 'gpg', 'lsb-release', 'vim',
             'python3', 'python3-distutils', 'python3-venv', 'unzip', 'zip', 'cmake'
         ]
@@ -39,3 +39,9 @@ class UbuntuImage(Image):
         for cert in certificates:
             locations.append((cert, self.convert_cert_path(cert)))
         return locations
+
+    def get_entrypoint_commands(self, setup_script):
+        commands = ['/bin/bash', '-c', f'. {setup_script} && exec /bin/bash']
+        return commands
+
+

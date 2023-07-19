@@ -103,8 +103,9 @@ Spack group parameters deal with Spack installation and package inclusion for yo
 * `spack-version` - Specifies the version of Spack to install in the `X.Y.Z` format representing major, minor, and point release versions. Default is the latest Spack version.
 * `spack-mirrors` - A set of Spack mirrors that will be used to build Spack packages.
 * `spack-check-signatures` - A boolean to decide if Spack should check for signatures when installing Spack packages. Default is `True`.
+* `modules-env-file` - The local `modules.yaml` file used to configure environment modules.
 * `post-spack-install-commands` - A set of commands that execute after Spack installation.
-* `spack-env-file` - The local `.yaml` file used to build out Spack environments.
+* `spack-env-file` - The local `spack.yaml` file used to build out Spack environments.
 * `spack-compiler` - The Spack compiler to be installed for building the specified Spack packages.
 * `spack-packages` - A set of Spack packages to be installed into the image.
 * `post-spack-stage-commands` - A set of commands that execute towards the end of the Spack Stage of the Dockerfile build.
@@ -160,7 +161,11 @@ The template is also described here:
      -
    
    spack-version:
-   
+   spack-mirrors:
+     -
+
+   spack-check-signature: True
+   modules-env-file:
    post-spack-install-commands: 
      -
    
