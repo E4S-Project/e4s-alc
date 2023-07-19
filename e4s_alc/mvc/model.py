@@ -55,7 +55,7 @@ class Model():
         LOGGER.info('Setting {} as backend!'.format(backend))
         return True
 
-    def check_working_backend(self, backend, controller):
+    def check_working_backend(self, backend, controller, prefered_parent=None):
         if backend == 'docker':
             docker_controller = controller()
             if docker_controller.is_active:
@@ -69,7 +69,7 @@ class Model():
                 return True
 
         if backend == 'singularity':
-            singularity_controller = controller()
+            singularity_controller = controller(prefered_parent)
             if singularity_controller.is_active:
                 self.controller = singularity_controller
                 return True

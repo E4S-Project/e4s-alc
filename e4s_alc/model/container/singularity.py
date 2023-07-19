@@ -39,11 +39,19 @@ def human_readable_size(size, decimal_places=2):
     return f"{size:.{decimal_places}f} {unit}"
 
 class SingularityController(PodmanController, DockerController):
-    def __init__(self):
+    def __init__(self, prefered_parent):
         Controller.__init__(self, 'SingularityController')
         self.lacks_backend = False
-        self.use_docker = True
-        self.use_podman = True
+        self.use_docker = False
+        self.use_podman = False
+        if not prefered_parent:
+            self.use_docker = True
+            self.use_podman = True
+        elif prefered_parent == 'docker':
+            self.use_docker = True
+        else:
+            self.use_podman = True
+
         self.parent = PodmanController
 
         self.images_dir = os.path.join(self.config_dir, "singularity_images")
@@ -68,42 +76,44 @@ class SingularityController(PodmanController, DockerController):
             LOGGER.error("Missing package podman, docker or spython: either one of podman and docker is also needed to manipulate singularity images with e4s-alc")
             return
 
-        # Try to turn on API with podman 3
-        try:
-            server_process = subprocess.Popen(['podman', 'system', 'service', '-t', '0'])
-            atexit.register(server_process.terminate)
-        except:
-            LOGGER.debug('Failed to connect to podman API.')
+        if self.use_podman:
+            # Try to turn on API with podman 3
+            try:
+                server_process = subprocess.Popen(['podman', 'system', 'service', '-t', '0'])
+                atexit.register(server_process.terminate)
+            except:
+                LOGGER.debug('Failed to connect to podman API.')
 
-        # Try to connect with the podman runtime
-        try:
-            process = subprocess.Popen(['podman', 'info', '--format', 'json'],
-                                 stdout=subprocess.PIPE, 
-                                 stderr=subprocess.PIPE)
-            process_out, process_err = process.communicate()
-            if process_err:
-                if b"level=error" in process_err:
-                    LOGGER.debug('Failed to connect to Podman client')
+            # Try to connect with the podman runtime
+            try:
+                process = subprocess.Popen(['podman', 'info', '--format', 'json'],
+                                     stdout=subprocess.PIPE, 
+                                     stderr=subprocess.PIPE)
+                process_out, process_err = process.communicate()
+                if process_err:
+                    if b"level=error" in process_err:
+                        LOGGER.debug('Failed to connect to Podman client')
 
 
-            process_out_dict = json.loads(process_out.decode('utf-8'))
-            uri = 'unix://{}'.format(process_out_dict['host']['remoteSocket']['path'])
+                process_out_dict = json.loads(process_out.decode('utf-8'))
+                uri = 'unix://{}'.format(process_out_dict['host']['remoteSocket']['path'])
 
-            self.client_podman = podman.PodmanClient(base_url=uri)
-            self.client = self.client_podman
-        except FileNotFoundError:
-            self.use_podman = False
-            pass
-        except podman.errors.exceptions.APIError:
-            LOGGER.debug('Failed to connect to Podman client')
-            self.use_podman = False
+                self.client_podman = podman.PodmanClient(base_url=uri)
+                self.client = self.client_podman
+            except FileNotFoundError:
+                self.use_podman = False
+                pass
+            except podman.errors.exceptions.APIError:
+                LOGGER.debug('Failed to connect to Podman client')
+                self.use_podman = False
 
-        # Try to connect with the docker runtime     
-        try:
-            self.client_docker = docker.from_env(timeout=600)
-        except docker.errors.DockerException:
-            LOGGER.debug('Failed to connect to Docker client') 
-            self.use_docker = False
+        if self.use_docker:
+            # Try to connect with the docker runtime     
+            try:
+                self.client_docker = docker.from_env(timeout=600)
+            except docker.errors.DockerException:
+                LOGGER.debug('Failed to connect to Docker client') 
+                self.use_docker = False
         
         if not self.use_docker and not self.use_podman:
             LOGGER.error("Podman nor Docker available: Singularity backend requires one or the other to be available")

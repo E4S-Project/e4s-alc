@@ -24,12 +24,11 @@ class InitModel(Model):
                 LOGGER.info('Backend \'{}\' not supported'.format(args.backend))
                 exit(1)
 
-            elif not self.check_working_backend(args.backend, SUPPORTED_BACKENDS[args.backend]):
+            elif not self.check_working_backend(args.backend, SUPPORTED_BACKENDS[args.backend], args.parent):
                 LOGGER.info('Failed to find backend: {}'.format(args.backend))
                 exit(1)
             else:
                 self.set_backend(args.backend)
-                LOGGER.info('Found {}!'.format(args.backend))
 
         else:
             if not self.discover_backend():
