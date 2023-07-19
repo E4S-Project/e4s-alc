@@ -20,6 +20,7 @@ class DockerTests(unittest.TestCase):
         initCommand = InitModel()
         args = types.SimpleNamespace() 
         args.backend="docker"
+        args.parent=None
         initCommand.main(args)
 
     def test_create_empty_image_docker(self):

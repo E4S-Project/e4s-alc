@@ -22,6 +22,7 @@ class SingularityTests(unittest.TestCase):
         initCommand = InitModel()
         args = types.SimpleNamespace() 
         args.backend="singularity"
+        args.parent=None
         initCommand.main(args)
 
     def test_create_empty_image_singularity(self):
