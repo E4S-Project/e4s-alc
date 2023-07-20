@@ -5,6 +5,8 @@ from e4s_alc.cli.command import AbstractCommand
 
 HELP_PAGE_FMT = "'%(command)s' page to be written."
 
+from e4s_alc.model.container import SUPPORTED_BACKENDS
+
 class Init(AbstractCommand):
     def __init__(self, model):
         self.model = model()
@@ -17,7 +19,8 @@ class Init(AbstractCommand):
         usage = '%s init [options]' % self.command 
         
         self.parser.usage = usage
-        self.parser.add_argument('-b', '--backend', metavar='\b', help='Backend for containers')
+        self.parser.add_argument('-b', '--backend', metavar='\b', help='Backend for containers, currently supported options: {}'.format(list(SUPPORTED_BACKENDS.keys())), choices=['docker', 'podman', 'singularity'])
+        self.parser.add_argument('-P', '--parent', metavar='\b',help='Specific to singularity backend, choose which backend to use between Podman and Docker ["podman", "docker"] to only try initialising the backend with', choices=['docker', 'podman'], default=None)
         self.parser.add_argument('-h', '--help', action='store_true')
 
     def check_correct_args(self, args):

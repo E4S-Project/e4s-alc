@@ -20,6 +20,7 @@ class PodmanTests(unittest.TestCase):
         initCommand = InitModel()
         args = types.SimpleNamespace() 
         args.backend="podman"
+        args.parent=None
         initCommand.main(args)
 
     def test_create_empty_image_podman(self):
@@ -35,22 +36,19 @@ class PodmanTests(unittest.TestCase):
         controller.delete_image(['ubuntu'], True)
 
     @unittest.skipIf('podman' not in sys.modules, "Podman not available")
-    def test_create_ubuntu_podman(self):
-        controller = PodmanController()
-        controller.init_image('ubuntu')
-        self.assertIsNone(controller.execute_build("unittesting"))
-        controller.delete_image(['ubuntu', 'unittesting'], True)
-
-    @unittest.skipIf('podman' not in sys.modules, "Podman not available")
     def test_create_ubuntu_podman_spack(self):
         controller = PodmanController()
         controller.init_image('ubuntu')
         controller.add_ubuntu_package_commands('')
         controller.install_spack()
+        controller.add_spack_package_commands(['zlib'])
         self.assertIsNone(controller.execute_build("unittesting"))
+        p = Popen(["podman", "run", "--env", "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/spack/bin", "unittesting", "spack", "find"], stdout=PIPE)
+        stdout, _ = p.communicate()
+        self.assertIn(b'zlib@', stdout)
         controller.delete_image(['ubuntu', 'unittesting'], True)
 
-    @unittest.skipIf('docker' not in sys.modules, "Docker not available")
+    @unittest.skipIf('podman' not in sys.modules, "Podman not available")
     def test_create_ubuntu_podman_spack_yaml(self):
         controller = PodmanController()
         controller.init_image('ubuntu')

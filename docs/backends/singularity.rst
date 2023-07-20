@@ -15,4 +15,4 @@ Singularity images can be created/added-to through either docker or podman's cli
 
 Singularity not functionning through a locally running daemon also means that the images are accessible through the user's file system. Specifically, they will appear in the :code:`.e4s-alc/singularity_images` directory, which by default is in the user's home directory. 
 
-When referencing to a singularity image in the **e4s-alc** cli, the name should omit the ".sif" file extension, appart when deleting it.
+When referencing to a singularity image in the **e4s-alc** cli, the name should omit the ".sif" file extension.

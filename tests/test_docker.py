@@ -20,6 +20,7 @@ class DockerTests(unittest.TestCase):
         initCommand = InitModel()
         args = types.SimpleNamespace() 
         args.backend="docker"
+        args.parent=None
         initCommand.main(args)
 
     def test_create_empty_image_docker(self):
@@ -33,13 +34,6 @@ class DockerTests(unittest.TestCase):
         self.assertIn('ubuntu', controller.image_os)
         self.assertIn('latest', controller.image_tag)
         controller.delete_image(['ubuntu'], True)
-
-    @unittest.skipIf('docker' not in sys.modules, "Docker not available")
-    def test_create_ubuntu_docker(self):
-        controller = DockerController()
-        controller.init_image('ubuntu')
-        self.assertIsNone(controller.execute_build("unittesting"))
-        controller.delete_image(['ubuntu', 'unittesting'], True)
 
     @unittest.skipIf('docker' not in sys.modules, "Docker not available")
     def test_create_ubuntu_docker_spack(self):
