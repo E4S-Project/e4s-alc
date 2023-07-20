@@ -39,7 +39,7 @@ def human_readable_size(size, decimal_places=2):
     return f"{size:.{decimal_places}f} {unit}"
 
 class SingularityController(PodmanController, DockerController):
-    def __init__(self, prefered_parent):
+    def __init__(self, prefered_parent=None):
         Controller.__init__(self, 'SingularityController')
         self.lacks_backend = False
         self.use_docker = False
