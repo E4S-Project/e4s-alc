@@ -158,7 +158,6 @@ class CreateModel(Model):
             self.add_line(f'ADD conf/modules.yaml /spack/etc/spack/modules.yaml\n')
         self.add_line_break()
 
-
     def add_post_spack_install_commands(self):
         if self.post_spack_install_commands:
             logger.debug("Adding post spack install commands")
@@ -166,7 +165,6 @@ class CreateModel(Model):
             for command in self.post_spack_install_commands:
                 self.add_line(f'RUN {command}\n')
             self.add_line_break()
-
 
     def add_spack_env_install(self):
         signature_check = ''
