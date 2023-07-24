@@ -6,6 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "e4s-alc"
 authors = [
     {name = "Cameron Durbin", email = "cfd@uoregon.edu"},
+    {name = "Frederick Deny", email = "fdeny@uoregon.edu"},
 ]
 description = "Build Dockerfiles quickly with Spack integration."
 readme = "README.md"
@@ -21,6 +22,7 @@ classifiers = [
     "Natural Language :: English",
     "Programming Language :: Python :: 3",
 ]
+
 dependencies = ['pyyaml']
 dynamic = ["version"]
 

@@ -3,7 +3,6 @@ from e4s_alc.model.create import CreateModel
 from e4s_alc.cli.cli_view import HelpDescriptionFormatter
 from e4s_alc.cli.commands.command import AbstractCommand
 
-
 class CreateCommand(AbstractCommand):
     """A class represents the Create Command, used to create a Dockerfile."""
 
