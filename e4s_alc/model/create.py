@@ -133,7 +133,7 @@ class CreateModel(Model):
     def copy_conf_file(self):
         logger.debug("Copying modules.yaml conf file")
         file_path = get_modules_conf()
-        conf_dir_path = os.path.join(os.getcwd(), 'conf')
+        conf_dir_path = os.path.join(os.getcwd(), '.conf')
 
         if not os.path.exists(conf_dir_path):
             os.makedirs(conf_dir_path)
@@ -155,7 +155,7 @@ class CreateModel(Model):
             self.add_line(f'ADD {self.modules_env_file} /spack/etc/spack/modules.yaml\n')
         else:
             self.copy_conf_file()
-            self.add_line(f'ADD conf/modules.yaml /spack/etc/spack/modules.yaml\n')
+            self.add_line(f'ADD .conf/modules.yaml /spack/etc/spack/modules.yaml\n')
         self.add_line_break()
 
 
@@ -184,12 +184,29 @@ class CreateModel(Model):
             logger.debug("Adding spack compiler")
             self.add_line('# Installing Spack compiler\n')
 
+
+            # Here is where a controller class may be implemented.
+            # There are a lot of niche specs about compilers. 
+            # For instance:
+            #   The llvm package containers the clang compilers.
+            #
+            # More instances:
+            #   package_name_to_compiler_name = {
+            #         "llvm": "clang",
+            #         "intel-oneapi-compilers": "oneapi",
+            #         "llvm-amdgpu": "rocmcc",
+            #         "intel-oneapi-compilers-classic": "intel",
+            #         "acfl": "arm",
+            #   }
+            # 
+            # This is where the implement would be used.
+            # vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv 
+
             compiler, package, version = None, None, None
             
             # Check if self.spack_compiler is 'llvm'
             if self.spack_compiler == 'llvm':
                 compiler = 'clang'
-                self.spack_compiler += '+flang'
             else:
                 # Splitting package and version if '@' is present
                 if '@' in self.spack_compiler:
@@ -200,8 +217,9 @@ class CreateModel(Model):
 
                 if package == 'llvm':
                     version_suffix = f'@{version}' if version else ''
-                    self.spack_compiler += f'{version_suffix}+flang'
 
+            # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
+            # This is where the implement would be used.
             
             signature_check = ''
             if not self.spack_check_signature:
