@@ -44,13 +44,12 @@ class CreateModel(Model):
             self.add_line_break()
 
     def add_env_variables(self):
-        if self.env_vars:
-            logger.debug("Adding environment variables")
-            self.add_line('# Set up the environment\n')
-            self.env_vars.extend(['DEBIAN_FRONTEND=noninteractive', 'PATH=/spack/bin:$PATH'])
-            for env_var in self.env_vars:
-                self.add_line(f'ENV {env_var}\n')
-            self.add_line_break()
+        self.env_vars.extend(['DEBIAN_FRONTEND=noninteractive', 'PATH=/spack/bin:$PATH'])
+        logger.debug("Adding environment variables")
+        self.add_line('# Set up the environment\n')
+        for env_var in self.env_vars:
+            self.add_line(f'ENV {env_var}\n')
+        self.add_line_break()
 
     def add_initial_commands(self):
         if self.initial_commands:

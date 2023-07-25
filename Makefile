@@ -88,6 +88,6 @@ install-dev: $(PYTHON_EXE)
 	$(SILENT)echo
 
 clean:
-	$(SILENT)rm -rf $(PREFIX) build e4s_alc.egg-info
+	$(SILENT)rm -rf $(PREFIX) build e4s_alc.egg-info e4s-alc-*
 	$(SILENT)find e4s_alc -type d -name __pycache__ -exec rm -r {} +
 	$(SILENT)find . -type d -name .logs.log -exec rm -r {} +
