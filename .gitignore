@@ -1,7 +1,6 @@
+*.log
 build/
 e4s_alc.egg-info/
-e4s_alc/version.py
 __pycache__
 e4s-alc-*/
-system/
 *.swp

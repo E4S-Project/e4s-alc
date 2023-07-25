@@ -1,108 +1,93 @@
-RM = rm -f
-MV = mv -f
-COPY = cp -rv
-MKDIR = mkdir -p
-RMDIR = rm -fr
-
-VERSION = $(shell git describe --tags --abbrev=0 2>/dev/null || echo "0.0.1")
-
-# Get build system locations from configuration file or command line
-ifneq ("$(wildcard setup.cfg)","")
-	PREFIX = $(shell grep '^prefix =' setup.cfg | sed 's/prefix = //')
-endif
-ifeq ($(PREFIX),)
-	PREFIX=$(shell pwd)/e4s-alc-$(VERSION)
-endif
-INSTALL_BIN_DIR=$(PREFIX)/bin
-
-# Get target OS and architecture
-ifeq ($(HOST_OS),)
-	HOST_OS = $(shell uname -s)
-endif
-ifeq ($(HOST_ARCH),)
-	HOST_ARCH = $(shell uname -m)
-endif
-
-WGET = $(shell command -pv wget || which wget)
-CURL = $(shell command -pv curl || which curl)
-
-ifneq ($(WGET),)
-download = $(WGET) --no-check-certificate $(WGET_FLAGS) -O "$(2)" "$(1)"
+ifneq (,$(findstring v,$(MAKEFLAGS)))
+    SILENT =
+    CURL_SILENT_FLAG =
+    WGET_SILENT_FLAG =
+    CONDA_SILENT_FLAG =
 else
-ifneq ($(CURL),)
-download = $(CURL) --insecure $(CURL_FLAGS) -L "$(1)" > "$(2)"
-else
-$(error Either curl or wget must be in PATH to download the python interpreter)
-endif
+    SILENT = @
+    CURL_SILENT_FLAG = --silent
+    WGET_SILENT_FLAG = --quiet
+    CONDA_SILENT_FLAG = > /dev/null 
+
 endif
 
-# Miniconda configuration
-USE_MINICONDA = true
-ifeq ($(HOST_OS),Linux)
-	CONDA_OS = Linux
-else
-	USE_MINICONDA = false
-endif
-ifeq ($(HOST_ARCH),x86_64)
-	CONDA_ARCH = x86_64
-else
-	ifeq ($(HOST_ARCH),ppc64le)
-	CONDA_ARCH = ppc64le
-else
-	USE_MINICONDA = false
-endif
-endif
+VERSION := $(shell git describe --tags --abbrev=0 2>/dev/null || echo "0.0.1")
+PREFIX := $(shell pwd)/e4s-alc-$(VERSION)
+INSTALL_BIN_DIR := $(PREFIX)/bin
+HOST_OS := $(or $(HOST_OS), $(shell uname -s))
+HOST_ARCH := $(or $(HOST_ARCH), $(shell uname -m))
 
-CONDA_VERSION = latest
-CONDA_REPO = https://repo.anaconda.com/miniconda
-CONDA_PKG = Miniconda3-$(CONDA_VERSION)-$(CONDA_OS)-$(CONDA_ARCH).sh
-CONDA_URL = $(CONDA_REPO)/$(CONDA_PKG)
-CONDA_SRC = system/src/$(CONDA_PKG)
-CONDA_DEST = $(PREFIX)/conda
-CONDA_BIN = $(CONDA_DEST)/bin
-CONDA = $(CONDA_DEST)/bin/python
+DL_CMD := $(if $(shell command -pv wget || which wget), $(shell command -pv wget || which wget) $(WGET_SILENT_FLAG) --no-check-certificate -O, $(if $(shell command -pv curl || which curl), $(shell command -pv curl || which curl) $(CURL_SILENT_FLAG) --insecure -L, $(error Either curl or wget must be in PATH)))
+
+USE_MINICONDA := true
+ifdef HOST_OS
+ifneq ($(HOST_OS),Linux)
+    USE_MINICONDA := false
+endif
+endif
+CONDA_ARCH := $(or $(filter $(HOST_ARCH), x86_64 ppc64le aarch64), $(USE_MINICONDA := false))
+CONDA_VERSION := latest
+CONDA_REPO := https://repo.anaconda.com/miniconda
+CONDA_PKG := Miniconda3-$(CONDA_VERSION)-$(HOST_OS)-$(CONDA_ARCH).sh
+CONDA_URL := $(CONDA_REPO)/$(CONDA_PKG)
+CONDA_SRC := $(PREFIX)/$(CONDA_PKG)
+CONDA_DEST := $(PREFIX)/conda
+CONDA_BIN := $(CONDA_DEST)/bin
+CONDA := $(CONDA_DEST)/bin/python
 
 ifeq ($(USE_MINICONDA),true)
-	PYTHON_EXE = $(CONDA)
-	PYTHON_FLAGS = -EOu
+	PYTHON_EXE := $(CONDA)
+	PYTHON_FLAGS := -EOu
 else
-	$(warning WARNING: There are no miniconda packages for this system: $(HOST_OS), $(HOST_ARCH).)
-	CONDA_SRC =
-	PYTHON_EXE = $(shell command -pv python || type -P python || which python)
-	PYTHON_FLAGS = -O
+    $(warning WARNING: There are no miniconda packages for this system $(HOST_OS) $(HOST_ARCH) - $(CONDA_URL))
+	CONDA_SRC :=
+	PYTHON_EXE := $(shell command -pv python || type -P python || which python)
+	PYTHON_FLAGS := -O
 	ifeq ($(PYTHON_EXE),)
 		$(error python not found in PATH.)
 	else
-		$(warning WARNING: Trying to use '$(PYTHON_EXE)' instead.)
+		$(warning WARNING:  Trying to use '$(PYTHON_EXE)' instead.)
 	endif
 endif
-PYTHON = $(PYTHON_EXE) $(PYTHON_FLAGS)
+PYTHON := $(PYTHON_EXE) $(PYTHON_FLAGS)
 
 all: install
 
-#>============================================================================<
-# Conda setup and fetch target
-
 $(CONDA): $(CONDA_SRC)
-	bash $< -b -p $(CONDA_DEST)
-	touch $(CONDA_BIN)/*
+	$(SILENT)echo -n "Installing python packages..."
+	$(SILENT)bash $< -b -p $(CONDA_DEST) $(CONDA_SILENT_FLAG)
+	$(SILENT)touch $@
+	$(SILENT)echo "Installing python packages...Complete!"
 
 $(CONDA_SRC):
-	$(MKDIR) `dirname "$(CONDA_SRC)"`
-	$(call download,$(CONDA_URL),$(CONDA_SRC)) || \
-		(rm -f "$(CONDA_SRC)" ; \
-		echo "* ERROR: Unable to download $(CONDA_URL)." ; \
-		false)
-
-#>============================================================================<
-# Main installation target
+	$(SILENT)mkdir -p $(@D)
+	$(SILENT)echo -n "Downloading Miniconda..."
+	$(SILENT) $(DL_CMD) $@ $(CONDA_URL)
+	$(SILENT)echo "Complete!"
 
 install: $(PYTHON_EXE)
-	$(PYTHON) -m pip install -q --compile .
-	$(MKDIR) $(INSTALL_BIN_DIR)
-	ln -fs $(CONDA_BIN)/e4s-alc $(INSTALL_BIN_DIR)/e4s-alc
+	$(SILENT)echo -n "Installing e4s-alc through pip..."
+	$(SILENT)$(PYTHON) -m pip install -q --compile --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host=files.pythonhosted.org .
+	$(SILENT)mkdir -p $(INSTALL_BIN_DIR)
+	$(SILENT)ln -fs $(CONDA_BIN)/e4s-alc $(INSTALL_BIN_DIR)/e4s-alc
+	$(SILENT)echo "Complete!"
+	$(SILENT)echo "Add e4s-alc to your PATH environment variable:"
+	$(SILENT)echo
+	$(SILENT)echo "Run \`export PATH=\$$(pwd)/e4s-alc-$(VERSION)/bin:\$$PATH\`"
+	$(SILENT)echo
 
 install-dev: $(PYTHON_EXE)
-	$(PYTHON) -m pip install -q --editable .
-	$(MKDIR) $(INSTALL_BIN_DIR)
-	ln -fs $(CONDA_BIN)/e4s-alc $(INSTALL_BIN_DIR)/e4s-alc
+	$(SILENT)echo -n "Installing e4s-alc dev through pip..."
+	$(SILENT)$(PYTHON) -m pip install -q --editable .
+	$(SILENT)mkdir -p $(INSTALL_BIN_DIR)
+	$(SILENT)ln -fs $(CONDA_BIN)/e4s-alc $(INSTALL_BIN_DIR)/e4s-alc
+	$(SILENT)echo "Complete!"
+	$(SILENT)echo "Add e4s-alc to your PATH environment variable:"
+	$(SILENT)echo
+	$(SILENT)echo "Run \`export PATH=\$$(pwd)/e4s-alc-$(VERSION)/bin:\$$PATH\`"
+	$(SILENT)echo
+
+clean:
+	$(SILENT)rm -rf $(PREFIX) build e4s_alc.egg-info e4s-alc-*
+	$(SILENT)find e4s_alc -type d -name __pycache__ -exec rm -r {} +
+	$(SILENT)find . -type d -name .logs.log -exec rm -r {} +

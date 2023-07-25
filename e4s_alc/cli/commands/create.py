@@ -1,70 +1,90 @@
-import os
-from e4s_alc import E4S_ALC_VERSION, E4S_ALC_URL, E4S_ALC_SCRIPT
+from e4s_alc.util import Logger
 from e4s_alc.model.create import CreateModel
-from e4s_alc.cli.command import AbstractCommand
-from e4s_alc import logger
+from e4s_alc.cli.cli_view import HelpDescriptionFormatter
+from e4s_alc.cli.commands.command import AbstractCommand
 
-LOGGER = logger.get_logger(__name__)
+class CreateCommand(AbstractCommand):
+    """A class represents the Create Command, used to create a Dockerfile."""
 
-HELP_PAGE_FMT = "'%(command)s' page to be written."
+    def __init__(self):
+        """Initialize the CreateCommand class."""
+        
+        self.parser = None
+        self.usage = 'e4s-alc create [options]'
+        self.help = 'Create a Dockerfile'
 
-class Create(AbstractCommand):
-    def __init__(self, model):
-        self.model = model()
-        summary_parts = ["E4S-ALC %s " % E4S_ALC_VERSION, E4S_ALC_URL]
-        super().__init__(__name__, summary_fmt=''.join(summary_parts), help_page_fmt=HELP_PAGE_FMT)
-        self.command = os.path.basename(E4S_ALC_SCRIPT)
-        self.parser_help = 'Create a new image'
+    def create_subparser(self, subparsers):
+        """Create subparser and its attributes for this command."""
 
-    def _construct_parser(self):
-        usage = '%s create [options]' % self.command 
-       
-        self.parser.usage = usage
+        self.parser = subparsers.add_parser('create',
+                                            help=self.help,
+                                            usage=self.usage,
+                                            add_help=False,
+                                            formatter_class=HelpDescriptionFormatter
+                                            )
 
-        yaml_or_package = self.parser.add_mutually_exclusive_group()
-        yaml_or_package.add_argument('-p', '--package', nargs='+', metavar='\b', help='The name of a Spack package to install', default=[])
-        yaml_or_package.add_argument('-y', '--yaml', metavar='\b', help='The yaml file used to specify a spack environment to install')
-        yaml_or_package.add_argument('-f', '--file', metavar='\b', help='The file used to create a new image')
-        yaml_or_package.add_argument('-ns', '--no-spack', help='\b\b\b\bChoose to install spack', action='store_false', dest='spack')
 
-        self.parser.add_argument('-i', '--image', metavar='\b', help='The image name and the tag <image:tag>')
-        self.parser.add_argument('-n', '--name', metavar='\b', help='The name of the newly created image')
-        self.parser.add_argument('-a', '--os-package', nargs='+', metavar='\b', help='The name of an OS Package to install', default=[])
-        self.parser.add_argument('-c', '--copy', metavar='\b', help='Directory to copy into the image', action='append', default=[])
-        self.parser.add_argument('-t', '--tarball', metavar='\b', help='Tarball to expand in the image', action='append', default=[])
-        self.parser.add_argument('-P', '--parent', metavar='\b',help='Specific to singularity backend, choose which backend to use between Podman and Docker ["podman", "docker"] to prebuild the image', choices=['docker', 'podman'])
-        self.parser.add_argument('-h', '--help', help='\b\b\b\b',action='store_true')
+        self.parser.add_argument('-h', '--help', help='Display the help page', default=False, action='store_true', dest='help')
+        self.parser.add_argument('-v', '--verbose', help='Verbose mode', default=False, action='store_true', dest='verbose')
 
-    def check_correct_args(self, args):
-        if args.help:
-            print()
+        file_group_args = self.parser.add_argument_group('Load Arguments by file')
+        file_group_args.add_argument('-f', '--file', help='The file used to create a new image')
+        
+        base_group_desc = 'The base stage of the Dockerfile provides the foundation of the image.'
+        base_group_args = self.parser.add_argument_group('Base Stage Arguments', base_group_desc)
+        base_group_args.add_argument('-b', '--backend', help='The container backend used for image inspection')
+        base_group_args.add_argument('-i', '--image', help='The base image name <image:tag>')
+        base_group_args.add_argument('-r', '--registry', help='The image registry to search for the base image')
+        base_group_args.add_argument('-ev', '--env-variable', help='Set an environment variable inside the container', action='append', default=[], dest='env-variables')
+        base_group_args.add_argument('-af', '--add-file', help='Add a file to the container', action='append', default=[], dest='add-files')
+        base_group_args.add_argument('--initial-command', help='Commands to run after image is pulled', action='append', default=[], dest='initial-commands')
+        base_group_args.add_argument('--post-base-stage-command', help='Commands to run at the end of the base stage', action='append', default=[], dest='post-base-stage-commands')
+
+        system_group_desc = 'The system stage of the Dockerfile provides important dependencies that the image might need.'
+        system_group_args = self.parser.add_argument_group('System Stage Arguments', system_group_desc)
+        system_group_args.add_argument('-crt', '--certificate', help='Add an SSL certificate', action='append', default=[], dest='certificates')
+        system_group_args.add_argument('-a', '--os-package', help='The name of an OS Package to install', action='append', default=[], dest='os-packages')
+        system_group_args.add_argument('--pre-system-stage-command', help='Commands to run at the beginning of the system stage', action='append', default=[], dest='pre-system-package-commands')
+        system_group_args.add_argument('--post-system-stage-command',  help='Commands to run at the end of the system stage', action='append', default=[], dest='post-system-package-commands')
+
+        spack_group_desc = 'The Spack stage of the Dockerfile provides Spack installations for the image.'
+        spack_group_args = self.parser.add_argument_group('Spack Stage Arguments', spack_group_desc)
+        spack_group_args.add_argument('-s', '--spack', help='Choose to install spack', default=True, dest='spack')
+        spack_group_args.add_argument('-sv', '--spack-version', help='The version of a Spack to install')
+        spack_group_args.add_argument('-sm', '--spack-mirrors', help='The Spack mirror URL/Paths for Spack package caches.', default=[], dest='spack-mirrors')
+        spack_group_args.add_argument('-ss', '--spack-check-signature', help='Check for Spack package signature when installing packages from mirror', default=True)
+        spack_group_args.add_argument('-me', '--modules-env-file', help='The path to a modules.yaml environment file')
+        spack_group_args.add_argument('-sc', '--spack-compiler', help='The Spack compiler that will be installed and will build Spack packages')
+        spack_group_args.add_argument('-se', '--spack-env-file', help='The path to a spack.yaml environment file')
+        spack_group_args.add_argument('-p', '--spack-package', help='The name of a Spack package to install', action='append', default=[], dest='spack-packages')
+        spack_group_args.add_argument('--pre-spack-stage-command', help='Commands to run at the beginning of the spack stage', action='append', default=[], dest='pre-spack-install-commands')
+        spack_group_args.add_argument('--post-spack-install-command', help='Commands to run after Spack is installed', action='append', default=[], dest='post-spack-install-commands')
+        spack_group_args.add_argument('--post-spack-stage-command', help='Commands to run at the end of the spack stage', action='append', default=[], dest='post-spack-package-commands')
+
+        return {'command': self, 'parser': self.parser}
+
+    def check_arguments(self, arg_namespace):
+        """Check the arguments passed to the command."""
+
+        logger = Logger('core', '.logs.log', arg_namespace.verbose)
+
+        if arg_namespace.help:
             self.parser.print_help()
-            print()
             exit(0)
 
-        if not (args.image or args.name or args.file):
-            LOGGER.error('Arguments \'-i/--image\' and \'-n/--name\' or \'-f/--file\' are required.')
-            print()
+        if not (arg_namespace.image or arg_namespace.file):
+            print('Error: Arguments \'-i/--image\' or \'-f/--file\' are required.')
             self.parser.print_help()
-            print()
             exit(1)
 
-        if (args.image or args.name) and args.file:
-            LOGGER.error('Argument \'-f/--file\' cannot be used with argument \'-i/--image\' or \'-n/--name\'.')
-            print()
+        if arg_namespace.image and arg_namespace.file:
+            print('Error: Argument \'-f/--file\' cannot be used with argument \'-i/--image\'.')
             self.parser.print_help()
-            print()
             exit(1)
 
-        if (args.image or args.name) and not (args.image and args.name):
-            print()
-            LOGGER.error('Arguments \'-i/--image\' and \'-n/--name\' are both required.')
-            self.parser.print_help()
-            print()
-            exit(1)
-
-    def main(self, args):
-        self.check_correct_args(args)
-        self.model.main(args)
-
-AbstractCommand.commands['create'] = Create(CreateModel)
+    def run(self, arg_namespace):
+        """Run the command after checking the arguments."""
+        
+        self.check_arguments(arg_namespace)
+        model = CreateModel(arg_namespace)
+        model.create()

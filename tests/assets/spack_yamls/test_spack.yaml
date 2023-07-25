@@ -1,6 +1,0 @@
-spack:
-  # add package specs to the `specs` list
-  specs: [zlib, tcl]
-  view: true
-  concretizer:
-    unify: true

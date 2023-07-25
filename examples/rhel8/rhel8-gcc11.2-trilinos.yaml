@@ -1,0 +1,11 @@
+######## Base group ########
+backend: podman
+registry: registry.access.redhat.com
+image: ubi8/ubi
+
+####### Spack group #######
+spack: True
+spack-version: latest
+spack-compiler: gcc@11.2
+spack-packages: 
+  - trilinos
