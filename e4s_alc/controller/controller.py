@@ -1,6 +1,6 @@
 import logging
 from e4s_alc.controller.image import SlesImage, CentosImage, UbuntuImage, RhelImage
-from e4s_alc.controller.backend import DockerBackend, PodmanBackend
+from e4s_alc.controller.backend import DockerBackend, PodmanBackend, SingularityBackend
 
 logger = logging.getLogger('core')
 
@@ -14,6 +14,9 @@ class Controller():
         if backend == 'docker':
             logger.debug("Setting backend to Docker")
             self.backend = DockerBackend()
+        if backend == 'singularity':
+            logger.debug("Setting backend to Singularity")
+            self.backend = SingularityBackend()
 
         logger.debug(f"Getting OS from base image {base_image}")
         self.image = self.get_image_os(base_image)
