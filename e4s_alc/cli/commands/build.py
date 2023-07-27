@@ -65,8 +65,6 @@ class BuildCommand(AbstractCommand):
     def check_arguments(self, arg_namespace):
         """Check if arguments provided in the command line are correct."""
 
-        logger = Logger('core', '.logs.log', arg_namespace.verbose)
-
         # Print help if --help was provided
         if arg_namespace.help:
             self.parser.print_help()
