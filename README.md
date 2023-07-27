@@ -90,8 +90,9 @@ Parameters of the base group define the setup of the image and consist of the fo
 
 The system group gathers crucial binaries required for Spack as well as user-specific projects.
 * `pre-system-stage-commands` - A set of commands executed at the start of the System Stage of the Dockerfile build.
-* `certificates` - Includes `.pem`/`.cer` certificates required by your organization to download OS packages and for added security purposes.
 * `os-packages` - A set of OS packages to be included in the image. Note: `e4s-alc` auto-includes some OS packages for Spack's usability.
+* `certificates` - Includes `.pem`/`.cer` certificates required by your organization to download OS packages and for added security purposes.
+* `add-repos` - A set of GitHub repositories to be cloned into the image.
 * `post-system-stage-commands` - A set of commands executed at the end of the System Stage of the Dockerfile build.
 
 --------

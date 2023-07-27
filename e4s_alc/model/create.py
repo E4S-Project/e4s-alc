@@ -68,6 +68,14 @@ class CreateModel(Model):
             self.add_line_break()
 
     # System group
+    def add_os_package_commands(self):
+        logger.debug("Adding os package commands")
+        os_package_commands = self.controller.get_os_package_commands(self.os_packages)
+        self.add_line('# Install OS packages\n')
+        for command in os_package_commands:
+            self.add_line(f'RUN {command}\n')
+        self.add_line_break()
+
     def add_certificates(self):
         logger.debug("Adding certificates")
         cert_locations = self.controller.get_certificate_locations(self.certificates)
@@ -78,13 +86,12 @@ class CreateModel(Model):
             update_command = self.controller.get_update_certificate_command()
             self.add_line(f'RUN {update_command}\n\n')
 
-    def add_os_package_commands(self):
-        logger.debug("Adding os package commands")
-        os_package_commands = self.controller.get_os_package_commands(self.os_packages)
-        if os_package_commands:
-            self.add_line('# Install OS packages\n')
-            for command in os_package_commands:
-                self.add_line(f'RUN {command}\n')
+    def add_github_repos(self):
+        if self.git_repos:
+            logger.debug("Adding github repos")
+            self.add_line('# Clone GitHub repos\n')
+            for repo in self.git_repos:
+                self.add_line(f'RUN git clone {repo}\n')
             self.add_line_break()
 
     def add_pre_system_stage_commands(self):
@@ -293,6 +300,7 @@ class CreateModel(Model):
         self.add_pre_system_stage_commands()
         self.add_os_package_commands()
         self.add_certificates()
+        self.add_github_repos()
         self.add_post_system_stage_commands()
 
     def create_spack_stage(self):

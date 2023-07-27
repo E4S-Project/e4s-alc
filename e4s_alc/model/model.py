@@ -82,8 +82,9 @@ class Model():
         self.post_base_stage_commands = self.remove_nones(args.get('post-base-stage-commands', []))
 
         # System group
-        self.certificates = self.remove_nones(args.get('certificates', []))
         self.os_packages = self.remove_nones(args.get('os-packages', []))
+        self.git_repos = self.remove_nones(args.get('add-repos', []))
+        self.certificates = self.remove_nones(args.get('certificates', []))
         self.pre_system_stage_commands = self.remove_nones(args.get('pre-system-stage-commands', []))
         self.post_system_stage_commands = self.remove_nones(args.get('post-system-stage-commands', []))
 

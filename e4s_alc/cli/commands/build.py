@@ -43,6 +43,7 @@ class BuildCommand(AbstractCommand):
         system_group_args = self.parser.add_argument_group('System Stage Arguments', system_group_desc)
         system_group_args.add_argument('-crt', '--certificate', metavar='', help='Add an SSL certificate', action='append', default=[], dest='certificates')
         system_group_args.add_argument('-a', '--os-package', metavar='', help='The name of an OS Package to install', action='append', default=[], dest='os-packages')
+        system_group_args.add_argument('-ar', '--add-repo', help='Clone a GitHub repository into the image', action='append', default=[], dest='add-repos')
         system_group_args.add_argument('--pre-system-stage-command', metavar='', help='Commands to run before OS Packages are installed', action='append', default=[], dest='pre-system-package-commands')
         system_group_args.add_argument('--post-system-stage-command',  metavar='', help='Commands to run after OS Packages are installed', action='append', default=[], dest='post-system-package-commands')
 
