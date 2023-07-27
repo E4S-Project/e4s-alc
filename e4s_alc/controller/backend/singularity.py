@@ -36,7 +36,7 @@ class SingularityBackend(ContainerBackend):
     def get_os_release(self, image, tag):
         logger.debug("Getting OS release of the image")
         container_command = 'cat /etc/os-release'
-        system_command = f'{self.program} exec {self.image_dir}/{image} {container_command}'
+        system_command = f'{self.program} exec {self.image_dir}/{image}_{tag}.sif {container_command}'
         system_command_output = subprocess.check_output(system_command, shell=True)
         if not system_command_output:
             logger.error("Failed to get OS release of the image")
