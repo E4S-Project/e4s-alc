@@ -1,5 +1,5 @@
 import logging
-from e4s_alc.controller.image import SlesImage, CentosImage, UbuntuImage, RhelImage
+from e4s_alc.controller.image import SlesImage, CentosImage, UbuntuImage, RhelImage, RockyImage
 from e4s_alc.controller.backend import DockerBackend, PodmanBackend
 
 logger = logging.getLogger('core')
@@ -65,11 +65,18 @@ class Controller():
             logger.debug("OS is Red Hat Enterprise Linux")
             return RhelImage(self.os_release)
 
+        if os_id == 'rocky':
+            logger.debug("OS is Rocky Linux")
+            return RockyImage(self.os_release)
+
     def get_os_package_commands(self, os_packages):
         logger.info("Getting package manager commands for OS packages")
         return self.image.get_pkg_manager_commands(os_packages)
 
     def get_os_id(self):
+        return self.os_release['ID']
+
+    def get_os_id_and_version(self):
         os_id = self.os_release['ID']
         os_version = self.os_release['VERSION_ID'] 
         return f'{os_id}{os_version}'
