@@ -15,6 +15,7 @@ class Model():
 
         # Base group
         self.backend = None
+        self.bootstrap = None
         self.base_image = None
         self.image_registry = None
         self.local_files = None

@@ -33,40 +33,29 @@ class CreateDefinitionfileModel(Model):
     # Base group
     def add_base_image(self):
         logger.debug("Adding base image")
-        self.add_line(f'FROM {self.image_registry}{self.base_image} AS base-stage\n\n', indent=False)
+        self.add_line(f'FROM: {self.base_image}\n\n', indent=False)
 
     def add_local_files(self):
         if self.local_files:
             logger.debug("Adding local files")
-            self.add_line('# Add files from host to container\n')
             for file in self.local_files:
                 format_file_spaces = ' '.join(file.split())
                 src_file, dest_file = format_file_spaces.split(' ')
-                self.add_line(f'ADD {src_file} {dest_file}\n')
+                self.add_line(f'{src_file} {dest_file}\n')
             self.add_line_break()
 
     def add_env_variables(self):
         self.env_vars.extend(['DEBIAN_FRONTEND=noninteractive', 'PATH=/spack/bin:$PATH'])
         logger.debug("Adding environment variables")
-        self.add_line('# Set up the environment\n')
         for env_var in self.env_vars:
-            self.add_line(f'ENV {env_var}\n')
+            self.add_line(f'{env_var}\n')
         self.add_line_break()
 
     def add_initial_commands(self):
         if self.initial_commands:
             logger.debug("Adding initial commands")
-            self.add_line('# Run commands after pulling the image\n')
             for command in self.initial_commands:
-                self.add_line(f'RUN {command}\n')
-            self.add_line_break()
-
-    def add_post_base_stage_commands(self):
-        if self.post_base_stage_commands:
-            logger.debug("Adding post base stage commands")
-            self.add_line('# Run commands at the end of the base stage\n')
-            for command in self.post_base_stage_commands:
-                self.add_line(f'RUN {command}\n')
+                self.add_line(f'{command}\n')
             self.add_line_break()
 
     # System group
@@ -86,23 +75,7 @@ class CreateDefinitionfileModel(Model):
         if os_package_commands:
             self.add_line('# Install OS packages\n')
             for command in os_package_commands:
-                self.add_line(f'RUN {command}\n')
-            self.add_line_break()
-
-    def add_pre_system_stage_commands(self):
-        if self.pre_system_stage_commands:
-            logger.debug("Adding pre system stage commands")
-            self.add_line('# Run commands at the beginning of the system stage\n')
-            for command in self.pre_system_stage_commands:
-                self.add_line(f'RUN {command}\n')
-            self.add_line_break()
-
-    def add_post_system_stage_commands(self):
-        if self.post_system_stage_commands:
-            logger.debug("Adding post system stage commands")
-            self.add_line('# Run commands at the end of the system stage\n')
-            for command in self.post_system_stage_commands:
-                self.add_line(f'RUN {command}\n')
+                self.add_line(f'{command}\n')
             self.add_line_break()
 
     # Spack group
@@ -119,7 +92,7 @@ class CreateDefinitionfileModel(Model):
 
         self.add_line(f'# Install Spack version {self.spack_version}\n')
         for command in spack_install_commands:
-            self.add_line(f'RUN {command}\n')
+            self.add_line(f'{command}\n')
         self.add_line_break()
 
     def add_spack_mirrors(self):
@@ -127,8 +100,8 @@ class CreateDefinitionfileModel(Model):
             logger.debug("Adding spack mirrors")
             self.add_line('# Add Spack mirrors\n')
             for mirror in self.spack_mirrors:
-                self.add_line(f'RUN spack mirror add {mirror} {mirror}\n')
-            self.add_line('RUN spack buildcache keys --install --trust\n')
+                self.add_line(f'spack mirror add {mirror} {mirror}\n')
+            self.add_line('spack buildcache keys --install --trust\n')
             self.add_line_break()
 
     def copy_conf_file(self):
@@ -148,15 +121,15 @@ class CreateDefinitionfileModel(Model):
 
         self.add_line('# Setup spack and modules environment\n')
         for command in self.controller.get_env_setup_commands():
-            self.add_line(f'RUN {command}\n')
+            self.add_line(f'{command}\n')
         self.add_line_break()
 
         self.add_line('# Add modules.yaml file\n')
         if self.modules_env_file:
-            self.add_line(f'ADD {self.modules_env_file} /spack/etc/spack/modules.yaml\n')
+            self.add_line(f'{self.modules_env_file} /spack/etc/spack/modules.yaml\n')
         else:
             self.copy_conf_file()
-            self.add_line(f'ADD .conf/modules.yaml /spack/etc/spack/modules.yaml\n')
+            self.add_line(f'.conf/modules.yaml /spack/etc/spack/modules.yaml\n')
         self.add_line_break()
 
     def add_post_spack_install_commands(self):
@@ -164,7 +137,7 @@ class CreateDefinitionfileModel(Model):
             logger.debug("Adding post spack install commands")
             self.add_line('# Run commands after installing Spack\n')
             for command in self.post_spack_install_commands:
-                self.add_line(f'RUN {command}\n')
+                self.add_line(f'{command}\n')
             self.add_line_break()
 
     def add_spack_env_install(self):
@@ -174,8 +147,8 @@ class CreateDefinitionfileModel(Model):
 
         logger.debug("Adding spack env install commands")
         self.add_line('# Add Spack env file\n')
-        self.add_line(f'ADD {self.spack_env_file} /spack.yaml\n')
-        self.add_line(f'RUN spack --env / install {signature_check}\n')
+        self.add_line(f'{self.spack_env_file} /spack.yaml\n')
+        self.add_line(f'spack --env / install {signature_check}\n')
         self.add_line_break()
 
     def add_spack_compiler(self):
@@ -234,7 +207,7 @@ class CreateDefinitionfileModel(Model):
             ]
 
             for command in spack_compiler_commands:
-                self.add_line(f'RUN {command}\n')
+                self.add_line(f'{command}\n')
             self.add_line_break()
 
     def add_spack_packages(self):
@@ -247,7 +220,7 @@ class CreateDefinitionfileModel(Model):
 
             self.add_line('# Install Spack packages\n')
             for package in self.spack_packages:
-                self.add_line(f'RUN spack install {signature_check}{package}\n')
+                self.add_line(f'spack install {signature_check}{package}\n')
             self.add_line_break()
 
     def add_pre_spack_stage_commands(self):
@@ -255,7 +228,7 @@ class CreateDefinitionfileModel(Model):
             logger.debug("Adding pre spack stage commands")
             self.add_line('# Run commands at the beginning of the Spack stage\n')
             for command in self.pre_spack_stage_commands:
-                self.add_line(f'RUN {command}\n')
+                self.add_line(f'{command}\n')
             self.add_line_break()
 
     def add_post_spack_stage_commands(self):
@@ -263,15 +236,15 @@ class CreateDefinitionfileModel(Model):
             logger.debug("Adding post spack stage commands")
             self.add_line('# Run commands at the end of the Spack stage\n')
             for command in self.post_spack_stage_commands:
-                self.add_line(f'RUN {command}\n')
+                self.add_line(f'{command}\n')
             self.add_line_break()
 
-    def add_entrypoint(self):
-        logger.debug("Adding entrypoint")
-        self.add_line('# Entrypoint of the image\n')
-        command = self.controller.get_entrypoint_command()
-        self.add_line(f'ENTRYPOINT [{command}]\n')
+    def add_bootstrap(self):
+        if not self.bootstrap:
+            self.bootstrap = "docker"
+        self.add_line(f"Bootstrap: {self.bootstrap}\n", indent=False)
 
+ 
     def export_to_makefile(self):
         logger.info("Exporting to makefile")
         with open('Dockerfile', 'w') as f:
@@ -279,59 +252,59 @@ class CreateDefinitionfileModel(Model):
                 f.write(instruction)
 
     # Add stages
-    def create_base_stage(self):
-        logger.info("Creating base stage")
-        self.add_line('# Base Stage\n', indent=False)
+    def create_header(self):
+        logger.info("Creating header")
+        self.add_line('# Header\n', indent=False)
+        self.add_bootstrap()
         self.add_base_image()
-        self.add_initial_commands()
-        self.add_local_files()
-        self.add_env_variables()
-        self.add_post_base_stage_commands()
-
-    def create_system_stage(self):
-        logger.info("Creating system stage")
-        self.add_line('# System Stage\n', indent=False)
-        self.add_line(f'FROM base-stage AS system-stage\n\n', indent=False)
-        self.add_pre_system_stage_commands()
-        self.add_os_package_commands()
-        self.add_certificates()
-        self.add_post_system_stage_commands()
-
-    def create_spack_stage(self):
-        logger.info("Creating spack stage")
-        self.add_line('# Spack Stage\n', indent=False)
-        self.add_line(f'FROM system-stage AS spack-stage\n\n', indent=False)
-        self.add_pre_spack_stage_commands()
-        self.add_spack()
-        self.add_spack_mirrors()
-        self.add_setup_env()
-        self.add_post_spack_install_commands()
-        self.add_spack_compiler()
-        if self.spack_env_file:
-            self.add_spack_env_install()
-        else:
-            self.add_spack_packages()
-
-        self.add_line('# Update compiler list\n')
-        self.add_line('RUN spack compiler find\n')
         self.add_line_break()
-        self.add_post_spack_stage_commands()
 
-    def create_finalize_stage(self):
-        logger.info("Creating finalize stage")
-        self.add_line('# Finalize Stage\n', indent=False)
+    def create_environment(self):
+        self.add_line('# Environment\n', indent=False)
+        self.add_line('%environment\n', indent=False)
+        self.add_env_variables()
+        self.add_line_break()
+
+    def create_files(self):
+        self.add_line('# Files\n', indent=False)
+        self.add_line('%files\n', indent=False)
+        self.add_local_files()
+        self.add_line_break()
+
+    def create_post(self):
+        self.add_line('# Post\n', indent=False)
+        self.add_line('%post\n', indent=False)
+        self.add_os_package_commands()
         if self.spack_install:
-            self.add_line(f'FROM spack-stage AS finalize-stage\n\n', indent=False)
-        else:
-            self.add_line(f'FROM system-stage AS finalize-stage\n\n', indent=False)
+            self.add_pre_spack_stage_commands()
+            self.add_spack()
+            self.add_spack_mirrors()
+            self.add_setup_env()
+            self.add_post_spack_install_commands()
+            self.add_spack_compiler()
+            if self.spack_env_file:
+                self.add_spack_env_install()
+            else:
+                self.add_spack_packages()
+            self.add_line('spack compiler find\n')
+            self.add_line_break()
+            self.add_post_spack_stage_commands()
 
-        self.add_entrypoint()
-        self.export_to_makefile()
+    def create_startscript(self):
+        logger.debug("Adding startscript")
+        self.add_line('# Startscript of the image\n')
+        self.add_line('%startscript\n')
+        command = self.controller.get_entrypoint_command()
+        self.add_line(f'[{command}]\n')
+
+    def create_sections(self):
+        self.create_environment()
+        self.create_files()
+        self.create_post()
+        self.create_startscript()
 
     def create(self):
         logger.info("Creating stages")
-        self.create_base_stage()
-        self.create_system_stage()
-        if self.spack_install:
-            self.create_spack_stage()
-        self.create_finalize_stage()
+        self.create_header()
+        self.create_sections()
+        self.export_to_makefile()
