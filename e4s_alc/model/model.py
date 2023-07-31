@@ -3,7 +3,6 @@ import yaml
 import subprocess
 import logging
 from e4s_alc.util import BackendMissingError, YAMLNotFoundError
-from e4s_alc.controller.controller import Controller
 
 logger = logging.getLogger('core')
 
@@ -43,7 +42,6 @@ class Model():
         self.post_spack_stage_commands = None
 
         self.read_arguments(arg_namespace)
-        self.controller = Controller(self.backend, self.image_registry + self.base_image)
 
     def read_arguments_from_file(self, file_path):
         logger.info("Reading arguments from file")
@@ -69,7 +67,9 @@ class Model():
             args = self.read_arguments_from_file(args['file']) 
 
         # Base group
-        self.backend = args.get('backend', self.discover_backend())
+        self.backend = args.get('backend', None)
+        if not self.backend:
+            self.backend = self.discover_backend()
         self.base_image = args.get('image', None) or self.raise_argument_error('image')
         self.image_registry = self.none_to_blank(args.get('registry', ''))
         if self.image_registry:

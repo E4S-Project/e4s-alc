@@ -87,4 +87,3 @@ class CreateCommand(AbstractCommand):
         
         self.check_arguments(arg_namespace)
         model = CreateModel(arg_namespace)
-        model.create()
