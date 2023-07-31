@@ -237,8 +237,9 @@ class CreateModel(Model):
         if not os.path.exists(directory):
             os.makedirs(directory)
         
-        os_id = self.controller.get_os_id()
-        with open(f'{directory}/Dockerfile.{os_id}-{self.spack_compiler}', 'w') as f:
+        os_id = self.controller.get_os_id_and_version()
+        file_name = f'{directory}/Dockerfile.{os_id}-{self.spack_compiler.compiler}@{self.spack_compiler.version}' 
+        with open(file_name, 'w') as f:
             for instruction in self.instructions:
                 f.write(instruction)
 
@@ -263,8 +264,16 @@ class CreateModel(Model):
         self.add_line('# System Stage\n', indent=False)
         self.add_line(f'FROM base-stage AS system-stage\n\n', indent=False)
         self.add_pre_system_stage_commands()
-        self.add_os_package_commands()
-        self.add_certificates()
+
+        # If rockylinux (and others? not ubuntu):
+        #   Add certs before packages
+        if self.controller.get_os_id() == 'rocky':
+            self.add_certificates()
+            self.add_os_package_commands()
+        else:
+            self.add_os_package_commands()
+            self.add_certificates()
+
         self.add_github_repos()
         self.add_post_system_stage_commands()
 
