@@ -44,4 +44,3 @@ class RhelImage(Image):
     def get_entrypoint_commands(self, setup_script):
         commands = ['/bin/bash']
         return commands
-

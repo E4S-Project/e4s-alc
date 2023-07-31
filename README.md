@@ -36,12 +36,11 @@ cd e4s-alc && make
 
 ## Usage
 
-`e4s-alc` has 3 basic commands:
+`e4s-alc` has 2 basic commands:
 * `create` - Used to create a Dockerfile
-* `build` - Used to create and build a Dockerfile
 * `template` - Used to generate a template `.yaml` file
 
-While you are able to use `e4s-alc create` and `e4s-alc build` as a command line tool, it is recommended that you use a `.yaml` file.
+While you are able to use `e4s-alc create` as a command line tool, it is recommended that you use a `.yaml` file.
 
 To create a Dockerfile, run:
 ```
@@ -49,13 +48,6 @@ e4s-alc create -f example.yaml
 ```
 
 This will place a Dockerfile and `conf` directory in the current working directory. Do not remove the `conf` directory because this plays a role in the build of the container.
-
-To create a Docker and immediately begin building the container, run:
-```
-e4s-alc build -f example.yaml
-```
-
-This is the same as running `e4s-alc create -f example.yaml && {docker/podman} build .`
 
 To create a template `.yaml` file to work off, run:
 ```
@@ -207,18 +199,41 @@ e4s-alc create -f rhel8-gcc11.2-kokkos.yaml
 podman build .
 ``` 
 
-or
-
-```
-e4s-alc build -f rhel8-gcc11.2-kokkos.yaml
-```
-
 Then, I run the image in interactive mode and inspect the install:
 
-```
 [root@c5ad0d45ba1d /]# module avail
 ----------------------------- /modulefiles/linux-rhel8-power9le -----------------------------------
 gcc/11.2.0  kokkos/4.0.01  
 [root@c5ad0d45ba1d /]# module load gcc
 [root@c5ad0d45ba1d /]# module load kokkos
+```
+
+#### Example YAML file with matrix feature
+
+Here is an example `.yaml` file that creates multiple Dockerfiles using a single `.yaml` file. Notice that for each `registry-image-matrix` item that we specify, we build out a Dockerfile using each `spack-compiler-matrix` item. This feature could be powerful for testing Spack packages across different operating systems and compilers.
+
+```
+backend: podman
+registry-image-matrix:
+  - registry.access.redhat.com/ubi8/ubi
+  - ubuntu:20.04
+
+####### Spack group #######
+spack: True
+spack-version: latest
+
+spack-compiler-matrix:
+  - gcc@8.5.0 
+  - gcc@11.2.0 
+  - gcc@12.3.0
+  - gcc@12.0
+
+spack-packages: 
+  - kokkos
+```
+
+This `.yaml` file would create a directory named `dockerfiles` that contains the following Dockerfiles:
+```
+Dockerfile.rhel8.8-gcc@11.2.0  Dockerfile.rhel8.8-gcc@12.3.0  Dockerfile.ubuntu20.04-gcc@11.2.0  Dockerfile.ubuntu20.04-gcc@12.3.0
+Dockerfile.rhel8.8-gcc@12.0    Dockerfile.rhel8.8-gcc@8.5.0   Dockerfile.ubuntu20.04-gcc@12.0    Dockerfile.ubuntu20.04-gcc@8.5.0
 ```

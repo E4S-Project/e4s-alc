@@ -5,6 +5,9 @@ from e4s_alc.controller.backend import DockerBackend, PodmanBackend
 logger = logging.getLogger('core')
 
 class Controller():
+
+    image_cache = {}
+
     def __init__(self, backend, base_image):
         logger.info("Initializing Controller")
         self.backend = None
@@ -32,34 +35,44 @@ class Controller():
     def get_image_os(self, base_image):
         logger.info("Getting OS from base image")
 
-        # Pull image
         image, tag = self.get_image_tag(base_image)
-        logger.debug(f"Pulling base image {image}:{tag}")
-        self.backend.pull(image, tag)
+        key = f'{image}:{tag}'
 
-        # Run the image with cat /etc/os-release
-        os_release = self.backend.get_os_release(image, tag)        
-        os_id = os_release['ID']
+        if key in Controller.image_cache:
+            self.os_release = Controller.image_cache[key]
+        else:
+            # Pull and run cat /etc/os-release
+            logger.debug(f"Pulling base image {image}:{tag}")
+            self.backend.pull(image, tag)
+            self.os_release = self.backend.get_os_release(image, tag)
+            Controller.image_cache[key] = self.os_release
+
+        os_id = self.os_release['ID']
 
         if os_id == 'sles':
             logger.debug("OS is SUSE Linux Enterprise Server")
-            return SlesImage(os_release)
+            return SlesImage(self.os_release)
 
         if os_id == 'centos':
             logger.debug("OS is CentOS")
-            return CentosImage(os_release)
+            return CentosImage(self.os_release)
 
         if os_id == 'ubuntu':
             logger.debug("OS is Ubuntu")
-            return UbuntuImage(os_release)
+            return UbuntuImage(self.os_release)
 
         if os_id == 'rhel':
             logger.debug("OS is Red Hat Enterprise Linux")
-            return RhelImage(os_release)
+            return RhelImage(self.os_release)
 
     def get_os_package_commands(self, os_packages):
         logger.info("Getting package manager commands for OS packages")
         return self.image.get_pkg_manager_commands(os_packages)
+
+    def get_os_id(self):
+        os_id = self.os_release['ID']
+        os_version = self.os_release['VERSION_ID'] 
+        return f'{os_id}{os_version}'
 
     def get_certificate_locations(self, certificates):
         logger.info("Getting certificate locations")
@@ -83,7 +96,3 @@ class Controller():
         logger.info("Getting entrypoint command")
         commands = self.image.get_entrypoint_commands(self.setup_script)
         return '"' + '", "'.join(commands) + '"'
-
-    def build(self):
-        logger.info("Building Dockerfile with backend")
-        self.backend.build()
