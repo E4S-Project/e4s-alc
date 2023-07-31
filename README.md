@@ -225,8 +225,8 @@ spack-version: latest
 spack-compiler-matrix:
   - gcc@8.5.0 
   - gcc@11.2.0 
-  - gcc@12.3.0
   - gcc@12.0
+  - gcc@12.3.0
 
 spack-packages: 
   - kokkos
@@ -234,6 +234,12 @@ spack-packages:
 
 This `.yaml` file would create a directory named `dockerfiles` that contains the following Dockerfiles:
 ```
-Dockerfile.rhel8.8-gcc@11.2.0  Dockerfile.rhel8.8-gcc@12.3.0  Dockerfile.ubuntu20.04-gcc@11.2.0  Dockerfile.ubuntu20.04-gcc@12.3.0
-Dockerfile.rhel8.8-gcc@12.0    Dockerfile.rhel8.8-gcc@8.5.0   Dockerfile.ubuntu20.04-gcc@12.0    Dockerfile.ubuntu20.04-gcc@8.5.0
+Dockerfile.rhel8.8-gcc@8.5.0
+Dockerfile.rhel8.8-gcc@11.5.0
+Dockerfile.rhel8.8-gcc@12.0
+Dockerfile.rhel8.8-gcc@12.3.0
+Dockerfile.ubuntu20.04-gcc@8.5.0
+Dockerfile.ubuntu20.04-gcc@11.5.0
+Dockerfile.ubuntu20.04-gcc@12.0
+Dockerfile.ubuntu20.04-gcc@12.3.0
 ```
