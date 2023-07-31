@@ -1,0 +1,14 @@
+######## Base group ########
+backend: podman
+registry: 
+image: ubuntu
+
+######## System group ########
+
+add-repos:
+  - https://github.com/E4S-Project/e4s-alc.git
+
+####### Spack group #######
+spack: True
+spack-version: latest
+spack-compiler: gcc@10.3.0

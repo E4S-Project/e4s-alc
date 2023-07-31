@@ -12,47 +12,47 @@ class PodmanBackend(ContainerBackend):
         logger.info("Initializing PodmanBackend")
         self.program = 'podman'
 
+    def system_call(self, command):
+        call_success = not os.system(command)
+        if not call_success:
+            logger.error("System call failed")
+            raise BackendFailedError(self.program, command)
+        return call_success
+
+    def subprocess_call(self, command):
+        try:
+            output = subprocess.check_output(command, shell=True)
+        except subprocess.CalledProcessError as e:
+            logger.error("Subprocess call failed")
+            raise BackendFailedError(self.program, command) from e
+        return output
+
     def pull(self, image, tag):
         logger.debug("Pulling image")
         pull_command = f'{self.program} pull {image}:{tag}'
-        pull_success = not os.system(pull_command)
-        if not pull_success:
-            logger.error("Failed to pull image")
-            raise BackendFailedError(self.program, pull_command)
-
-    def build(self):
-        logger.debug("Building image")
-        build_command = f'{self.program} build .'
-        build_success = not os.system(build_command)
-        if not build_success:
-            logger.error("Failed to build image")
-            raise BackendFailedError(self.program, build_command)
+        self.system_call(pull_command)
 
     def get_os_release(self, image, tag):
         logger.debug("Getting OS release of Podman image")
         container_command = 'cat /etc/os-release'
-        system_command = f'{self.program} run {image}:{tag} {container_command}'
-        try:
-            system_command_output = subprocess.check_output(system_command, shell=True)
-        except subprocess.CalledProcessError as e:
-            logger.error("Failed to get os release")
-            raise BackendFailedError(self.program, system_command) from e
+        run_command = f'{self.program} run {image}:{tag} {container_command}'
+        system_command_output = self.subprocess_call(run_command)
 
-        logger.debug("Stopping container")
-        stop_container_command = f'{self.program} stop $({self.program} ps -l -q) &> /dev/null'
-        stop_container_success = not os.system(stop_container_command)
-        if not stop_container_success:
-            logger.error("Failed to stop container")
-            raise BackendFailedError(self.program, stop_container_command)
+        self.clean_up()
 
-        logger.debug("Removing container")
-        remove_container_command = f'{self.program} rm $({self.program} ps -l -q) &> /dev/null'
-        remove_container_success = not os.system(remove_container_command)
-        if not remove_container_success:
-            logger.error("Failed to remove container")
-            raise BackendFailedError(self.program, remove_container_command)
+        os_release = self.parse_os_release(system_command_output)
+        return os_release
 
-        logger.info('Parsing OS release information')
+    def clean_up(self):
+        logger.debug('Stopping container')
+        stop_command = f'{self.program} stop $({self.program} ps -l -q) &> /dev/null'
+        self.system_call(stop_command)
+
+        logger.debug('Removing container')
+        remove_command = f'{self.program} rm $({self.program} ps -l -q) &> /dev/null'
+        self.system_call(remove_command)
+
+    def parse_os_release(self, system_command_output):
         os_release = {}
         os_release_list = system_command_output.decode('utf-8').split('\n')
         for item in os_release_list:
@@ -60,5 +60,5 @@ class PodmanBackend(ContainerBackend):
                 continue
             key, value = item.split('=')
             os_release[key] = value.replace('"', '')
-
+            
         return os_release

@@ -31,7 +31,7 @@ class CreateModel(Model):
     # Base group
     def add_base_image(self):
         logger.debug("Adding base image")
-        self.add_line(f'FROM {self.image_registry}{self.base_image} AS base-stage\n\n', indent=False)
+        self.add_line(f'FROM {self.full_image_path} AS base-stage\n\n', indent=False)
 
     def add_local_files(self):
         if self.local_files:
@@ -68,6 +68,14 @@ class CreateModel(Model):
             self.add_line_break()
 
     # System group
+    def add_os_package_commands(self):
+        logger.debug("Adding os package commands")
+        os_package_commands = self.controller.get_os_package_commands(self.os_packages)
+        self.add_line('# Install OS packages\n')
+        for command in os_package_commands:
+            self.add_line(f'RUN {command}\n')
+        self.add_line_break()
+
     def add_certificates(self):
         logger.debug("Adding certificates")
         cert_locations = self.controller.get_certificate_locations(self.certificates)
@@ -78,13 +86,12 @@ class CreateModel(Model):
             update_command = self.controller.get_update_certificate_command()
             self.add_line(f'RUN {update_command}\n\n')
 
-    def add_os_package_commands(self):
-        logger.debug("Adding os package commands")
-        os_package_commands = self.controller.get_os_package_commands(self.os_packages)
-        if os_package_commands:
-            self.add_line('# Install OS packages\n')
-            for command in os_package_commands:
-                self.add_line(f'RUN {command}\n')
+    def add_github_repos(self):
+        if self.git_repos:
+            logger.debug("Adding github repos")
+            self.add_line('# Clone GitHub repos\n')
+            for repo in self.git_repos:
+                self.add_line(f'RUN git clone {repo}\n')
             self.add_line_break()
 
     def add_pre_system_stage_commands(self):
@@ -132,7 +139,11 @@ class CreateModel(Model):
     def copy_conf_file(self):
         logger.debug("Copying modules.yaml conf file")
         file_path = get_modules_conf()
-        conf_dir_path = os.path.join(os.getcwd(), '.conf')
+
+        if self.matrix:
+            conf_dir_path = os.path.join(os.getcwd(), 'dockerfiles', '.conf')
+        else:
+            conf_dir_path = os.path.join(os.getcwd(), '.conf')
 
         if not os.path.exists(conf_dir_path):
             os.makedirs(conf_dir_path)
@@ -180,57 +191,7 @@ class CreateModel(Model):
         if self.spack_compiler:
             logger.debug("Adding spack compiler")
             self.add_line('# Installing Spack compiler\n')
-
-
-            # Here is where a controller class may be implemented.
-            # There are a lot of niche specs about compilers. 
-            # For instance:
-            #   The llvm package containers the clang compilers.
-            #
-            # More instances:
-            #   package_name_to_compiler_name = {
-            #         "llvm": "clang",
-            #         "intel-oneapi-compilers": "oneapi",
-            #         "llvm-amdgpu": "rocmcc",
-            #         "intel-oneapi-compilers-classic": "intel",
-            #         "acfl": "arm",
-            #   }
-            # 
-            # This is where the implement would be used.
-            # vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv 
-
-            compiler, package, version = None, None, None
-            
-            # Check if self.spack_compiler is 'llvm'
-            if self.spack_compiler == 'llvm':
-                compiler = 'clang'
-            else:
-                # Splitting package and version if '@' is present
-                if '@' in self.spack_compiler:
-                    package, version = self.spack_compiler.split('@')
-
-                # Set 'compiler' based on 'package' if it's not None, otherwise set to self.spack_compiler
-                compiler = 'clang' if package == 'llvm' else package or self.spack_compiler
-
-                if package == 'llvm':
-                    version_suffix = f'@{version}' if version else ''
-
-            # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
-            # This is where the implement would be used.
-            
-            signature_check = ''
-            if not self.spack_check_signature:
-                signature_check = '--no-check-signature '
-
-            spack_compiler_commands = [
-                'spack compiler find',
-                f'spack install {signature_check}{self.spack_compiler}',
-                'spack module tcl refresh -y 1> /dev/null',
-                f'. /etc/profile.d/setup-env.sh && spack load {self.spack_compiler} && spack compiler find',
-                'spack compiler rm "gcc@"$(/usr/bin/gcc -dumpversion)',
-                f'spack config add "packages:all:compiler:[{compiler}]"'
-            ]
-
+            spack_compiler_commands = self.spack_compiler.get_spack_compiler_commands(self.spack_check_signature)
             for command in spack_compiler_commands:
                 self.add_line(f'RUN {command}\n')
             self.add_line_break()
@@ -270,8 +231,19 @@ class CreateModel(Model):
         command = self.controller.get_entrypoint_command()
         self.add_line(f'ENTRYPOINT [{command}]\n')
 
-    def export_to_makefile(self):
-        logger.info("Exporting to makefile")
+    def export_dockerfile_matrix(self):
+        logger.info("Exporting to dockerfiles")
+        directory = './dockerfiles'
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        
+        os_id = self.controller.get_os_id()
+        with open(f'{directory}/Dockerfile.{os_id}-{self.spack_compiler}', 'w') as f:
+            for instruction in self.instructions:
+                f.write(instruction)
+
+    def export_to_dockerfile(self):
+        logger.info("Exporting to dockerfile")
         with open('Dockerfile', 'w') as f:
             for instruction in self.instructions:
                 f.write(instruction)
@@ -293,6 +265,7 @@ class CreateModel(Model):
         self.add_pre_system_stage_commands()
         self.add_os_package_commands()
         self.add_certificates()
+        self.add_github_repos()
         self.add_post_system_stage_commands()
 
     def create_spack_stage(self):
@@ -322,9 +295,11 @@ class CreateModel(Model):
             self.add_line(f'FROM spack-stage AS finalize-stage\n\n', indent=False)
         else:
             self.add_line(f'FROM system-stage AS finalize-stage\n\n', indent=False)
-
         self.add_entrypoint()
-        self.export_to_makefile()
+        if self.matrix:
+            self.export_dockerfile_matrix()
+        else:
+            self.export_to_dockerfile()
 
     def create(self):
         logger.info("Creating stages")

@@ -1,9 +1,8 @@
 import os
-import yaml
 import subprocess
 import logging
 from e4s_alc.util import BackendMissingError, YAMLNotFoundError
-from e4s_alc.controller.controller import Controller
+from e4s_alc.controller import Controller, Compiler
 
 logger = logging.getLogger('core')
 
@@ -11,6 +10,7 @@ class Model():
     def __init__(self, module_name, arg_namespace):
         logger.info("Initializing Model")
         self.module_name = module_name
+        self.matrix = None 
         self.controller = None
         self.instructions = []
 
@@ -18,6 +18,7 @@ class Model():
         self.backend = None
         self.base_image = None
         self.image_registry = None
+        self.full_image_path = None
         self.local_files = None
         self.env_vars = None
         self.initial_commands = None
@@ -42,48 +43,33 @@ class Model():
         self.post_spack_install_commands = None
         self.post_spack_stage_commands = None
 
+        # Finalize group
+        self.registry_image_matrix = None
+        self.spack_compiler_matrix = None
+
         self.read_arguments(arg_namespace)
-        self.controller = Controller(self.backend, self.image_registry + self.base_image)
+        self.controller = Controller(self.backend, self.full_image_path)
 
-    def read_arguments_from_file(self, file_path):
-        logger.info("Reading arguments from file")
-        abs_file_path = os.path.abspath(file_path)
-
-        if not os.path.isfile(abs_file_path):
-            raise YAMLNotFoundError(abs_file_path)
-
-        with open(abs_file_path, 'r') as file:
-            if file_path.endswith('.yaml'):
-                data = yaml.safe_load(file)
-            else:
-                print('Invalid file format. Please provide .yaml file format. Run `e4s-alc template` to generate a template .yaml file.')
-                exit(1)
-        return data
-
-    def read_arguments(self, arg_namespace):
-        logger.info("Reading arguments")
-        args = vars(arg_namespace)
-
-        # File group
-        if args['file']:
-            args = self.read_arguments_from_file(args['file']) 
+    def read_arguments(self, args):
 
         # Base group
         self.backend = args.get('backend', self.discover_backend())
-        self.base_image = args.get('image', None) or self.raise_argument_error('image')
+        self.base_image = args.get('image', None)
         self.image_registry = self.none_to_blank(args.get('registry', ''))
         if self.image_registry:
             if not self.image_registry.endswith('/'):
                 self.image_registry += '/'
 
+        self.full_image_path = self.image_registry + self.base_image
         self.local_files = self.remove_nones(args.get('add-files', []))
         self.env_vars = self.remove_nones(args.get('env-variables', []))
         self.initial_commands = self.remove_nones(args.get('initial-commands', []))
         self.post_base_stage_commands = self.remove_nones(args.get('post-base-stage-commands', []))
 
         # System group
-        self.certificates = self.remove_nones(args.get('certificates', []))
         self.os_packages = self.remove_nones(args.get('os-packages', []))
+        self.git_repos = self.remove_nones(args.get('add-repos', []))
+        self.certificates = self.remove_nones(args.get('certificates', []))
         self.pre_system_stage_commands = self.remove_nones(args.get('pre-system-stage-commands', []))
         self.post_system_stage_commands = self.remove_nones(args.get('post-system-stage-commands', []))
 
@@ -95,14 +81,22 @@ class Model():
 
         self.spack_mirrors = self.remove_nones(args.get('spack-mirrors', []))
         self.spack_check_signature = self.string_to_bool(args.get('spack-check-signature', True))
-
         self.modules_env_file = args.get('modules-env-file', None)
         self.spack_compiler = args.get('spack-compiler', None)
+        if self.spack_compiler:
+            self.spack_compiler = Compiler(self.spack_compiler) 
+
         self.spack_env_file = args.get('spack-env-file', None)
         self.spack_packages = self.remove_nones(args.get('spack-packages', []))
         self.pre_spack_stage_commands = self.remove_nones(args.get('pre-spack-stage-commands', []))
         self.post_spack_install_commands = self.remove_nones(args.get('post-spack-install-commands', []))
         self.post_spack_stage_commands = self.remove_nones(args.get('post-spack-stage-commands', []))
+
+        # Finalize group
+        self.matrix = args.get('matrix', False)
+        if self.matrix:
+            self.registry_image_matrix = args.get('registry-image-matrix', [])
+            self.spack_compiler_matrix = args.get('spack-compiler-matrix', [])
 
     def remove_nones(self, l):
         return [s for s in l if s != None]
@@ -148,7 +142,3 @@ class Model():
         output = subprocess.check_output(full_command, shell=True)
         version_number = output.decode('utf-8').strip().replace('v', '')
         return version_number 
-
-    def raise_argument_error(self, argument):
-        print(f'ERROR: add raise here {argument}')
-        exit(1)
