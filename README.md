@@ -200,7 +200,7 @@ podman build .
 ``` 
 
 Then, I run the image in interactive mode and inspect the install:
-
+```
 [root@c5ad0d45ba1d /]# module avail
 ----------------------------- /modulefiles/linux-rhel8-power9le -----------------------------------
 gcc/11.2.0  kokkos/4.0.01  
