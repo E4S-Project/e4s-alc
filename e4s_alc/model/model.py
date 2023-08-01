@@ -13,6 +13,13 @@ class Model():
         self.controller = None
         self.instructions = []
 
+        # Definition file specific attributes
+        self.header = []
+        self.environment = []
+        self.files = []
+        self.post = []
+        self.startscript = []
+
         # Base group
         self.backend = None
         self.bootstrap = None
