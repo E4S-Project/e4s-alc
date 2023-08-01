@@ -19,6 +19,7 @@ class Model():
         self.files = []
         self.post = []
         self.startscript = []
+        self.runscript = []
 
         # Base group
         self.backend = None
