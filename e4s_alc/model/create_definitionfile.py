@@ -42,7 +42,6 @@ class CreateDefinitionfileModel(Model):
                 format_file_spaces = ' '.join(file.split())
                 src_file, dest_file = format_file_spaces.split(' ')
                 self.add_line(f'{src_file} {dest_file}\n', "files")
-            self.add_line_break("files")
 
     def add_env_variables(self):
         self.env_vars.extend(['DEBIAN_FRONTEND=noninteractive', 'PATH=/spack/bin:$PATH'])
@@ -267,17 +266,14 @@ class CreateDefinitionfileModel(Model):
         logger.info("Creating header")
         self.add_bootstrap()
         self.add_base_image()
-        self.add_line_break("header")
 
     def create_environment(self):
         self.add_line('%environment\n', "environment", indent=False)
         self.add_env_variables()
-        self.add_line_break("environment")
 
     def create_files(self):
         self.add_line('%files\n', "files", indent=False)
         self.add_local_files()
-        self.add_line_break("files")
 
     def create_post(self):
         self.add_line('%post\n', "post", indent=False)
@@ -295,8 +291,8 @@ class CreateDefinitionfileModel(Model):
             else:
                 self.add_spack_packages()
             self.add_line('spack compiler find\n', "post")
-            self.add_line_break("post")
             self.add_post_spack_stage_commands()
+            self.add_line_break("post")
 
     def convert_to_bash_script(self, command, section):
         logger.debug("Converting command to bash script")
