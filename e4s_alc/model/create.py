@@ -160,9 +160,10 @@ class CreateModel(Model):
             self.add_line(f'RUN {command}\n')
         self.add_line_break()
 
+    def add_modules_file(self):
         self.add_line('# Add modules.yaml file\n')
-        if self.modules_env_file:
-            self.add_line(f'ADD {self.modules_env_file} /spack/etc/spack/modules.yaml\n')
+        if self.modules_yaml_file:
+            self.add_line(f'ADD {self.modules_yaml_file} /spack/etc/spack/modules.yaml\n')
         else:
             self.copy_conf_file()
             self.add_line(f'ADD .conf/modules.yaml /spack/etc/spack/modules.yaml\n')
@@ -176,15 +177,22 @@ class CreateModel(Model):
                 self.add_line(f'RUN {command}\n')
             self.add_line_break()
 
-    def add_spack_env_install(self):
+    def add_spack_yaml_install(self):
         signature_check = ''
         if not self.spack_check_signature:
             signature_check = '--no-check-signature'
 
         logger.debug("Adding spack env install commands")
         self.add_line('# Add Spack env file\n')
-        self.add_line(f'ADD {self.spack_env_file} /spack.yaml\n')
-        self.add_line(f'RUN spack --env / install {signature_check}\n')
+        self.add_line(f'ADD {self.spack_yaml_file} /spack.yaml\n')
+        self.add_line(f'RUN spack env create main /spack.yaml\n')
+        self.add_line(f'RUN spack --env main install {signature_check}\n')
+        self.add_line_break()
+
+    def add_create_spack_env(self):
+        logger.debug("Creating Spack environment")
+        self.add_line('# Create a Spack environment\n')
+        self.add_line('RUN spack env create main\n')
         self.add_line_break()
 
     def add_spack_compiler(self):
@@ -205,8 +213,9 @@ class CreateModel(Model):
                 signature_check = '--no-check-signature '
 
             self.add_line('# Install Spack packages\n')
+            env_install = '. /spack/share/spack/setup-env.sh && spack env activate main &&' 
             for package in self.spack_packages:
-                self.add_line(f'RUN spack install {signature_check}{package}\n')
+                self.add_line(f'RUN {env_install} spack install --add {signature_check}{package}\n')
             self.add_line_break()
 
     def add_pre_spack_stage_commands(self):
@@ -284,14 +293,19 @@ class CreateModel(Model):
         self.add_pre_spack_stage_commands()
         self.add_spack()
         self.add_spack_mirrors()
-        self.add_setup_env()
         self.add_post_spack_install_commands()
+
+        self.add_setup_env()
+        self.add_modules_file()
+
         self.add_spack_compiler()
-        if self.spack_env_file:
-            self.add_spack_env_install()
+        if self.spack_yaml_file:
+            self.add_spack_yaml_install()
         else:
+            self.add_create_spack_env()
             self.add_spack_packages()
 
+        # self.add_packages to moduels
         self.add_line('# Update compiler list\n')
         self.add_line('RUN spack compiler find\n')
         self.add_line_break()
@@ -300,11 +314,14 @@ class CreateModel(Model):
     def create_finalize_stage(self):
         logger.info("Creating finalize stage")
         self.add_line('# Finalize Stage\n', indent=False)
+
         if self.spack_install:
             self.add_line(f'FROM spack-stage AS finalize-stage\n\n', indent=False)
         else:
             self.add_line(f'FROM system-stage AS finalize-stage\n\n', indent=False)
+
         self.add_entrypoint()
+
         if self.matrix:
             self.export_dockerfile_matrix()
         else:

@@ -89,13 +89,14 @@ class Controller():
         logger.info("Getting command to update certificates")
         return self.image.get_update_certificate_command()
 
-    def get_env_setup_commands(self):        
+    def get_env_setup_commands(self): 
         logger.info("Getting environment setup commands")
         commands = [
             f'echo "spack module tcl refresh -y" >> {self.setup_script}',
             f'echo ". /etc/profile.d/modules.sh" >> {self.setup_script}',
             f'echo ". /spack/share/spack/setup-env.sh" >> {self.setup_script}',
-            f'echo "export MODULEPATH=\$(echo \$MODULEPATH | cut -d\':\' -f1)" >> {self.setup_script}'
+            f'echo "export MODULEPATH=\$(echo \$MODULEPATH | cut -d\':\' -f1)" >> {self.setup_script}',
+            f'echo "spack env activate main" >> {self.setup_script}'
         ]
         return commands
 

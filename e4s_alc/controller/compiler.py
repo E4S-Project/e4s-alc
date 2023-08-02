@@ -39,9 +39,9 @@ class Compiler:
             'spack compiler find',
             f'spack install {signature_flag}{self.spack_compiler}',
             'spack module tcl refresh -y 1> /dev/null',
-            f'. /etc/profile.d/setup-env.sh && spack load {self.spack_compiler} && spack compiler find',
-            'spack compiler rm "gcc@"$(/usr/bin/gcc -dumpversion)',
+            f'. /spack/share/spack/setup-env.sh && spack load {self.spack_compiler} && spack compiler find',
             f'spack config add "packages:all:compiler:[{self.compiler}{self.version_suffix}]"'
+            f'spack config add "config:install_missing_compilers:true"'
         ]
         return spack_compiler_commands
 

@@ -35,9 +35,9 @@ class Model():
         self.spack_version = None
         self.spack_mirrors = None
         self.spack_check_signature = None
-        self.modules_env_file = None
+        self.modules_yaml_file = None
         self.spack_compiler = None
-        self.spack_env_file = None
+        self.spack_yaml_file = None
         self.spack_packages = None
         self.pre_spack_stage_commands = None
         self.post_spack_install_commands = None
@@ -81,12 +81,12 @@ class Model():
 
         self.spack_mirrors = self.remove_nones(args.get('spack-mirrors', []))
         self.spack_check_signature = self.string_to_bool(args.get('spack-check-signature', True))
-        self.modules_env_file = args.get('modules-env-file', None)
+        self.modules_yaml_file = args.get('modules-yaml-file', None)
         self.spack_compiler = args.get('spack-compiler', None)
         if self.spack_compiler:
             self.spack_compiler = Compiler(self.spack_compiler) 
 
-        self.spack_env_file = args.get('spack-env-file', None)
+        self.spack_yaml_file = args.get('spack-yaml-file', None)
         self.spack_packages = self.remove_nones(args.get('spack-packages', []))
         self.pre_spack_stage_commands = self.remove_nones(args.get('pre-spack-stage-commands', []))
         self.post_spack_install_commands = self.remove_nones(args.get('post-spack-install-commands', []))
