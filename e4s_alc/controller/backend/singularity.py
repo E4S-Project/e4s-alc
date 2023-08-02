@@ -17,13 +17,33 @@ class SingularityBackend(ContainerBackend):
         if not os.path.exists(self.image_dir):
             os.makedirs(self.image_dir)
 
-    def pull(self, image, tag):
+    def pull(self, image, tag, repull=None):
+
+        def execute_pull():
+            system_command = f'{self.program} pull --dir {self.image_dir} {image}:{tag}'
+            pull_success = not os.system(system_command)
+            if not pull_success:
+                logger.error("Failed to pull Singularity image")
+                raise BackendFailedError(self.program, system_command)
+
         logger.debug("Pulling image")
-        system_command = f'{self.program} pull --dir {self.image_dir} {image}:{tag}'
-        pull_success = not os.system(system_command)
-        if not pull_success:
-            logger.error("Failed to pull Singularity image")
-            raise BackendFailedError(self.program, system_command)
+        image_name = f'{image}_{tag}.sif'
+        image_path = f'{SINGULARITY_IMAGES}{image_name}'
+        if os.path.exists(image_path):
+            if repull is not None:
+                if repull:
+                    os.remove(image_path)
+                    execute_pull()
+            else:
+                delete_image = input(f"WARNING: An image named {image_name} has been found. Should that image be used? If not, it will be removed. [Y/n]\n")
+                if delete_image in ['n', 'N', 'no']:
+                    print(f"Removed {image_path} and pulling a new one.")
+                    os.remove(image_path)
+                    execute_pull()
+                else:
+                    print(f"Using {image_path} instead of pulling new one.")
+        else:
+            execute_pull()
 
 #    def build(self):
 #        logger.debug("Building Singularity image")
