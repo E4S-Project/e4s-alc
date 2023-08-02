@@ -20,6 +20,7 @@ class Model():
         self.post = []
         self.startscript = []
         self.runscript = []
+        self.repull = None
 
         # Base group
         self.backend = None
@@ -74,6 +75,9 @@ class Model():
         # File group
         if args['file']:
             args = self.read_arguments_from_file(args['file']) 
+
+        # Definition file specific attributes
+        self.repull = args.get('repull', None)
 
         # Base group
         self.backend = args.get('backend', None)

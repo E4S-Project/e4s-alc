@@ -12,7 +12,7 @@ class CreateDefinitionfileModel(Model):
     def __init__(self, arg_namespace):
         logger.info("Initializing CreateModel")
         super().__init__(module_name=self.__class__.__name__, arg_namespace=arg_namespace)
-        self.controller = Controller(self.backend, self.image_registry + self.base_image)
+        self.controller = Controller(self.backend, self.image_registry + self.base_image, self.repull)
 
     def debug_line(self, line):
         line = logger_line = line.replace('\n', '').replace('\t', '').replace('\\', '')

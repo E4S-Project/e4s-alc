@@ -5,9 +5,12 @@ from e4s_alc.controller.backend import DockerBackend, PodmanBackend, Singularity
 logger = logging.getLogger('core')
 
 class Controller():
-    def __init__(self, backend, base_image):
+    def __init__(self, backend, base_image, repull=None):
         logger.info("Initializing Controller")
         self.backend = None
+        # singularity-specific parameter
+        self.repull = repull
+        self.backend_str = backend
         if backend == 'podman':
             logger.debug("Setting backend to Podman")
             self.backend = PodmanBackend()
@@ -38,7 +41,10 @@ class Controller():
         # Pull image
         image, tag = self.get_image_tag(base_image)
         logger.debug(f"Pulling base image {image}:{tag}")
-        self.backend.pull(image, tag)
+        if self.backend_str == "singularity":
+            self.backend.pull(image, tag, self.repull)
+        else:
+            self.backend.pull(image, tag)
 
         # Run the image with cat /etc/os-release
         os_release = self.backend.get_os_release(image, tag)        
