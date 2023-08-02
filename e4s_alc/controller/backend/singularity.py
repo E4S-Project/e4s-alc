@@ -45,14 +45,6 @@ class SingularityBackend(ContainerBackend):
         else:
             execute_pull()
 
-#    def build(self):
-#        logger.debug("Building Singularity image")
-#        build_command = f'{self.program} build --fakeroot '
-#        build_success = not os.system(build_command)
-#        if not build_success:
-#            logger.error("Failed to build Singularity image")
-#            raise BackendFailedError(self.program, build_command)
-
     def get_os_release(self, image, tag):
         logger.debug("Getting OS release of the image")
         container_command = 'cat /etc/os-release'
