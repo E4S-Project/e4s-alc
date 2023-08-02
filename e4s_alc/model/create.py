@@ -13,7 +13,7 @@ class CreateModel(Model):
         super().__init__(module_name=self.__class__.__name__, arg_namespace=arg_namespace)
 
     def debug_line(self, line):
-        line = logger_line = line.replace('\n', '').replace('\t', '').replace('\\', '')
+        logger_line = line.replace('\n', '').replace('\t', '').replace('\\', '')
         logger.debug(f"Adding line: {logger_line}")
 
     # Instruction adding
