@@ -182,7 +182,6 @@ class Controller:
             list: List of environment setup commands.
         """
         commands = [
-            f'echo "spack module tcl refresh -y" >> {self.setup_script}',
             f'echo ". /etc/profile.d/modules.sh" >> {self.setup_script}',
             f'echo ". /spack/share/spack/setup-env.sh" >> {self.setup_script}',
             f'echo "export MODULEPATH=\$(echo \$MODULEPATH | cut -d\':\' -f1)" >> {self.setup_script}',

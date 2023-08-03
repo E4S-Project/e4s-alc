@@ -16,7 +16,6 @@ class CentosImage(Image):
 
         """
         super().__init__(os_release)
-        logger.info("Initializing CentosImage")
         self.pkg_manager_commands = None
         self.packages = [
             'curl', 'findutils', 'gcc-c++', 'gcc', 'gcc-gfortran', 'git',
@@ -37,7 +36,6 @@ class CentosImage(Image):
         Returns:
             list: List of commands required for the specific CentOS version.
         """
-        logger.debug("Getting version commands")
         commands = []
 
         if version == '8':
@@ -60,7 +58,6 @@ class CentosImage(Image):
         Returns:
             list: List of commands required to install packages.
         """
-        logger.debug("Getting pkg manager commands")
         self.packages.extend(added_packages)
         self.packages = ' '.join(self.packages)
         self.packages = self.wrap_packages(self.packages)
@@ -85,8 +82,21 @@ class CentosImage(Image):
         Returns:
             list: List of tuples where each tuple contains a certificate and its location.
         """
-        logger.debug("Getting certificate locations")
         locations = []
         for cert in certificates:
             locations.append((cert, self.cert_location))
         return locations
+
+    @log_function_call
+    def get_entrypoint_commands(self, setup_script):
+        """
+        Returns the entrypoint command list for given setup script.
+
+        Args:
+            setup_script (str): The setup script. 
+
+        Returns:
+            list: A list of entrypont commands. 
+        """
+        commands = ['/bin/bash']
+        return commands
