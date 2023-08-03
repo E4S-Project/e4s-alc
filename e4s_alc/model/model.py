@@ -1,14 +1,11 @@
 import os
 import subprocess
-import logging
-from e4s_alc.util import BackendMissingError, YAMLNotFoundError
+from e4s_alc.util import log_function_call, BackendMissingError, YAMLNotFoundError
 from e4s_alc.controller import Controller, Compiler
 
-logger = logging.getLogger('core')
-
 class Model():
+    @log_function_call
     def __init__(self, module_name, arg_namespace):
-        logger.info("Initializing Model")
         self.module_name = module_name
         self.matrix = None 
         self.controller = None
@@ -35,9 +32,9 @@ class Model():
         self.spack_version = None
         self.spack_mirrors = None
         self.spack_check_signature = None
-        self.modules_env_file = None
+        self.modules_yaml_file = None
         self.spack_compiler = None
-        self.spack_env_file = None
+        self.spack_yaml_file = None
         self.spack_packages = None
         self.pre_spack_stage_commands = None
         self.post_spack_install_commands = None
@@ -50,9 +47,14 @@ class Model():
         self.read_arguments(arg_namespace)
         self.controller = Controller(self.backend, self.full_image_path)
 
+    @log_function_call
     def read_arguments(self, args):
 
         # Base group
+        self.backend = args.get('backend', None)
+        if not self.backend:
+            self.backend = self.discover_backend()
+
         self.backend = args.get('backend', self.discover_backend())
         self.base_image = args.get('image', None)
         self.image_registry = self.none_to_blank(args.get('registry', ''))
@@ -75,18 +77,18 @@ class Model():
 
         # Spack group
         self.spack_install = self.string_to_bool(args.get('spack', True))
-        self.spack_version = args.get('spack-version', self.discover_latest_spack_version())
-        if self.spack_version == 'latest':
+        self.spack_version = args.get('spack-version', None)
+        if self.spack_version == 'latest' or self.spack_version == None:
             self.spack_version = self.discover_latest_spack_version()
 
         self.spack_mirrors = self.remove_nones(args.get('spack-mirrors', []))
         self.spack_check_signature = self.string_to_bool(args.get('spack-check-signature', True))
-        self.modules_env_file = args.get('modules-env-file', None)
+        self.modules_yaml_file = args.get('modules-yaml-file', None)
         self.spack_compiler = args.get('spack-compiler', None)
         if self.spack_compiler:
             self.spack_compiler = Compiler(self.spack_compiler) 
 
-        self.spack_env_file = args.get('spack-env-file', None)
+        self.spack_yaml_file = args.get('spack-yaml-file', None)
         self.spack_packages = self.remove_nones(args.get('spack-packages', []))
         self.pre_spack_stage_commands = self.remove_nones(args.get('pre-spack-stage-commands', []))
         self.post_spack_install_commands = self.remove_nones(args.get('post-spack-install-commands', []))
@@ -98,23 +100,26 @@ class Model():
             self.registry_image_matrix = args.get('registry-image-matrix', [])
             self.spack_compiler_matrix = args.get('spack-compiler-matrix', [])
 
+    @log_function_call
     def remove_nones(self, l):
         return [s for s in l if s != None]
 
+    @log_function_call
     def string_to_bool(self, s):
         if isinstance(s, str):
             return s.lower() == 'true'
         if isinstance(s, bool):
             return s
 
+    @log_function_call
     def none_to_blank(self, n):
         if n == None: 
             return ''
         else:
             return n
 
+    @log_function_call
     def discover_backend(self):        
-        logger.info("Discovering backend")
         # Capture exit status of container version
         # The exit status is flipped to return a True/False
         podman_check = not os.system('podman -v &> /dev/null')
@@ -128,9 +133,8 @@ class Model():
 
         raise BackendMissingError        
 
+    @log_function_call
     def discover_latest_spack_version(self):
-        logger.info("Discovering latest spack version")
-
         # create the curl, grep, and sed commands as strings
         curl_command = 'curl --silent "https://api.github.com/repos/spack/spack/releases/latest"'
         grep_command = "grep '\"tag_name\":'"
