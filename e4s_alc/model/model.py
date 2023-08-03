@@ -1,9 +1,12 @@
 import os
 import subprocess
-from e4s_alc.util import log_function_call, BackendMissingError, YAMLNotFoundError
 from e4s_alc.controller import Controller, Compiler
+from e4s_alc.util import log_function_call, BackendMissingError, YAMLNotFoundError
 
 class Model():
+
+    _spack_version_cache = None
+
     @log_function_call
     def __init__(self, module_name, arg_namespace):
         self.module_name = module_name
@@ -42,6 +45,7 @@ class Model():
 
         # Finalize group
         self.registry_image_matrix = None
+        self.spack_version_matrix = None
         self.spack_compiler_matrix = None
 
         self.read_arguments(arg_namespace)
@@ -98,6 +102,7 @@ class Model():
         self.matrix = args.get('matrix', False)
         if self.matrix:
             self.registry_image_matrix = args.get('registry-image-matrix', [])
+            self.spack_version_matrix = args.get('spack-version-matrix', [])
             self.spack_compiler_matrix = args.get('spack-compiler-matrix', [])
 
     @log_function_call
@@ -135,6 +140,10 @@ class Model():
 
     @log_function_call
     def discover_latest_spack_version(self):
+
+        if Model._spack_version_cache:
+            return Model._spack_version_cache
+
         # create the curl, grep, and sed commands as strings
         curl_command = 'curl --silent "https://api.github.com/repos/spack/spack/releases/latest"'
         grep_command = "grep '\"tag_name\":'"
@@ -145,4 +154,10 @@ class Model():
         
         output = subprocess.check_output(full_command, shell=True)
         version_number = output.decode('utf-8').strip().replace('v', '')
+
+        if not version_number:
+            print('Failed to discover latest Spack version. Defaulting to Spack v0.20.1')
+            version_number = '0.20.1'
+
+        Model._spack_version_cache = version_number
         return version_number 

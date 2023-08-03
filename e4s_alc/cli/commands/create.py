@@ -1,6 +1,7 @@
 import os
 import yaml
 import argparse
+from itertools import product
 from e4s_alc.model.create import CreateModel
 from e4s_alc.util import Logger, YAMLNotFoundError
 from e4s_alc.cli.cli_view import HelpDescriptionFormatter
@@ -68,6 +69,7 @@ class CreateCommand(AbstractCommand):
         matrix_option_desc = 'The matrix options allow users to build multiple Dockerfiles in one call with.'
         matrix_option_args = self.parser.add_argument_group('Matrix Option Arguments', matrix_option_desc)
         matrix_option_args.add_argument('-rim', '--registry-image-matrix', help='The registry+image paths for each image to build', action='append', default=[], dest='registry-image-matrix')
+        matrix_option_args.add_argument('-svm', '--spack-version-matrix', help='The Spack version for each image to build', action='append', default=[], dest='spack-version-matrix')
         matrix_option_args.add_argument('-scm', '--spack-compiler-matrix', help='The Spack compiler for each image to build', action='append', default=[], dest='spack-compiler-matrix')
 
         return {'command': self, 'parser': self.parser}
@@ -106,6 +108,21 @@ class CreateCommand(AbstractCommand):
                 exit(1)
         return data
 
+    def create_model(self, args):
+        self.check_arguments(args)
+        model = CreateModel(args)
+        model.create()
+
+    def generate_combinations(self, args, matrices):
+        # Filter out empty lists
+        matrices = {k: v for k, v in matrices.items() if v}
+
+        # Generate a product of items in the dictionary and create a model
+        for values in product(*matrices.values()):
+            data = dict(zip(matrices.keys(), values))
+            args = {**args, 'matrix': True, **data}
+            self.create_model(args)
+
     def run(self, arg_namespace):
         """Run the command after checking the arguments."""
         args = vars(arg_namespace)
@@ -116,38 +133,16 @@ class CreateCommand(AbstractCommand):
             args = {**args, **file_args, 'matrix': False}
 
         # Extract command matrices for registry images and spack compilers.
-        registry_image_matrix = args.get('registry-image-matrix', [])
-        spack_compiler_matrix = args.get('spack-compiler-matrix', [])
+        matrices = {
+            "image": args.get('registry-image-matrix', []),
+            "spack-version": args.get('spack-version-matrix', []),
+            "spack-compiler": args.get('spack-compiler-matrix', [])
+        }
 
-        # If there exists a registry image matrix but not a spack compiler matrix,
-        # add registry image-specific arguments and create corresponding model.
-        if registry_image_matrix and not spack_compiler_matrix:
-            for image in registry_image_matrix:
-                registry_image_args = {**args, 'matrix': True, 'image': image}
-                self.check_arguments(registry_image_args)
-                model = CreateModel(registry_image_args)
-                model.create()
+        if matrices['image'] or matrices['spack-version'] or matrices['spack-compiler']:
+            self.generate_combinations(args, matrices)
             return
 
-        # If there exists a spack compiler matrix but not a registry image matrix,
-        # add spack compiler-specific arguments and create corresponding model.
-        if spack_compiler_matrix and not registry_image_matrix:
-            for compiler in spack_compiler_matrix:
-                spack_compiler_args = {**args, 'matrix': True, 'spack-compiler': compiler}
-                self.check_arguments(spack_compiler_args)
-                model = CreateModel(spack_compiler_args)
-                model.create()
-            return
-
-        # If both matrices exist, create models for each combination of registry image and spack compiler.
-        if registry_image_matrix and spack_compiler_matrix:
-            for image in registry_image_matrix:
-                for compiler in spack_compiler_matrix:
-                    image_compiler_args = {**args, 'matrix': True, 'image': image, 'spack-compiler': compiler}
-                    self.check_arguments(image_compiler_args)
-                    model = CreateModel(image_compiler_args)
-                    model.create()
-            return
 
         # If no matrices, check, create and execute the model with the original arguments.
         self.check_arguments(args)

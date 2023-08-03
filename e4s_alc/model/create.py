@@ -245,7 +245,7 @@ class CreateModel(Model):
             os.makedirs(directory)
         
         os_id = self.controller.get_os_id_and_version()
-        file_name = f'{directory}/Dockerfile.{os_id}-{self.spack_compiler.compiler}@{self.spack_compiler.version}' 
+        file_name = f'{directory}/Dockerfile.{os_id}-spack{self.spack_version}-{self.spack_compiler.compiler}{self.spack_compiler.version}' 
         with open(file_name, 'w') as f:
             for instruction in self.instructions:
                 self.log_line(instruction)
