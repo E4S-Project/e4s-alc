@@ -105,18 +105,15 @@ class Model():
             self.spack_version_matrix = args.get('spack-version-matrix', [])
             self.spack_compiler_matrix = args.get('spack-compiler-matrix', [])
 
-    @log_function_call
     def remove_nones(self, l):
         return [s for s in l if s != None]
 
-    @log_function_call
     def string_to_bool(self, s):
         if isinstance(s, str):
             return s.lower() == 'true'
         if isinstance(s, bool):
             return s
 
-    @log_function_call
     def none_to_blank(self, n):
         if n == None: 
             return ''
