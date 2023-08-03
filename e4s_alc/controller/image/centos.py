@@ -1,10 +1,20 @@
-import logging
+from e4s_alc.util import log_function_call
 from e4s_alc.controller.image.image import Image
 
-logger = logging.getLogger('core')
-
 class CentosImage(Image):
+    """
+    A class that defines a CentosImage extending the Image class.
+    """
+
+    @log_function_call
     def __init__(self, os_release):
+        """
+        Initializes the CentosImage and sets the basic packages and certificate locations.
+
+        Args:
+            os_release (str): The OS release version.
+
+        """
         super().__init__(os_release)
         logger.info("Initializing CentosImage")
         self.pkg_manager_commands = None
@@ -16,7 +26,17 @@ class CentosImage(Image):
         self.update_cert_command = 'update-ca-trust'
         self.cert_location = '/etc/pki/ca-trust/source/anchors/'
 
+    @log_function_call
     def get_version_commands(self, version):
+        """
+        Returns the commands required for specific CentOS version.
+
+        Args:
+            version (str): CentOS version.
+
+        Returns:
+            list: List of commands required for the specific CentOS version.
+        """
         logger.debug("Getting version commands")
         commands = []
 
@@ -29,7 +49,17 @@ class CentosImage(Image):
 
         return commands
 
-    def get_pkg_manager_commands(self, added_packages):
+    @log_function_call
+    def get_package_manager_commands(self, added_packages):
+        """
+        Returns the commands required to install packages.
+
+        Args:
+            added_packages (list): List of additional packages to be installed.
+
+        Returns:
+            list: List of commands required to install packages.
+        """
         logger.debug("Getting pkg manager commands")
         self.packages.extend(added_packages)
         self.packages = ' '.join(self.packages)
@@ -44,7 +74,17 @@ class CentosImage(Image):
         ])
         return self.pkg_manager_commands
 
+    @log_function_call
     def get_certificate_locations(self, certificates):
+        """
+        Returns the list of locations for the given certificates.
+
+        Args:
+            certificates (str): Certificates.
+
+        Returns:
+            list: List of tuples where each tuple contains a certificate and its location.
+        """
         logger.debug("Getting certificate locations")
         locations = []
         for cert in certificates:

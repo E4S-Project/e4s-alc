@@ -1,12 +1,22 @@
-import logging
+from e4s_alc.util import log_function_call
 from e4s_alc.controller.image.image import Image
 
-logger = logging.getLogger('core')
-
 class RhelImage(Image):
+    """
+    This class represents an object of Red Hat Enterprise Linux Image.
+    Inherits from the Image base class.
+    """
+
+    @log_function_call
     def __init__(self, os_release):
+        """
+        Initialises the RhelImage with given OS release and
+        sets the package manager commands, required packages and certificate details.
+
+        Args:
+            os_release (str): Release version of the operating system.
+        """
         super().__init__(os_release)
-        logger.info("Initializing RhelImage")
         self.pkg_manager_commands = None
         self.packages = [
             'curl', 'findutils', 'gcc-c++', 'gcc', 'gcc-gfortran', 'git',  'xz',
@@ -16,13 +26,31 @@ class RhelImage(Image):
         self.update_cert_command = 'update-ca-trust'
         self.cert_location = '/etc/pki/ca-trust/source/anchors/'
 
+    @log_function_call
     def get_version_commands(self, version):
-        logger.debug("Getting version commands")
+        """
+        Returns the list of commands based on version.
+
+        Args:
+            version (str): Version string.
+
+        Returns:
+            commands (list): List of commands.
+        """
         commands = []
         return commands
 
-    def get_pkg_manager_commands(self, added_packages):
-        logger.debug("Getting package manager commands")
+    @log_function_call
+    def get_package_manager_commands(self, added_packages):
+        """
+        Extends the package list, wraps the packages and gives list of package manager commands.
+
+        Args:
+            added_packages (list) : List of additional packages to be installed.
+
+        Returns:
+            pkg_manager_commands (list) : List of package manager commands required.
+        """
         self.packages.extend(added_packages)
         self.packages = ' '.join(self.packages)
         self.packages = self.wrap_packages(self.packages)
@@ -34,13 +62,32 @@ class RhelImage(Image):
         ])
         return self.pkg_manager_commands
 
+    @log_function_call
     def get_certificate_locations(self, certificates):
-        logger.debug("Getting certificate locations")
+        """
+        Appends the path of the certificate files to the list of locations.
+
+        Args:
+            certificates (list) : List of certificates.
+
+        Returns:
+            locations (list) : List of tuples containing certificate and its path.
+        """
         locations = []
         for cert in certificates:
             locations.append((cert, self.cert_location))
         return locations
 
+    @log_function_call
     def get_entrypoint_commands(self, setup_script):
+        """
+        Returns the list of entrypoint commands.
+
+        Args:
+            setup_script (str) : Script to setup entrypoints.
+
+        Returns:
+            commands (list) : List of commands.
+        """
         commands = ['/bin/bash']
         return commands
