@@ -47,7 +47,7 @@ class Controller():
             self.backend.pull(image, tag)
 
         # Run the image with cat /etc/os-release
-        os_release = self.backend.get_os_release(image, tag)        
+        os_release = self.backend.get_os_release(image, tag)
         os_id = os_release['ID']
 
         if os_id == 'sles':

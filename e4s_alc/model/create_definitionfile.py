@@ -103,33 +103,36 @@ class CreateDefinitionfileModel(Model):
             self.add_line('spack buildcache keys --install --trust\n', "post")
             self.add_line_break("post")
 
- #   def copy_conf_file(self):
- #       logger.debug("Copying modules.yaml conf file")
- #       file_path = get_modules_conf()
- #       conf_dir_path = os.path.join(os.getcwd(), '.conf')
+    def copy_conf_file(self):
+        logger.debug("Copying modules.yaml conf file")
+        file_path = get_modules_conf()
+        conf_dir_path = os.path.join(os.getcwd(), '.conf')
 
- #       if not os.path.exists(conf_dir_path):
- #           os.makedirs(conf_dir_path)
+        if not os.path.exists(conf_dir_path):
+            os.makedirs(conf_dir_path)
 
- #       file_name = os.path.basename(file_path)
- #       dest_path = os.path.join(conf_dir_path, file_name)
- #       shutil.copy(file_path, dest_path)
+        file_name = os.path.basename(file_path)
+        dest_path = os.path.join(conf_dir_path, file_name)
+        shutil.copy(file_path, dest_path)
 
- #   def add_setup_env(self):
- #       logger.debug("Adding setup env")
+    def add_setup_env(self):
+        logger.debug("Adding setup env")
 
- #       self.add_line('# Setup spack and modules environment\n', "post")
- #       for command in self.controller.get_env_setup_commands():
- #           self.add_line(f'{command}\n', "post")
- #       self.add_line_break("post")
+        self.add_line('# Setup spack and modules environment\n', "post")
+        for command in self.controller.get_env_setup_commands():
+            self.add_line(f'{command}\n', "post")
+        self.add_line_break("post")
 
- #       self.add_line('# Add modules.yaml file\n', "files")
- #       if self.modules_env_file:
- #           self.add_line(f'{self.modules_env_file} /spack/etc/spack/modules.yaml\n', "files")
- #       else:
- #           self.copy_conf_file()
- #           self.add_line(f'.conf/modules.yaml /spack/etc/spack/modules.yaml\n', "files")
- #       self.add_line_break("files")
+        self.add_line('# Add modules.yaml file\n', "files")
+        if self.modules_env_file:
+            self.add_line(f'{self.modules_env_file} /modules.yaml\n', "files")
+        else:
+            self.copy_conf_file()
+            self.add_line(f'.conf/modules.yaml /modules.yaml\n', "files")
+        self.add_line('# Move modules.yaml file to correct emplacement\n', "post")
+        self.add_line('mv /modules.yaml /spack/etc/spack/modules.yaml\n', "post")
+        self.add_line_break("post")
+        self.add_line_break("files")
 
     def add_post_spack_install_commands(self):
         if self.post_spack_install_commands:
@@ -283,7 +286,7 @@ class CreateDefinitionfileModel(Model):
             self.add_pre_spack_stage_commands()
             self.add_spack()
             self.add_spack_mirrors()
-            #self.add_setup_env()
+            self.add_setup_env()
             self.add_post_spack_install_commands()
             self.add_spack_compiler()
             if self.spack_env_file:
