@@ -1,5 +1,5 @@
-from e4s_alc.util import log_function_call
-from e4s_alc.controller.image import SlesImage, CentosImage, UbuntuImage, RhelImage, RockyImage
+from e4s_alc.util import log_function_call, log_info, log_error
+from e4s_alc.controller.image import UbuntuImage, RhelImage, RockyImage
 from e4s_alc.controller.backend import DockerBackend, PodmanBackend
 
 class Controller:
@@ -7,9 +7,7 @@ class Controller:
     Class for managing container images and performing operations with them using specified backend.
     """
 
-    _image_os_dict = {'sles': SlesImage,
-                      'centos': CentosImage,
-                      'ubuntu': UbuntuImage,
+    _image_os_dict = {'ubuntu': UbuntuImage,
                       'rhel': RhelImage,
                       'rocky': RockyImage}
 
@@ -63,6 +61,8 @@ class Controller:
         image, tag = base_image, 'latest'
         if ':' in base_image:
             image, tag = base_image.split(':')
+
+        log_info(f"Image: {image}, Tag: {tag}")
         return image, tag
 
     @log_function_call
@@ -80,12 +80,17 @@ class Controller:
         image_key = f'{image}:{tag}'
 
         if image_key in self._image_cache:
+            log_info("Image key found in image cache.")
             self.os_release = self._image_cache[image_key]
         else:
+            log_info("Image key not found in image cache. Pulling and getting os release.")
             self.os_release = self._pull_and_get_os_release(image, tag, image_key)
 
         os_id = self.get_os_id()
-        return self._image_os_dict[os_id](self.os_release) if os_id in self._image_os_dict else None
+        image_os = self._image_os_dict[os_id](self.os_release) if os_id in self._image_os_dict else None
+        log_info(f"Final image_os: {image_os}")
+
+        return image_os
 
     @log_function_call
     def _pull_and_get_os_release(self, image, tag, image_key):
@@ -101,8 +106,14 @@ class Controller:
             dict: Dictionary containing release information of the operating system.
         """
         self.backend.pull(image, tag)
+
+        log_info("Getting OS release from backend.")
         os_release = self.backend.get_os_release(image, tag)
+
+        log_info(f"Caching OS release with image_key: {image_key}.")
         self._image_cache[image_key] = os_release
+
+        log_info(f"Returning OS release: {os_release}.")
         return os_release
 
     @log_function_call

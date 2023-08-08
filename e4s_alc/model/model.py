@@ -1,7 +1,7 @@
 import os
 import subprocess
 from e4s_alc.controller import Controller, Compiler
-from e4s_alc.util import log_function_call, BackendMissingError, YAMLNotFoundError
+from e4s_alc.util import log_function_call, log_info, log_error, BackendMissingError, YAMLNotFoundError
 
 class Model():
 
@@ -59,7 +59,6 @@ class Model():
         if not self.backend:
             self.backend = self.discover_backend()
 
-        self.backend = args.get('backend', self.discover_backend())
         self.base_image = args.get('image', None)
         self.image_registry = self.none_to_blank(args.get('registry', ''))
         if self.image_registry:
@@ -105,18 +104,15 @@ class Model():
             self.spack_version_matrix = args.get('spack-version-matrix', [])
             self.spack_compiler_matrix = args.get('spack-compiler-matrix', [])
 
-    @log_function_call
     def remove_nones(self, l):
         return [s for s in l if s != None]
 
-    @log_function_call
     def string_to_bool(self, s):
         if isinstance(s, str):
             return s.lower() == 'true'
         if isinstance(s, bool):
             return s
 
-    @log_function_call
     def none_to_blank(self, n):
         if n == None: 
             return ''
@@ -127,21 +123,27 @@ class Model():
     def discover_backend(self):        
         # Capture exit status of container version
         # The exit status is flipped to return a True/False
+        log_info("Checking for podman...")
         podman_check = not os.system('podman -v &> /dev/null')
-        docker_check = not os.system('docker -v &> /dev/null')
-
+        
         if podman_check:
-            return 'podman' 
-
+            log_info("Podman found.")
+            return 'podman'
+        
+        log_info("Checking for docker...")
+        docker_check = not os.system('docker -v &> /dev/null')
+        
         if docker_check:
+            log_info("Docker found.")
             return 'docker'
-
-        raise BackendMissingError        
+        
+        log_error("No backend (podman or docker) found.")
+        raise BackendMissingError
 
     @log_function_call
     def discover_latest_spack_version(self):
-
         if Model._spack_version_cache:
+            log_info("Found cached spack version: " + Model._spack_version_cache)
             return Model._spack_version_cache
 
         # create the curl, grep, and sed commands as strings
@@ -151,13 +153,16 @@ class Model():
 
         # add the commands together
         full_command = curl_command + " | " + grep_command + " | " + sed_command
-        
+        log_info("Final command to execute: " + full_command)
+
         output = subprocess.check_output(full_command, shell=True)
         version_number = output.decode('utf-8').strip().replace('v', '')
 
         if not version_number:
-            print('Failed to discover latest Spack version. Defaulting to Spack v0.20.1')
+            log_info('Failed to discover latest Spack version. Defaulting to Spack v0.20.1')
             version_number = '0.20.1'
+        else:
+            log_info('Discovered latest spack version: ' + version_number)
 
         Model._spack_version_cache = version_number
-        return version_number 
+        return version_number

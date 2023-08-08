@@ -10,6 +10,14 @@ def get_subpath(path):
     else:
         return ''
 
+def log_info(message):
+    logger = logging.getLogger('core')
+    logger.info(message)
+
+def log_error(message):
+    logger = logging.getLogger('core')
+    logger.error(message)
+
 def log_function_call(f):
     @functools.wraps(f)
     def wrapper(*args, **kwargs):

@@ -16,7 +16,6 @@ class UbuntuImage(Image):
             os_release (str): OS release version.
         """
         super().__init__(os_release)
-        #Essential packages for Ubuntu Image.
         self.packages = [
             'build-essential', 'ca-certificates', 'coreutils', 'curl', 'file',
             'environment-modules', 'gfortran', 'git', 'gpg', 'lsb-release', 'vim',
@@ -50,11 +49,17 @@ class UbuntuImage(Image):
         Returns:
             list: List of package manager commands.
         """
+        log_info(f"Adding packages: {added_packages}")
         self.packages.extend(added_packages)
+
+        log_info("Joining the packages into a single string.")
         self.packages = ' '.join(self.packages)
         self.packages = self.wrap_packages(self.packages)
 
+        log_info("Getting package manager commands based on the version.")
         self.pkg_manager_commands = self.get_version_commands(self.version)
+
+        log_info("Adding update and installation commands for the packages.")
         self.pkg_manager_commands.extend([
             'apt-get update',
             f'apt-get install -y {self.packages}'
@@ -73,8 +78,12 @@ class UbuntuImage(Image):
             list: List of tuples containing certificate and its converted path.
         """
         locations = []
+
+        log_info(f"Looping over certificates: {certificates}.")
         for cert in certificates:
+            log_info(f"Appending certificate: {cert} with location: {self.cert_location}.")
             locations.append((cert, self.convert_cert_path(cert)))
+
         return locations
 
     @log_function_call
