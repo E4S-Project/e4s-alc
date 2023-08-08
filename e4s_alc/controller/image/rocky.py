@@ -1,25 +1,24 @@
 from e4s_alc.util import log_function_call
 from e4s_alc.controller.image.image import Image
 
-class CentosImage(Image):
+class RockyImage(Image):
     """
-    A class that defines a CentosImage extending the Image class.
+    A class representing a Rocky Image.
     """
 
     @log_function_call
     def __init__(self, os_release):
         """
-        Initializes the CentosImage and sets the basic packages and certificate locations.
+        Initializes a RockyImage object.
 
         Args:
-            os_release (str): The OS release version.
-
+            os_release (str): The OS version for the image.
         """
         super().__init__(os_release)
         self.pkg_manager_commands = None
         self.packages = [
-            'curl', 'findutils', 'gcc-c++', 'gcc', 'gcc-gfortran', 'git',
-            'gnupg2', 'hostname', 'iproute', 'redhat-lsb-core', 'make', 'patch',
+            'findutils', 'gcc-c++', 'gcc', 'gcc-gfortran', 'git',  'xz',
+            'gnupg2', 'hostname', 'iproute', 'make', 'patch', 'bzip2',
             'python3', 'python3-pip', 'python3-setuptools', 'unzip', 'cmake', 'vim', 'environment-modules'
         ]
         self.update_cert_command = 'update-ca-trust'
@@ -28,35 +27,27 @@ class CentosImage(Image):
     @log_function_call
     def get_version_commands(self, version):
         """
-        Returns the commands required for specific CentOS version.
+        Returns an empty command list for given version. To be implemented in subclasses.
 
         Args:
-            version (str): CentOS version.
+            version (str): The OS version.
 
         Returns:
-            list: List of commands required for the specific CentOS version.
+            list: An empty list of commands. 
         """
         commands = []
-
-        if version == '8':
-            swap_repo = 'swap centos-linux-repos centos-stream-repos'
-            commands.extend([
-                f'yum -y --disablerepo \'*\' --enablerepo=extras {swap_repo}',
-                'yum -y distro-sync'
-            ])
-
         return commands
 
     @log_function_call
     def get_package_manager_commands(self, added_packages):
         """
-        Returns the commands required to install packages.
+        Returns the package manager commands for given additional packages.
 
         Args:
-            added_packages (list): List of additional packages to be installed.
+            added_packages (list): Additional packages to be added. 
 
         Returns:
-            list: List of commands required to install packages.
+            list: A list of package manager commands. 
         """
         self.packages.extend(added_packages)
         self.packages = ' '.join(self.packages)
@@ -65,22 +56,20 @@ class CentosImage(Image):
         self.pkg_manager_commands = self.get_version_commands(self.version)
         self.pkg_manager_commands.extend([
             'yum update -y',
-            'yum install epel-release -y',
-            'yum --enablerepo epel groupinstall -y "Development Tools"',
-            f'yum --enablerepo epel install -y {self.packages}',
+            f'yum install -y {self.packages}',
         ])
         return self.pkg_manager_commands
 
     @log_function_call
     def get_certificate_locations(self, certificates):
         """
-        Returns the list of locations for the given certificates.
+        Returns a list of tuples containing certificate and location.
 
         Args:
-            certificates (str): Certificates.
+            certificates (list): List of certificate file names.
 
         Returns:
-            list: List of tuples where each tuple contains a certificate and its location.
+            list: A list of tuples, each containing a certificate file name and its location.
         """
         locations = []
         for cert in certificates:

@@ -1,0 +1,18 @@
+######## Base group ########
+backend: podman
+registry-image-matrix:
+  - registry.access.redhat.com/ubi8/ubi
+  - ubuntu:20.04
+
+####### Spack group #######
+spack: True
+spack-version: latest
+
+spack-compiler-matrix:
+  - gcc@8.5.0 
+  - gcc@11.2.0 
+  - gcc@12.3.0
+  - gcc@12.0
+
+spack-packages: 
+  - kokkos
