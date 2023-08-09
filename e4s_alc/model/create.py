@@ -3,7 +3,6 @@ import sys
 import shutil
 import logging
 from e4s_alc.model import Model
-from e4s_alc.conf import get_modules_conf
 from e4s_alc.util import log_function_call
 
 logger = logging.getLogger('core')
@@ -136,22 +135,6 @@ class CreateModel(Model):
             self.add_line_break()
 
     @log_function_call
-    def copy_conf_file(self):
-        file_path = get_modules_conf()
-
-        if self.matrix:
-            conf_dir_path = os.path.join(os.getcwd(), 'dockerfiles', '.conf')
-        else:
-            conf_dir_path = os.path.join(os.getcwd(), '.conf')
-
-        if not os.path.exists(conf_dir_path):
-            os.makedirs(conf_dir_path)
-
-        file_name = os.path.basename(file_path)
-        dest_path = os.path.join(conf_dir_path, file_name)
-        shutil.copy(file_path, dest_path)
-
-    @log_function_call
     def add_setup_env(self):
         self.add_line('# Setup spack and modules environment\n')
         for command in self.controller.get_env_setup_commands():
@@ -164,8 +147,7 @@ class CreateModel(Model):
         if self.modules_yaml_file:
             self.add_line(f'COPY {self.modules_yaml_file} /spack/etc/spack/modules.yaml\n')
         else:
-            self.copy_conf_file()
-            self.add_line(f'COPY .conf/modules.yaml /spack/etc/spack/modules.yaml\n')
+            self.add_line(f'RUN curl https://www.nic.uoregon.edu/~cfd/e4s-alc/modules.yaml -o /spack/etc/spack/modules.yaml\n')
         self.add_line_break()
 
     @log_function_call
