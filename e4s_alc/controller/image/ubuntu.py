@@ -1,4 +1,4 @@
-from e4s_alc.util import log_function_call
+from e4s_alc.util import log_function_call, log_info
 from e4s_alc.controller.image.image import Image
 
 class UbuntuImage(Image):
