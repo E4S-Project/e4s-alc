@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'E4S A-La-Carte'
+project = 'E4S-alc'
 copyright = '2023, OACISS'
 author = 'Cameron Durbin, Frederick Deny'
 
@@ -49,6 +49,7 @@ exclude_patterns = []
 # a list of builtin themes.
 #
 html_theme = 'furo'
+html_theme = 'sphinx_rtd_theme'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -62,26 +63,26 @@ sass_targets = {"main.scss": "main.css"}
 
 # -- HTML theme options ------------------------------------------------------
 
-# Make fonts bigger for clarity
-options = {
-    "code-font-size": "1em",
-    "admonition-title-font-size": "1em",
-    "admonition-font-size": ".92em",
-    "font-size--small--2": ".90em",
-    "font-size--small--3": ".82em",
-}
-
-html_theme_options = {
-    "navigation_with_keys": True,
-    "light_css_variables": options,
-    "dark_css_variables": options
-}
-
+## Make fonts bigger for clarity
+#options = {
+#    "code-font-size": "1em",
+#    "admonition-title-font-size": "1em",
+#    "admonition-font-size": ".92em",
+#    "font-size--small--2": ".90em",
+#    "font-size--small--3": ".82em",
+#}
+#
+#html_theme_options = {
+#    "navigation_with_keys": True,
+#    "light_css_variables": options,
+#    "dark_css_variables": options
+#}
+#
 # -- Options for man output --------------------------------------------------
 
 man_pages = [('index', 'e4s-alc', 'E4S A-La-Carte', '', 1)]
 
 # -- Options for code color  -------------------------------------------------
 
-pygments_style = "gruvbox-light"
-pygments_dark_style = "gruvbox-dark"
+#pygments_style = "gruvbox-light"
+#pygments_dark_style = "gruvbox-dark"

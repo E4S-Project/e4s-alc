@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quick start &mdash; E4S A-La-Carte vNot set documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/main.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="installation.html" />
+    <link rel="prev" title="E4S A-La-Carte vNot set documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            E4S A-La-Carte
+          </a>
+              <div class="version">
+                vNot set
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Quick start</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#initializing-the-backend">Initializing the backend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#creating-an-image">Creating an image</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#adding-to-an-image">Adding to an image</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#listing-available-images">Listing available images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#deleting-images">Deleting images</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/index.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration_file.html">Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_directory.html">User Directory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how_it_works.html">How it works</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">E4S A-La-Carte</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Quick start</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/quickstart.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="quick-start">
+<h1>Quick start<a class="headerlink" href="#quick-start" title="Permalink to this heading"></a></h1>
+<dl class="simple">
+<dt>The CLI tool is called <strong>e4s-alc</strong>. Before it can create/modify an image, it first needs to be set to one of the supported backends:</dt><dd><ul class="simple">
+<li><p>Podman</p></li>
+<li><p>Docker</p></li>
+<li><p>Singularity</p></li>
+</ul>
+</dd>
+</dl>
+<section id="initializing-the-backend">
+<h2>Initializing the backend<a class="headerlink" href="#initializing-the-backend" title="Permalink to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ e4s-alc init -b singularity
+Found singularity!
+Setting singularity as backend!
+$ cat ~/.e4s-alc/config.ini
+[DEFAULT]
+name = e4s-alc
+backend = singularity
+</pre></div>
+</div>
+<p>When initializing <strong>e4s-alc</strong>, it will check for an installation of the desired backend on the local system, which is needed to create an image towards that backend.</p>
+<div class="admonition-note admonition">
+<p class="admonition-title">Note</p>
+<p>If no backend is specified, the default used backend will be Docker.</p>
+</div>
+</section>
+<section id="creating-an-image">
+<h2>Creating an image<a class="headerlink" href="#creating-an-image" title="Permalink to this heading"></a></h2>
+<p>Once a backend is setup through the <strong>e4s-alc</strong>’s initialization, it can be use to create images seamlessly. An image to pull must be provided, as well as a name. Spack will be automatically installed (except if explicitely disabled through <code class="code docutils literal notranslate"><span class="pre">--no-spack</span></code> flag), and Spack packages as well as OS packages can be installed.</p>
+<p>Also, the command line instructions can be fed through a json file.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ e4s-alc create \
+    --image centos:8 \
+    --name my-centos-image \
+    -p py-numpy autodiff
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ e4s-alc create \
+    --image ubuntu:22.04 \
+    --name my-ubuntu-image \
+    --no-spack
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cat test.json
+
+{
+    &quot;image&quot;: &quot;ubuntu:22.04&quot;,
+    &quot;name&quot;: &quot;test-file-kokkos-raja&quot;,
+    &quot;spack&quot;: true,
+    &quot;spack-packages&quot;: [
+        &quot;kokkos&quot;,
+        &quot;raja&quot;
+    ],
+    &quot;os-packages&quot;: [
+        &quot;neovim&quot;,
+        &quot;valgrind&quot;
+    ]
+}
+
+$ e4s-alc create -f test.json
+</pre></div>
+</div>
+<p>If you have a spack environment file (spack.yaml), you can provide it to <strong>e4s-alc</strong> by placing it in the <strong>e4s-alc</strong> <a class="reference internal" href="user_directory.html#userdir"><span class="std std-ref">user directory</span></a> subdirectory named <strong>spack_yamls</strong>. Then, when creating an image (or adding to an image), specify the file’s name through the <strong>-y/–yaml</strong> flag to have the environment installed:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ls ~/.e4s-alc/spack_yamls/
+spack.yaml  test_spack.yaml
+
+$ e4s-alc create \
+--image ubuntu:22.04 \
+--name spack_environment_image \
+--yaml spack.yaml
+</pre></div>
+</div>
+</section>
+<section id="adding-to-an-image">
+<h2>Adding to an image<a class="headerlink" href="#adding-to-an-image" title="Permalink to this heading"></a></h2>
+<p>Once an image is created (through <strong>e4s-alc</strong> or not), it can be updated with new os-packages and/or spack packages through a new call:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ e4s-alc add -n my-ubuntu-image -p kokkos -a neovim
+</pre></div>
+</div>
+<p>If you want to use a spack environment file to add to an image, it is supported and done the same way than for the image creation.</p>
+</section>
+<section id="listing-available-images">
+<h2>Listing available images<a class="headerlink" href="#listing-available-images" title="Permalink to this heading"></a></h2>
+<p>After creating images, they can be listed with the <strong>list</strong> command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ e4s-alc create -i ubuntu -n my-ubuntu-image
+$ e4s-alc list
++-----------------+--------+--------------+----------------------+------------+
+|       Name      |  Tag   |      Id      |       Created        |    Size    |
++-----------------+--------+--------------+----------------------+------------+
+| my-ubuntu-image | latest | 70ee2ea5dc24 | 05/15/2023, 20:16:49 | 604.99 MiB |
+|      ubuntu     | latest | 3b418d7b466a | 04/25/2023, 17:30:49 | 74.21 MiB  |
++-----------------+--------+--------------+----------------------+------------+
+</pre></div>
+</div>
+<div class="admonition-note admonition">
+<p class="admonition-title">Note</p>
+<p>Only the images created from the currently initialised backend will be shown. To list images from another backend, you should first run <code class="code docutils literal notranslate"><span class="pre">e4s-alc</span> <span class="pre">init</span> <span class="pre">-b</span> <span class="pre">other_backend</span></code></p>
+</div>
+</section>
+<section id="deleting-images">
+<h2>Deleting images<a class="headerlink" href="#deleting-images" title="Permalink to this heading"></a></h2>
+<p>Images can also be removed by using the <strong>delete</strong> command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ e4s-alc list
++-----------------+--------+--------------+----------------------+------------+
+|       Name      |  Tag   |      Id      |       Created        |    Size    |
++-----------------+--------+--------------+----------------------+------------+
+| my-ubuntu-image | latest | 70ee2ea5dc24 | 05/15/2023, 20:16:49 | 604.99 MiB |
+|      ubuntu     | latest | 3b418d7b466a | 04/25/2023, 17:30:49 | 74.21 MiB  |
++-----------------+--------+--------------+----------------------+------------+
+$ e4s-alc delete -n ubuntu
+$ e4s-alc list
++-----------------+--------+--------------+----------------------+------------+
+|       Name      |  Tag   |      Id      |       Created        |    Size    |
++-----------------+--------+--------------+----------------------+------------+
+| my-ubuntu-image | latest | 70ee2ea5dc24 | 05/15/2023, 20:16:49 | 604.99 MiB |
++-----------------+--------+--------------+----------------------+------------+
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="E4S A-La-Carte vNot set documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, OACISS.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

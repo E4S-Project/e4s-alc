@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Singularity &mdash; E4S A-La-Carte vNot set documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/main.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Configuration File" href="../configuration_file.html" />
+    <link rel="prev" title="Podman" href="podman.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            E4S A-La-Carte
+          </a>
+              <div class="version">
+                vNot set
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Backends</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="docker.html">Docker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="podman.html">Podman</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Singularity</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#description">Description</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration_file.html">Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_directory.html">User Directory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../how_it_works.html">How it works</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Authors</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">E4S A-La-Carte</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Backends</a></li>
+      <li class="breadcrumb-item active">Singularity</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/backends/singularity.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="singularity">
+<h1>Singularity<a class="headerlink" href="#singularity" title="Permalink to this heading"></a></h1>
+<p>The Singularity backend is currently supported through the Docker or Podman backend. The Singularity image format prevents modifying image without superuser privileges, so <strong>E4S A-La-Carte</strong> instead uses another backend to pull the image, apply modifications and then builds it to a singularity file format.</p>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this heading"></a></h2>
+<p>Singularity images can be created/added-to through either docker or podman’s client. This is specified by the user through the <code class="code docutils literal notranslate"><span class="pre">--parent</span></code> flag (default backend used is docker). The creation/addition process will happen entirely through the alternate backend and then the image will be converted to the singularity image format.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>In order to add to a singularity image generated through <strong>e4s-alc</strong>, the image pulled by the original alternate backend must be still available.
+In addition, you cannot add to a singularity image if the image wasn’t created through <strong>e4s-alc</strong>.</p>
+</div>
+<p>Singularity not functionning through a locally running daemon also means that the images are accessible through the user’s file system. Specifically, they will appear in the <code class="code docutils literal notranslate"><span class="pre">.e4s-alc/singularity_images</span></code> directory, which by default is in the user’s home directory.</p>
+<p>When referencing to a singularity image in the <strong>e4s-alc</strong> cli, the name should omit the “.sif” file extension.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="podman.html" class="btn btn-neutral float-left" title="Podman" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../configuration_file.html" class="btn btn-neutral float-right" title="Configuration File" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, OACISS.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Directory &mdash; E4S A-La-Carte vNot set documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/main.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="How it works" href="how_it_works.html" />
+    <link rel="prev" title="Configuration File" href="configuration_file.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            E4S A-La-Carte
+          </a>
+              <div class="version">
+                vNot set
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/index.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration_file.html">Configuration File</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">User Directory</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#configuration-file">Configuration File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#spack-environment-files">Spack Environment Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#singularity-images">Singularity Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#podman-tarballs">Podman Tarballs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="how_it_works.html">How it works</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">E4S A-La-Carte</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">User Directory</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/user_directory.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="user-directory">
+<span id="userdir"></span><h1>User Directory<a class="headerlink" href="#user-directory" title="Permalink to this heading"></a></h1>
+<p><strong>e4s-alc</strong> uses a user directory to store user specific data. This article describes the different directories withing it.</p>
+<section id="configuration-file">
+<h2>Configuration File<a class="headerlink" href="#configuration-file" title="Permalink to this heading"></a></h2>
+<p><strong>config.ini</strong> is a simple configuration file that currently simply holds the value for the backend currently in use eg:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cat ~/.e4s-alc/config.ini
+
+[DEFAULT]
+name = e4s-alc
+backend = docker
+</pre></div>
+</div>
+</section>
+<section id="spack-environment-files">
+<h2>Spack Environment Files<a class="headerlink" href="#spack-environment-files" title="Permalink to this heading"></a></h2>
+<p><strong>spack_yamls</strong> holds the spack environment files. If you want to use a yaml file configuring a spack environment to configure an image, you need to copy that file into this directory and then specify the file name using the command line interface at image creation or addition.</p>
+</section>
+<section id="singularity-images">
+<h2>Singularity Images<a class="headerlink" href="#singularity-images" title="Permalink to this heading"></a></h2>
+<p><strong>singularity_images</strong> holds the singularity images created through <strong>e4s-alc</strong>. As <strong>Singularity</strong> functions without a locally running daemon, <strong>e4s-alc</strong> keeps its images at a specific location to avoid losing track of them. Other supported backend technologies have a locally run daemon and handle their own images.</p>
+</section>
+<section id="podman-tarballs">
+<h2>Podman Tarballs<a class="headerlink" href="#podman-tarballs" title="Permalink to this heading"></a></h2>
+<p>With <strong>e4s-alc</strong>, you need either <strong>Docker</strong> or <strong>Podman</strong> support to generate <strong>Singularity</strong> images. Indeed, <strong>Singularity</strong> doesn’t have the ability to commit modified images in a container instance. Instead, we commit an image pulled and modified with <strong>Docker</strong> or <strong>Podman</strong> (<strong>Podman</strong> being the default but <strong>Docker</strong> can be used instead, through the <strong>–parent</strong> flag), and then generate a <strong>Singularity</strong> image from it.</p>
+<p>When using <strong>Podman</strong> as a parent, it will create a tarball of the image as a step to generate the <strong>Singularity</strong> image, and store it in the <strong>podman_tarballs</strong> directory.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="configuration_file.html" class="btn btn-neutral float-left" title="Configuration File" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="how_it_works.html" class="btn btn-neutral float-right" title="How it works" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, OACISS.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
