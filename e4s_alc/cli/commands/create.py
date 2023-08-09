@@ -77,7 +77,10 @@ class CreateCommand(AbstractCommand):
     def check_arguments(self, args):
         """Check the arguments passed to the command."""
 
-        logger = Logger('core', '.logs.log', args['verbose'])
+        log_path = '/tmp/e4s-alc/'
+        if not os.path.exists(log_path):
+            os.mkdir(log_path)
+        logger = Logger('core', log_path + 'logs.log', args['verbose'])
 
         if args['help']:
             self.parser.print_help()
