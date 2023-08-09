@@ -39,7 +39,7 @@ class CreateModel(Model):
             for file in self.local_files:
                 format_file_spaces = ' '.join(file.split())
                 src_file, dest_file = format_file_spaces.split(' ')
-                self.add_line(f'ADD {src_file} {dest_file}\n')
+                self.add_line(f'COPY {src_file} {dest_file}\n')
             self.add_line_break()
 
     @log_function_call
@@ -81,7 +81,7 @@ class CreateModel(Model):
         if cert_locations:
             self.add_line('# Add certificates\n')
             for cert, new_cert in cert_locations:
-                self.add_line(f'ADD {cert} {new_cert}\n')
+                self.add_line(f'COPY {cert} {new_cert}\n')
             update_command = self.controller.get_update_certificate_command()
             self.add_line(f'RUN {update_command}\n\n')
 
@@ -162,10 +162,10 @@ class CreateModel(Model):
     def add_modules_file(self):
         self.add_line('# Add modules.yaml file\n')
         if self.modules_yaml_file:
-            self.add_line(f'ADD {self.modules_yaml_file} /spack/etc/spack/modules.yaml\n')
+            self.add_line(f'COPY {self.modules_yaml_file} /spack/etc/spack/modules.yaml\n')
         else:
             self.copy_conf_file()
-            self.add_line(f'ADD .conf/modules.yaml /spack/etc/spack/modules.yaml\n')
+            self.add_line(f'COPY .conf/modules.yaml /spack/etc/spack/modules.yaml\n')
         self.add_line_break()
 
     @log_function_call
@@ -183,7 +183,7 @@ class CreateModel(Model):
             signature_check = '--no-check-signature'
 
         self.add_line('# Add Spack env file\n')
-        self.add_line(f'ADD {self.spack_yaml_file} /spack.yaml\n')
+        self.add_line(f'COPY {self.spack_yaml_file} /spack.yaml\n')
         self.add_line(f'RUN spack env create main /spack.yaml\n')
         self.add_line(f'RUN spack --env main install {signature_check}\n')
         self.add_line_break()
