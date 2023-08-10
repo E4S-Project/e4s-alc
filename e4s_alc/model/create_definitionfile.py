@@ -155,6 +155,14 @@ class CreateDefinitionfileModel(Model):
         self.add_line_break("post")
 
     def add_spack_compiler(self):
+
+        def workaround_gcc_build_fail(version):
+            if "^gmake@" in version:
+                return version
+            else:
+                version = version + " ^gmake@4.3"
+                return version
+
         if self.spack_compiler:
             logger.debug("Adding spack compiler")
             self.add_line('# Installing Spack compiler\n', "post")
@@ -185,7 +193,7 @@ class CreateDefinitionfileModel(Model):
             else:
                 # Splitting package and version if '@' is present
                 if '@' in self.spack_compiler:
-                    package, version = self.spack_compiler.split('@')
+                    package, version = self.spack_compiler.split('@', 1)
 
                 # Set 'compiler' based on 'package' if it's not None, otherwise set to self.spack_compiler
                 compiler = 'clang' if package == 'llvm' else package or self.spack_compiler
@@ -199,6 +207,11 @@ class CreateDefinitionfileModel(Model):
             signature_check = ''
             if not self.spack_check_signature:
                 signature_check = '--no-check-signature '
+
+            # Check if compiler to install is gcc and avoids gmake@4.4 dependency as it fails in singularity build
+            if package == "gcc":
+                version = workaround_gcc_build_fail(version)
+                self.spack_compiler = package + "@" + version
 
             spack_compiler_commands = [
                 'spack compiler find',
