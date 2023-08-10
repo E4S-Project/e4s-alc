@@ -43,9 +43,6 @@ backend:
 registry:
 image:
 
-# registry-image-matrix:
-#   -
-
 initial-commands:
   -
 
@@ -73,16 +70,10 @@ post-system-stage-commands:
 
 ####### Spack group #######
 spack: True
-
 pre-spack-stage-commands:
   -
 
 spack-version:
-
-# spack-version-matrix:
-#   - 
-
-
 spack-mirrors:
   -
 
@@ -93,12 +84,18 @@ post-spack-install-commands:
 
 spack-yaml-file: 
 spack-compiler:
-
-# spack-compiler-matrix:
-#   - 
-
 spack-packages: 
   -
 
 post-spack-stage-commands: 
+  -
+  
+####### Matrix group #######
+registry-image-matrix:
+  -
+
+spack-version-matrix:
+  - 
+
+spack-compiler-matrix:
   -"""
