@@ -1,0 +1,11 @@
+######## Base group ########
+backend: singularity
+registry: 
+image: ubuntu:latest
+repull: False
+
+####### Spack group #######
+spack: True
+spack-version: latest
+spack-compiler: intel-oneapi-compilers
+spack-env-file: ./light_spack.yaml
