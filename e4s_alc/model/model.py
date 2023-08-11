@@ -81,6 +81,7 @@ class Model():
 
         # Base group
         self.backend = args.get('backend', None)
+        self.bootstrap = args.get('bootstrap', None)
         if not self.backend:
             self.backend = self.discover_backend()
         self.base_image = args.get('image', None) or self.raise_argument_error('image')
