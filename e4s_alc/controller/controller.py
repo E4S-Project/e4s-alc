@@ -30,7 +30,7 @@ class Controller():
         image = None
         tag = None
         if ':' in base_image:
-            image, tag = base_image.split(':')
+            image, tag = base_image.rsplit(':', 1)
         else:
             image, tag = base_image, 'latest'
         return image, tag

@@ -33,7 +33,7 @@ class CreateDefinitionfileModel(Model):
     # Base group
     def add_base_image(self):
         logger.debug("Adding base image")
-        self.add_line(f'From: {self.base_image}\n\n', "header", indent=False)
+        self.add_line(f'From: {self.image_registry}{self.base_image}\n\n', "header", indent=False)
 
     def add_local_files(self):
         if self.local_files:
