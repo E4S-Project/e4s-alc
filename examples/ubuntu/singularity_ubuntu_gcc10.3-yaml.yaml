@@ -8,4 +8,4 @@ repull: False
 spack: True
 spack-version: latest
 spack-compiler: gcc@10.3.0
-spack-env-file: ./light_spack.yaml
+spack-env-file: ./spack.yaml
