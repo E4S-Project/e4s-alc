@@ -65,6 +65,9 @@ certificates:
 os-packages: 
   -
 
+add-repo:
+  -
+
 post-system-stage-commands: 
   -
 
