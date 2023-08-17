@@ -1,6 +1,6 @@
-=================
+===============
 Getting Started
-=================
+===============
 
 This guide will walk you through the basics of using our tool. 
 We'll cover everything from system prerequisites to how the software works.
@@ -8,9 +8,9 @@ We'll cover everything from system prerequisites to how the software works.
 .. contents:: 
    :depth: 3
 
--------------------
+--------------------
 System Prerequisites
--------------------
+--------------------
 
 Before installing and running this program, make sure that your system meets the following prerequisites:
 
@@ -18,19 +18,18 @@ Before installing and running this program, make sure that your system meets the
 
 2. ``wget`` or ``curl``: These are frequently used command-line tools for sending HTTP requests. Most Unix-based systems include them by default. If they are not installed, you can install either of them using your system's package manager. For instance, ``sudo apt install wget`` or ``sudo apt install curl``.
 
-3. **Container backend** (``docker``, ``podman``, or ``singularity``): The program requires a container backend to run. You can choose between Docker, Podman, or Singularity. Please follow the official installation instructions for the particular backend you choose to install:
+3. **Container backend** (``docker`` or ``podman``): The program requires a container backend to run. You can choose between Docker, Podman. Please follow the official installation instructions for the particular backend you choose to install:
 
     - For Docker: https://docs.docker.com/engine/install/
     - For Podman: https://podman.io/getting-started/installation
-    - For Singularity: https://sylabs.io/guides/3.0/user-guide/installation.html
   
 4. **Internet connection**: The program needs an active internet connection to function correctly. Please ensure your device is connected to the internet before initializing the program.
 
 Please keep in mind that to install the aforementioned system prerequisites and to run the program itself, you may require administrative (``sudo``) rights on your system.
 
--------------------
+------------
 Installation
--------------------
+------------
 
 To install ``e4s-alc``, you need to perform these commands in terminal:
 
@@ -142,7 +141,9 @@ The corresponding Dockerfile is shown below. You may notice that the Dockerfile 
 Workflow Stages
 ---------------
 
-The sequential structure of the Dockerfile is crucial, as each stage is dependent on the one preceding it. For example, if the Base Stage specifies ``rockylinux:9`` instead of ``ubuntu:22.04``, the System Stage would utilize the package manager ``yum`` instead of ``apt``. This structure provides a maintaining dynamic functionality that ``e4s-alc`` adapts based on the input parameters.
+The sequential structure of the Dockerfile is crucial, as each stage is dependent on the one preceding it. For example, if the Base Stage specifies ``rockylinux:9`` instead of ``ubuntu:22.04``, the System Stage would utilize the package manager ``yum`` instead of ``apt``. This structure provides a maintaining dynamic functionality that ``e4s-alc`` adapts based on the input parameters. 
+
+``e4s-alc`` also provides options for running commands before and after each stage. This makes workflow customization simple for build complex systems.
 
 ~~~~~~~~~~
 Base Stage
@@ -227,7 +228,7 @@ The finalize stage is the concluding stage in the Dockerfile where the image is 
 
 
 -------------------------
-Running the example image
+Running the Example Image
 -------------------------
 
 .. code-block:: console
@@ -236,20 +237,20 @@ Running the example image
           --image ubuntu:22.04 \
           --spack-package zlib
 
-Following the completion the above command, a Dockerfile appears in the current directory.
+Following the completion of the command above, a Dockerfile appears in the current working directory.
 
 .. code-block:: console
 
    $ ls
    Dockerfile
 
-Using ``podman``, I build and run the image with:
+Using ``podman`` (for example), I build and run the image with:
 
 .. code-block:: console
 
    $ podman build . -t example-image && podman run -it example-image
 
-Now I'm in the image. Now let's check our spack packages with ``spack find``:
+Now I'm in the image. Now let's check our spack packages with ``spack find``. Notice how an environment has already been created for our specs.
 
 .. code-block:: console
 
@@ -263,7 +264,7 @@ Now I'm in the image. Now let's check our spack packages with ``spack find``:
    zlib@1.2.13
    ==> 1 installed package
 
-Let's also list our available modules and load ``zlib``:
+The container comes with Environment Modules so we can easily load and unload installed packages with ``module``. Let's list our available modules and load ``zlib``:
 
 .. code-block:: console
 
@@ -281,6 +282,6 @@ Let's also list our available modules and load ``zlib``:
 How It Works
 ------------
 
-``e4s-alc`` operates by receiving a set of inputs. Once these inputs are processed, ``e4s-alc`` initiates the process of pulling the designated base image. Following this, the content of the base image is meticulously analyzed to confirm its compatibility with the succeeding stages.
+``e4s-alc`` operates by receiving a set of inputs in the form of a command line call. Once these inputs are processed, ``e4s-alc`` initiates the process of pulling the designated base image. Following this, the content of the base image is analyzed to confirm its compatibility with the succeeding stages.
 
-Upon completion of the analysis, ``e4s-alc`` shifts into the building phase. It commences the systematic construction of each stage, ensuring that the commands utilised in each stage align correctly with the given inputs and the base image. This iterative construction ensures the resulting Dockerfile maintains compatibility throughout all stages.
+Upon completion of the analysis, ``e4s-alc`` shifts into the building phase. It commences the systematic construction of each stage, ensuring that the commands utilized in each stage align correctly with the given inputs and the base image. This iterative construction ensures the resulting Dockerfile maintains compatibility throughout all stages.

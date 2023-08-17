@@ -2,8 +2,6 @@
 Tutorial: ``e4s-alc`` matrices
 ===============================
 
---------
-Tutorial
---------
+.. code-block:: console 
 
-test
+   This section is in progress.
