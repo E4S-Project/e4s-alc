@@ -27,6 +27,8 @@ class Model():
         # System group
         self.certificates = None
         self.os_packages = None
+        self.remote_files = None
+        self.git_repos = None
         self.pre_system_stage_commands = None
         self.post_system_stage_commands = None
 
@@ -73,8 +75,9 @@ class Model():
 
         # System group
         self.os_packages = self.remove_nones(args.get('os-packages', []))
-        self.git_repos = self.remove_nones(args.get('add-repos', []))
         self.certificates = self.remove_nones(args.get('certificates', []))
+        self.remote_files = self.remove_nones(args.get('add-remote-files', []))
+        self.git_repos = self.remove_nones(args.get('add-repos', []))
         self.pre_system_stage_commands = self.remove_nones(args.get('pre-system-stage-commands', []))
         self.post_system_stage_commands = self.remove_nones(args.get('post-system-stage-commands', []))
 
