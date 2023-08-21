@@ -57,16 +57,22 @@ class CreateDefinitionfileModel(Model):
                 self.add_line(f'{command}\n', "post")
             self.add_line_break("post")
 
-  #  # System group
-  #  def add_certificates(self):
-  #      logger.debug("Adding certificates")
-  #      cert_locations = self.controller.get_certificate_locations(self.certificates)
-  #      if cert_locations:
-  #          self.add_line('# Add certificates\n')
-  #          for cert, new_cert in cert_locations:
-  #              self.add_line(f'ADD {cert} {new_cert}\n')
-  #          update_command = self.controller.get_update_certificate_command()
-  #          self.add_line(f'RUN {update_command}\n\n')
+    def add_certificates(self):
+        logger.debug("Adding certificates")
+        cert_locations = self.controller.get_certificate_locations(self.certificates)
+        if cert_locations:
+            self.add_line('# Add certificates\n', "files")
+            for cert, new_cert in cert_locations:
+                self.add_line(f'{cert} {new_cert}\n', "files")
+            update_command = self.controller.get_update_certificate_command()
+            self.add_line(f'{update_command}\n\n', "post")
+
+    def add_post_system_stages_commands(self):
+        logger.debug("Adding post system stages commands")
+        if self.post_system_stage_commands:
+            for command in self.post_system_stage_commands:
+                self.add_line(f'{command}\n', "post")
+            self.add_line_break("post")
 
     def add_os_package_commands(self):
         logger.debug("Adding os package commands")
@@ -282,9 +288,11 @@ class CreateDefinitionfileModel(Model):
     def create_post(self):
         self.add_line('%post\n', "post", indent=False)
         self.add_line('export DEBIAN_FRONTEND=noninteractive\n', "post")
-        self.add_line_break()
+        self.add_line_break("post")
         self.add_initial_commands()
+        self.add_certificates()
         self.add_os_package_commands()
+        self.add_post_system_stages_commands()
         if self.spack_install:
             self.add_pre_spack_stage_commands()
             self.add_spack()
