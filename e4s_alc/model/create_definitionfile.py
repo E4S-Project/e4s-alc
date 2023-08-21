@@ -57,9 +57,16 @@ class CreateDefinitionfileModel(Model):
                 self.add_line(f'{command}\n', "post")
             self.add_line_break("post")
 
-    def add_pre_system_stages_commands(self):
+    def add_post_base_stage_commands(self):
         if self.post_system_stage_commands:
-            logger.debug("Adding pre system stages commands")
+            logger.debug("Adding post base stage commands")
+            for command in self.post_system_stage_commands:
+                self.add_line(f'{command}\n', "post")
+            self.add_line_break("post")
+
+    def add_pre_system_stage_commands(self):
+        if self.post_system_stage_commands:
+            logger.debug("Adding pre system stage commands")
             for command in self.post_system_stage_commands:
                 self.add_line(f'{command}\n', "post")
             self.add_line_break("post")
@@ -74,9 +81,9 @@ class CreateDefinitionfileModel(Model):
             update_command = self.controller.get_update_certificate_command()
             self.add_line(f'{update_command}\n\n', "post")
 
-    def add_post_system_stages_commands(self):
+    def add_post_system_stage_commands(self):
         if self.post_system_stage_commands:
-            logger.debug("Adding post system stages commands")
+            logger.debug("Adding post system stage commands")
             for command in self.post_system_stage_commands:
                 self.add_line(f'{command}\n', "post")
             self.add_line_break("post")
@@ -297,10 +304,11 @@ class CreateDefinitionfileModel(Model):
         self.add_line('export DEBIAN_FRONTEND=noninteractive\n', "post")
         self.add_line_break("post")
         self.add_initial_commands()
-        self.add_pre_system_stages_commands()
+        self.add_post_base_stage_commands()
+        self.add_pre_system_stage_commands()
         self.add_certificates()
         self.add_os_package_commands()
-        self.add_post_system_stages_commands()
+        self.add_post_system_stage_commands()
         if self.spack_install:
             self.add_pre_spack_stage_commands()
             self.add_spack()
