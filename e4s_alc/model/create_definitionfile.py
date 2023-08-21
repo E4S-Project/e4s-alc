@@ -50,12 +50,12 @@ class CreateDefinitionfileModel(Model):
             self.add_line(f'{env_var}\n', "environment")
         self.add_line_break("environment")
 
-  #  def add_initial_commands(self):
-  #      if self.initial_commands:
-  #          logger.debug("Adding initial commands")
-  #          for command in self.initial_commands:
-  #              self.add_line(f'{command}\n')
-  #          self.add_line_break()
+    def add_initial_commands(self):
+        if self.initial_commands:
+            logger.debug("Adding initial commands")
+            for command in self.initial_commands:
+                self.add_line(f'{command}\n', "post")
+            self.add_line_break("post")
 
   #  # System group
   #  def add_certificates(self):
@@ -156,13 +156,6 @@ class CreateDefinitionfileModel(Model):
 
     def add_spack_compiler(self):
 
-        def workaround_gcc_build_fail(version):
-            if "^gmake@" in version:
-                return version
-            else:
-                version = version + " ^gmake@4.3"
-                return version
-
         if self.spack_compiler:
             logger.debug("Adding spack compiler")
             self.add_line('# Installing Spack compiler\n', "post")
@@ -207,11 +200,6 @@ class CreateDefinitionfileModel(Model):
             signature_check = ''
             if not self.spack_check_signature:
                 signature_check = '--no-check-signature '
-
-            # Check if compiler to install is gcc and avoids gmake@4.4 dependency as it fails in singularity build
-            if package == "gcc":
-                version = workaround_gcc_build_fail(version)
-                self.spack_compiler = package + "@" + version
 
             spack_compiler_commands = [
                 'spack compiler find',
@@ -294,6 +282,8 @@ class CreateDefinitionfileModel(Model):
     def create_post(self):
         self.add_line('%post\n', "post", indent=False)
         self.add_line('export DEBIAN_FRONTEND=noninteractive\n', "post")
+        self.add_line_break()
+        self.add_initial_commands()
         self.add_os_package_commands()
         if self.spack_install:
             self.add_pre_spack_stage_commands()
