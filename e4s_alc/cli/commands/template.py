@@ -68,7 +68,7 @@ os-packages:
 add-remote-files:
   -
 
-add-repo:
+add-repos:
   -
 
 post-system-stage-commands: 
