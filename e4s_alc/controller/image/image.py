@@ -63,4 +63,4 @@ class Image():
         Returns:
             str: Properly wrapped package list string.
         """
-        return textwrap.fill(packages, width=70, break_long_words=False, break_on_hyphens=False).replace('\n', ' \\\n\t\t')
+        return textwrap.fill(packages, width=70, break_long_words=False, break_on_hyphens=False).replace('\n', ' \\\n\t    ')

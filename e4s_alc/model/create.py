@@ -2,6 +2,7 @@ import os
 import sys
 import shutil
 import logging
+from urllib.parse import urlparse
 from e4s_alc.model import Model
 from e4s_alc.util import log_function_call
 
@@ -35,10 +36,15 @@ class CreateModel(Model):
     def add_local_files(self):
         if self.local_files:
             self.add_line('# Add files from host to container\n')
-            for file in self.local_files:
-                format_file_spaces = ' '.join(file.split())
-                src_file, dest_file = format_file_spaces.split(' ')
-                self.add_line(f'COPY {src_file} {dest_file}\n')
+            for file_pair in self.local_files:
+                format_file_spaces = ' '.join(file_pair.split())
+                src_file, dest_dir = format_file_spaces.split(' ')
+                self.add_line(f'RUN mkdir -p {dest_dir}\n')
+                self.add_line(f'COPY {src_file} {dest_dir}\n')
+                if src_file.endswith('.tar.gz') or src_file.endswith('.tgz'):
+                    command = f'cd {dest_dir} && tar -xzf {src_file} && rm {src_file}'
+                    self.add_line(f'RUN {command}\n')
+
             self.add_line_break()
 
     @log_function_call
@@ -84,8 +90,31 @@ class CreateModel(Model):
             update_command = self.controller.get_update_certificate_command()
             self.add_line(f'RUN {update_command}\n\n')
 
+    def is_url(self, string):
+        try:
+            result = urlparse(string)
+            return all([result.scheme, result.netloc])
+        except ValueError:
+            return False
+
     @log_function_call
-    def add_github_repos(self):
+    def add_remote_files(self):
+        if self.remote_files:
+            self.add_line('# Add remote files from host to container\n')
+            for file_pair in self.remote_files:
+                format_file_spaces = ' '.join(file_pair.split())
+                src_file, dest_dir = format_file_spaces.split(' ')
+                command = f'mkdir -p {dest_dir} && cd {dest_dir} && curl -L ' 
+                if src_file.endswith('.tar.gz') or src_file.endswith('.tgz'):
+                    command += f'{src_file} | tar -xz'
+                else:
+                    command += f'-O {src_file}'
+
+                self.add_line(f'RUN {command}\n')
+            self.add_line_break()
+                
+    @log_function_call
+    def add_repos(self):
         if self.git_repos:
             self.add_line('# Clone GitHub repos\n')
             for repo in self.git_repos:
@@ -111,18 +140,10 @@ class CreateModel(Model):
     # Spack group
     @log_function_call
     def add_spack(self):
-        spack_url = f'https://github.com/spack/spack/releases/download/v{self.spack_version}/spack-{self.spack_version}.tar.gz'
-
-        spack_install_commands = [
-            f'curl -L {spack_url} -o /spack.tar.gz',
-            'gzip -d /spack.tar.gz && tar -xf /spack.tar && rm /spack.tar',
-            f'mv /spack-{self.spack_version} /spack && . /spack/share/spack/setup-env.sh',
-            'echo export PATH=/spack/bin:$PATH >> ~/.bashrc'
-        ]
-
         self.add_line(f'# Install Spack version {self.spack_version}\n')
-        for command in spack_install_commands:
-            self.add_line(f'RUN {command}\n')
+        spack_url = f'https://github.com/spack/spack/releases/download/v{self.spack_version}/spack-{self.spack_version}.tar.gz'
+        command = f'curl -L {spack_url} | tar xz && mv /spack-{self.spack_version} /spack'
+        self.add_line(f'RUN {command}\n')
         self.add_line_break()
 
     @log_function_call
@@ -137,8 +158,8 @@ class CreateModel(Model):
     @log_function_call
     def add_setup_env(self):
         self.add_line('# Setup spack and modules environment\n')
-        for command in self.controller.get_env_setup_commands():
-            self.add_line(f'RUN {command}\n')
+        command = ' && \\\n\t    '.join(self.controller.get_env_setup_commands())
+        self.add_line(f'RUN {command}\n')
         self.add_line_break()
 
     @log_function_call
@@ -226,8 +247,8 @@ class CreateModel(Model):
         if not os.path.exists(directory):
             os.makedirs(directory)
         
-        os_id = self.controller.get_os_id_and_version()
-        file_name = f'{directory}/Dockerfile.{os_id}-spack{self.spack_version}-{self.spack_compiler.compiler}{self.spack_compiler.version}' 
+        os_id_version = self.controller.get_os_id_and_version()
+        file_name = f'{directory}/Dockerfile.{os_id_version}-spack{self.spack_version}-{self.spack_compiler.compiler}{self.spack_compiler.version}' 
         with open(file_name, 'w') as f:
             for instruction in self.instructions:
                 self.log_line(instruction)
@@ -265,7 +286,8 @@ class CreateModel(Model):
             self.add_os_package_commands()
             self.add_certificates()
 
-        self.add_github_repos()
+        self.add_remote_files()
+        self.add_repos()
         self.add_post_system_stage_commands()
 
     @log_function_call

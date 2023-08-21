@@ -48,6 +48,7 @@ class CreateCommand(AbstractCommand):
         system_group_args = self.parser.add_argument_group('System Stage Arguments', system_group_desc)
         system_group_args.add_argument('-crt', '--certificate', help='Add an SSL certificate', action='append', default=[], dest='certificates')
         system_group_args.add_argument('-a', '--os-package', help='The name of an OS Package to install', action='append', default=[], dest='os-packages')
+        system_group_args.add_argument('--add-remote-file', help='Add a remote file to the container', action='append', default=[], dest='add-remote-files')
         system_group_args.add_argument('--add-repo', help='Clone a GitHub repository into the image', action='append', default=[], dest='add-repos')
         system_group_args.add_argument('--pre-system-stage-command', help='Commands to run at the beginning of the system stage', action='append', default=[], dest='pre-system-package-commands')
         system_group_args.add_argument('--post-system-stage-command',  help='Commands to run at the end of the system stage', action='append', default=[], dest='post-system-package-commands')

@@ -177,16 +177,6 @@ class Controller:
     @log_function_call
     def get_env_setup_commands(self):
         """
-        Retrieves the environment setup commands.
-
-        Returns:
-            list: List of environment setup commands.
-        """
-        return self._generate_env_setup_commands()
-
-    @log_function_call
-    def _generate_env_setup_commands(self):
-        """
         Generates the environment setup commands and returns them.
 
         Returns:

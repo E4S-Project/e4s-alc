@@ -65,6 +65,9 @@ certificates:
 os-packages: 
   -
 
+add-remote-files:
+  -
+
 add-repo:
   -
 
