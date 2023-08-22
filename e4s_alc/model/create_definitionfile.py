@@ -268,10 +268,10 @@ class CreateDefinitionfileModel(Model):
             self.bootstrap = "docker"
         self.add_line(f"Bootstrap: {self.bootstrap}\n", "header", indent=False)
 
- 
     def export_to_makefile(self):
         logger.info("Exporting to makefile")
-        with open('singularity.def', 'w') as f:
+        output_file = self.name if self.name else 'singularity.def'
+        with open(output_file, 'w') as f:
             for line in self.header:
                 f.write(line)
             for line in self.environment:

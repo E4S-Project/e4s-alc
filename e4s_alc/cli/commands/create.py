@@ -26,6 +26,7 @@ class CreateCommand(AbstractCommand):
 
         self.parser.add_argument('-h', '--help', help='Display the help page', default=False, action='store_true', dest='help')
         self.parser.add_argument('-v', '--verbose', help='Verbose mode', default=False, action='store_true', dest='verbose')
+        self.parser.add_argument('-n', '--name', help='Name of the output file')
 
         file_group_args = self.parser.add_argument_group('Load Arguments by file')
         file_group_args.add_argument('-f', '--file', help='The file used to create a new image')

@@ -274,7 +274,8 @@ class CreateDockerfileModel(Model):
 
     def export_to_makefile(self):
         logger.info("Exporting to makefile")
-        with open('Dockerfile', 'w') as f:
+        output_file = self.name if self.name else 'Dockerfile'
+        with open(output_file, 'w') as f:
             for instruction in self.instructions:
                 f.write(instruction)
 

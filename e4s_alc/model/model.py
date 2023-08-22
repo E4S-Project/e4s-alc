@@ -14,6 +14,7 @@ class Model():
         self.instructions = []
 
         # Definition file specific attributes
+        self.name = ''
         self.header = []
         self.environment = []
         self.files = []
@@ -71,6 +72,9 @@ class Model():
     def read_arguments(self, arg_namespace):
         logger.info("Reading arguments")
         args = vars(arg_namespace)
+
+        # Output file name
+        self.name = args.get('name', None)
 
         # File group
         if args['file']:

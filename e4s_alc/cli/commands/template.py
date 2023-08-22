@@ -20,6 +20,7 @@ class TemplateCommand(AbstractCommand):
                                             )
  
         self.parser.add_argument('-o', '--output', type=str, choices=['json', 'yaml'], help='Choose a format to output a message: json or yaml', default='yaml')
+        self.parser.add_argument('-n', '--name', help='Name of the output file')
         self.parser.add_argument('-h', '--help', help='Display the help page', default=False, action='store_true', dest='help')
         return {'command': self, 'parser': self.parser}
 
