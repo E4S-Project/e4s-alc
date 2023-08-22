@@ -58,16 +58,16 @@ class CreateDefinitionfileModel(Model):
             self.add_line_break("post")
 
     def add_post_base_stage_commands(self):
-        if self.post_system_stage_commands:
+        if self.post_base_stage_commands:
             logger.debug("Adding post base stage commands")
-            for command in self.post_system_stage_commands:
+            for command in self.post_base_stage_commands:
                 self.add_line(f'{command}\n', "post")
             self.add_line_break("post")
 
     def add_pre_system_stage_commands(self):
-        if self.post_system_stage_commands:
+        if self.pre_system_stage_commands:
             logger.debug("Adding pre system stage commands")
-            for command in self.post_system_stage_commands:
+            for command in self.pre_system_stage_commands:
                 self.add_line(f'{command}\n', "post")
             self.add_line_break("post")
 
@@ -78,6 +78,7 @@ class CreateDefinitionfileModel(Model):
             self.add_line('# Add certificates\n', "files")
             for cert, new_cert in cert_locations:
                 self.add_line(f'{cert} {new_cert}\n', "files")
+            self.add_line_break("files")
             update_command = self.controller.get_update_certificate_command()
             self.add_line(f'{update_command}\n\n', "post")
 
