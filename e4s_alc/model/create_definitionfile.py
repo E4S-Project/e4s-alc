@@ -47,7 +47,10 @@ class CreateDefinitionfileModel(Model):
         self.env_vars.extend(['DEBIAN_FRONTEND=noninteractive', 'PATH=/spack/bin:$PATH'])
         logger.debug("Adding environment variables")
         for env_var in self.env_vars:
-            self.add_line(f'{env_var}\n', "environment")
+            if "export" in env_var:
+                self.add_line(f'{env_var}\n', "environment")
+            else:
+                self.add_line(f'export {env_var}\n', "environment")
         self.add_line_break("environment")
 
     def add_initial_commands(self):
