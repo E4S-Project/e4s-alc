@@ -1,3 +1,5 @@
+.. _yaml_params:
+
 ===============
 YAML Parameters
 ===============
@@ -78,17 +80,17 @@ Base Group Parameters
 ~~~~~~~~~~~~~
 
 | **Type**: ``list<string>``
-| **Description**: The files that will be copied into the image. Each entry must take the form ``<source> <destination>``. This copies the directory/file **FROM** the host ``<source>`` **TO** the image ``<destination>``. This parameter is optional. 
+| **Description**: The files that will be copied into the image. Each entry must take the form ``<source> <destination_directory>``. This copies the host ``<source>`` **TO** the image ``<destination_directory>``. This parameter is optional. 
 | **Example**:
 
 .. code-block:: console
 
    add-files:
      - project_dir /project_dir    
-     - inputs.txt /data/inputs.txt
+     - inputs.txt /data/
 
-| **Note**: The ``<source>`` path must be inside the context of the build. Because the first step of a container build is to send the context directory to the container daemon, you cannot use the form ``- ../something /something``
-
+| **Note**: The ``<source>`` path must be inside the context of the build. Because the first step of a container build is to send the context directory to the container daemon, you cannot use the form ``- ../something /something``.
+| **Note**: If the extension of ``<source>`` is ``.tgz`` or ``.tar.gz`` then the file will be unpacked and placed in ``<destination_directory>``.
 ----
 
 ~~~~~~~~~~~~~~~~~
@@ -149,7 +151,7 @@ System Group Parameters
 ~~~~~~~~~~~~~~~~
 
 | **Type**: ``list<string>``
-| **Description**: The certificates to add into the image. These certificates will be used to establish secure HTTPS connections to servers with certificates issued by globally recognized CA. 
+| **Description**: The certificates to add into the image. These certificates will be used to establish secure HTTPS connections to servers with certificates issued by globally recognized CA. This parameter is optional.
 | **Example**:
 
 .. code-block:: console
@@ -165,7 +167,7 @@ System Group Parameters
 ~~~~~~~~~~~~~~~
 
 | **Type**: ``list<string>``
-| **Description**: The additional OS packages to install into the image. By default, the image will install the system `prerequisites <https://spack.readthedocs.io/en/latest/getting_started.html>`__ for Spack based on the OS package manager. This parameter is optional
+| **Description**: The additional OS packages to install into the image. By default, the image will install the system `prerequisites <https://spack.readthedocs.io/en/latest/getting_started.html>`__ for Spack based on the OS package manager. This parameter is optional.
 | **Example**:
 
 .. code-block:: console
@@ -175,6 +177,25 @@ System Group Parameters
      - neovim
 
 ----
+
+
+~~~~~~~~~~~~~~~
+``add-remote-files``
+~~~~~~~~~~~~~~~
+
+| **Type**: ``list<string>``
+| **Description**: Similar to the parameter, ``add-files`` except instead of using a local file as the ``<source>``, the ``<source>`` is a URL to a file. This parameter will download the file to the ``<destination_directory>``. This parameter is optional.
+| **Example**:
+
+.. code-block:: console
+
+   add-remote-files:
+     - http://tau.uoregon.edu/tau.tgz /opt/
+
+----
+
+| **Note**: If the extension of ``<source>`` is ``.tgz`` or ``.tar.gz`` then the file will be unpacked and placed in ``<destination_directory>``.
+
 
 ~~~~~~~~~~~~~~~
 ``add-repo``
@@ -188,7 +209,7 @@ System Group Parameters
 
    add-repo:
      - https://github.com/MyProject/packages.git /opt/packages
-     - --branch development https://github.com/MyProject/packages.git
+     - https://github.com/MyProject/packages.git --branch development
 
 ----
 

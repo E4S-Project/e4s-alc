@@ -54,6 +54,7 @@ Because building scientific packages is not easy, ``e4s-alc`` provides enough fl
    
      -crt, --certificate           Add an SSL certificate
      -a, --os-package              The name of an OS Package to install
+     --add-remote-file             Add a remote file to the container
      --add-repo                    Clone a GitHub repository into the image
      --pre-system-stage-command    Commands to run at the beginning of the system stage
      --post-system-stage-command   Commands to run at the end of the system stage
@@ -119,9 +120,12 @@ Running an ``e4s-alc create`` command with a lot of parameters can become messy.
    
    os-packages: 
      -
-
-   add-repo:
-     - 
+   
+   add-remote-files:
+     -
+   
+   add-repos:
+     -
    
    post-system-stage-commands: 
      -
@@ -157,4 +161,3 @@ Running an ``e4s-alc create`` command with a lot of parameters can become messy.
    
    spack-compiler-matrix:
      -
-   

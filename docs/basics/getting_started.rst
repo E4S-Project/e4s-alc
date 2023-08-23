@@ -90,53 +90,50 @@ The corresponding Dockerfile is shown below. You may notice that the Dockerfile 
 
    # Base Stage
    FROM ubuntu:22.04 AS base-stage
-
+   
            # Set up the environment
            ENV DEBIAN_FRONTEND=noninteractive
            ENV PATH=/spack/bin:$PATH
-
+   
    # System Stage
    FROM base-stage AS system-stage
-
+   
            # Install OS packages
            RUN apt-get update
            RUN apt-get install -y build-essential ca-certificates coreutils curl file \
-                   environment-modules gfortran git gpg lsb-release vim python3 \
-                   python3-distutils python3-venv unzip zip cmake
-
+               environment-modules gfortran git gpg lsb-release vim python3 \
+               python3-distutils python3-venv unzip zip cmake
+   
    # Spack Stage
    FROM system-stage AS spack-stage
-
+   
            # Install Spack version 0.20.1
-           RUN curl -L https://github.com/spack/spack/releases/download/v0.20.1/spack-0.20.1.tar.gz -o /spack.tar.gz
-           RUN gzip -d /spack.tar.gz && tar -xf /spack.tar && rm /spack.tar
-           RUN mv /spack-0.20.1 /spack && . /spack/share/spack/setup-env.sh
-           RUN echo export PATH=/spack/bin:$PATH >> ~/.bashrc
-
+           RUN curl -L https://github.com/spack/spack/releases/download/v0.20.1/spack-0.20.1.tar.gz | tar xz && mv /spack-0.20.1 /spack
+   
            # Setup spack and modules environment
-           RUN echo ". /etc/profile.d/modules.sh" >> /etc/profile.d/setup-env.sh
-           RUN echo ". /spack/share/spack/setup-env.sh" >> /etc/profile.d/setup-env.sh
-           RUN echo "export MODULEPATH=\$(echo \$MODULEPATH | cut -d':' -f1)" >> /etc/profile.d/setup-env.sh
-           RUN echo "spack env activate main" >> /etc/profile.d/setup-env.sh
-
+           RUN echo ". /etc/profile.d/modules.sh" >> /etc/profile.d/setup-env.sh && \
+               echo ". /spack/share/spack/setup-env.sh" >> /etc/profile.d/setup-env.sh && \
+               echo "export MODULEPATH=\$(echo \$MODULEPATH | cut -d':' -f1)" >> /etc/profile.d/setup-env.sh && \
+               echo "spack env activate main" >> /etc/profile.d/setup-env.sh
+   
            # Add modules.yaml file
            RUN curl https://www.nic.uoregon.edu/~cfd/e4s-alc/modules.yaml -o /spack/etc/spack/modules.yaml
-
+   
            # Create a Spack environment
            RUN spack env create main
-
+   
            # Install Spack packages
            RUN . /spack/share/spack/setup-env.sh && spack env activate main && spack install --add zlib
-
+   
            # Update compiler list
            RUN spack compiler find
-
+   
    # Finalize Stage
    FROM spack-stage AS finalize-stage
-
+   
            # Entrypoint of the image
            ENTRYPOINT ["/bin/bash", "-c", ". /etc/profile.d/setup-env.sh && exec /bin/bash"]
-
+   
 ---------------
 Workflow Stages
 ---------------
@@ -168,12 +165,12 @@ System Stage
 
    # System Stage
    FROM base-stage AS system-stage
-
+   
            # Install OS packages
            RUN apt-get update
            RUN apt-get install -y build-essential ca-certificates coreutils curl file \
-                   environment-modules gfortran git gpg lsb-release vim python3 \
-                   python3-distutils python3-venv unzip zip cmake
+               environment-modules gfortran git gpg lsb-release vim python3 \
+               python3-distutils python3-venv unzip zip cmake
 
 Following the base-stage, the system-stage further builds on the base image by installing additional utilities and packages needed for the specific use-case of the Docker image. These packages provide essential functionalities to enable system operations, developer utilities or runtime of applications. This stage helps to customize the image to meet specific requirements.
 
@@ -185,18 +182,15 @@ Spack Stage
 
    # Spack Stage
    FROM system-stage AS spack-stage
-
+   
            # Install Spack version 0.20.1
-           RUN curl -L https://github.com/spack/spack/releases/download/v0.20.1/spack-0.20.1.tar.gz -o /spack.tar.gz
-           RUN gzip -d /spack.tar.gz && tar -xf /spack.tar && rm /spack.tar
-           RUN mv /spack-0.20.1 /spack && . /spack/share/spack/setup-env.sh
-           RUN echo export PATH=/spack/bin:$PATH >> ~/.bashrc
-
+           RUN curl -L https://github.com/spack/spack/releases/download/v0.20.1/spack-0.20.1.tar.gz | tar xz && mv /spack-0.20.1 /spack
+   
            # Setup spack and modules environment
-           RUN echo ". /etc/profile.d/modules.sh" >> /etc/profile.d/setup-env.sh
-           RUN echo ". /spack/share/spack/setup-env.sh" >> /etc/profile.d/setup-env.sh
-           RUN echo "export MODULEPATH=\$(echo \$MODULEPATH | cut -d':' -f1)" >> /etc/profile.d/setup-env.sh
-           RUN echo "spack env activate main" >> /etc/profile.d/setup-env.sh
+           RUN echo ". /etc/profile.d/modules.sh" >> /etc/profile.d/setup-env.sh && \
+               echo ". /spack/share/spack/setup-env.sh" >> /etc/profile.d/setup-env.sh && \
+               echo "export MODULEPATH=\$(echo \$MODULEPATH | cut -d':' -f1)" >> /etc/profile.d/setup-env.sh && \
+               echo "spack env activate main" >> /etc/profile.d/setup-env.sh
 
            # Add modules.yaml file
            RUN curl https://www.nic.uoregon.edu/~cfd/e4s-alc/modules.yaml -o /spack/etc/spack/modules.yaml
