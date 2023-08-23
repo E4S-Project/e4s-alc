@@ -19,4 +19,5 @@ class CreateModel(Model):
         else:
             self.BackendModel = CreateDockerfileModel(arg_namespace)
 
+    def create(self):
         self.BackendModel.create()

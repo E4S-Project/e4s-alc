@@ -24,7 +24,7 @@ class Controller:
         # singularity-specific parameter
         self.repull = repull
         
-        self.backend_str = backend
+        self.backend_str = backend_type
         self.backend = self._initialize_backend(backend_type)
         self.image = self._get_image_os(base_image)
         self.setup_script = '/etc/profile.d/setup-env.sh'
@@ -47,7 +47,7 @@ class Controller:
             return PodmanBackend()
         elif backend_type == 'docker':
             return DockerBackend()
-        elif backend == 'singularity':
+        elif backend_type == 'singularity':
             return SingularityBackend()
         else:
             raise ValueError(f"Unsupported backend type: {backend_type}")

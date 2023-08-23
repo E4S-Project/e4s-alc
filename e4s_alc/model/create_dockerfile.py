@@ -3,7 +3,6 @@ import sys
 import shutil
 import logging
 from e4s_alc.model import Model
-from e4s_alc.conf import get_modules_conf
 from urllib.parse import urlparse
 from e4s_alc.controller.controller import Controller
 from e4s_alc.util import log_function_call

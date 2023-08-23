@@ -3,7 +3,6 @@ import sys
 import shutil
 import logging
 from e4s_alc.model import Model
-from e4s_alc.conf import get_modules_conf
 from e4s_alc.controller.controller import Controller
 
 logger = logging.getLogger('core')
