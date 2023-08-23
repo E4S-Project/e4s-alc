@@ -1,22 +1,30 @@
-E4S A-La-Carte |version| documentation
-==================================================
+===========
+``e4s-alc``
+===========
 
-Introduction
-------------
-
-E4S A-La-Carte is a tool to facilitate the creation of container images complete with the installation of specified spack packages and OS packages.
-
-Supporting the biggest container technologies in HPC like Docker, Podman and Singularity, E4S A-La-Carte creates custom spack integrated images with minimal work.
+``e4s-alc`` (E4S À-la-carte) is a practical software tool designed to simplify the creation of Dockerfiles and Singularityfiles with relevant Spack configurations. Our tool focuses on making the set up of Spack package-loaded containers faster and easier, allowing developers to focus more on their coding and less on system configurations.
 
 .. toctree::
-   :maxdepth: 1
-   :hidden:
+   :maxdepth: 3
+   :caption: Basics
 
-   quickstart
-   installation
-   reference/index
-   backends/index
-   configuration_file
-   user_directory
-   how_it_works
-   authors
+   basics/introduction
+   basics/getting_started
+   basics/basic_usage
+   basics/yaml_parameters
+   basics/tutorial_101
+   basics/tutorial_matrix
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Reference
+
+   reference/using_a_buildcache
+   reference/creating_a_buildcache
+
+.. toctree::
+   :maxdepth: 2
+   :caption: General
+
+   general/use_cases
+   general/contributing
