@@ -66,12 +66,17 @@ certificates:
 os-packages: 
   -
 
+add-remote-files:
+  -
+
+add-repos:
+  -
+
 post-system-stage-commands: 
   -
 
 ####### Spack group #######
 spack: True
-
 pre-spack-stage-commands:
   -
 
@@ -80,14 +85,24 @@ spack-mirrors:
   -
 
 spack-check-signature: True
-modules-env-file: 
+modules-yaml-file: 
 post-spack-install-commands: 
   -
 
-spack-env-file: 
+spack-yaml-file: 
 spack-compiler:
 spack-packages: 
   -
 
 post-spack-stage-commands: 
+  -
+  
+####### Matrix group #######
+registry-image-matrix:
+  -
+
+spack-version-matrix:
+  - 
+
+spack-compiler-matrix:
   -"""
