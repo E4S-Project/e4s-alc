@@ -1,8 +1,33 @@
 import sys
 import logging
+import inspect
+import functools
+
+def get_subpath(path):
+    identifier = 'e4s_alc'
+    if identifier in path:
+        return path[path.index(identifier):]
+    else:
+        return ''
+
+def log_info(message):
+    logger = logging.getLogger('core')
+    logger.info(message)
+
+def log_error(message):
+    logger = logging.getLogger('core')
+    logger.error(message)
+
+def log_function_call(f):
+    @functools.wraps(f)
+    def wrapper(*args, **kwargs):
+        logger = logging.getLogger('core')
+        subpath = get_subpath(inspect.getfile(f))
+        logger.debug(f"{subpath}: Calling: {f.__qualname__}")
+        return f(*args, **kwargs)
+    return wrapper
 
 class Logger:
-
     def __init__(self, log_name, log_file, verbose=False):
         self.logger = logging.getLogger(log_name)
         self.logger.setLevel(logging.DEBUG)  

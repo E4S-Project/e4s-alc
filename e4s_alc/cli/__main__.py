@@ -1,6 +1,5 @@
 import argparse
 from e4s_alc.cli.commands.create import CreateCommand
-from e4s_alc.cli.commands.build import BuildCommand
 from e4s_alc.cli.commands.template import TemplateCommand
 from e4s_alc.cli.cli_view import NoSubparsersMetavarFormatter
 
@@ -27,7 +26,6 @@ class MainCommand():
         # Initialize commands
         commands = [
             CreateCommand(),
-            BuildCommand(),
             TemplateCommand()
         ]
 
