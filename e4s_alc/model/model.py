@@ -62,7 +62,7 @@ class Model():
         self.spack_compiler_matrix = None
 
         self.read_arguments(arg_namespace)
-        self.controller = Controller(self.backend, self.full_image_path)
+        self.controller = Controller(self.backend, self.full_image_path, self.repull)
 
     @log_function_call
     def read_arguments(self, args):
