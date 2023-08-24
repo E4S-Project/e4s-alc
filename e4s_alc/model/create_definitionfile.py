@@ -4,6 +4,7 @@ import shutil
 import logging
 from e4s_alc.model import Model
 from e4s_alc.controller.controller import Controller
+from e4s_alc.util import log_function_call
 
 logger = logging.getLogger('core')
 
@@ -127,17 +128,20 @@ class CreateDefinitionfileModel(Model):
             self.add_line_break("post")
 
     def add_setup_env(self):
-        logger.debug("Adding setup env")
-
         self.add_line('# Setup spack and modules environment\n', "post")
-        for command in self.controller.get_env_setup_commands():
-            self.add_line(f'{command}\n', "post")
+        command = ' && \\\n\t    '.join(self.controller.get_env_setup_commands())
+        self.add_line(f'{command}\n', "post")
         self.add_line_break("post")
 
-        self.add_line('# Move modules.yaml file to correct emplacement\n', "post")
-        self.add_line('mv /modules.yaml /spack/etc/spack/modules.yaml\n', "post")
-        self.add_line_break("post")
-        self.add_line_break("files")
+    def add_modules_file(self):
+        if self.modules_yaml_file:
+            self.add_line('# Add modules.yaml file\n', "files")
+            self.add_line(f'{self.modules_yaml_file} /spack/etc/spack/modules.yaml\n', "files")
+            self.add_line_break("files")
+        else:
+            self.add_line('# Add modules.yaml file\n', "post")
+            self.add_line(f'curl https://www.nic.uoregon.edu/~cfd/e4s-alc/modules.yaml -o /spack/etc/spack/modules.yaml\n', "post")
+            self.add_line_break("post")
 
     def add_post_spack_install_commands(self):
         if self.post_spack_install_commands:
@@ -159,62 +163,11 @@ class CreateDefinitionfileModel(Model):
         self.add_line_break("files")
         self.add_line_break("post")
 
+    @log_function_call
     def add_spack_compiler(self):
-
         if self.spack_compiler:
-            logger.debug("Adding spack compiler")
             self.add_line('# Installing Spack compiler\n', "post")
-
-
-            # Here is where a controller class may be implemented.
-            # There are a lot of niche specs about compilers. 
-            # For instance:
-            #   The llvm package containers the clang compilers.
-            #
-            # More instances:
-            #   package_name_to_compiler_name = {
-            #         "llvm": "clang",
-            #         "intel-oneapi-compilers": "oneapi",
-            #         "llvm-amdgpu": "rocmcc",
-            #         "intel-oneapi-compilers-classic": "intel",
-            #         "acfl": "arm",
-            #   }
-            # 
-            # This is where the implement would be used.
-            # vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv 
-
-            compiler, package, version = None, None, None
-            
-            # Check if self.spack_compiler is 'llvm'
-            if self.spack_compiler == 'llvm':
-                compiler = 'clang'
-            else:
-                # Splitting package and version if '@' is present
-                if '@' in self.spack_compiler:
-                    package, version = self.spack_compiler.split('@', 1)
-
-                # Set 'compiler' based on 'package' if it's not None, otherwise set to self.spack_compiler
-                compiler = 'clang' if package == 'llvm' else package or self.spack_compiler
-
-                if package == 'llvm':
-                    version_suffix = f'@{version}' if version else ''
-
-            # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
-            # This is where the implement would be used.
-            
-            signature_check = ''
-            if not self.spack_check_signature:
-                signature_check = '--no-check-signature '
-
-            spack_compiler_commands = [
-                'spack compiler find',
-                f'spack install {signature_check}{self.spack_compiler}',
-                'spack module tcl refresh -y 1> /dev/null',
-                f'. /etc/profile.d/setup-env.sh && spack load {self.spack_compiler} && spack compiler find',
-                'spack compiler rm "gcc@"$(/usr/bin/gcc -dumpversion)',
-                f'spack config add "packages:all:compiler:[{compiler}]"'
-            ]
-
+            spack_compiler_commands = self.spack_compiler.get_spack_compiler_commands(self.spack_check_signature)
             for command in spack_compiler_commands:
                 self.add_line(f'{command}\n', "post")
             self.add_line_break("post")
@@ -298,8 +251,11 @@ class CreateDefinitionfileModel(Model):
             self.add_pre_spack_stage_commands()
             self.add_spack()
             self.add_spack_mirrors()
-            self.add_setup_env()
             self.add_post_spack_install_commands()
+
+            self.add_setup_env()
+            self.add_modules_file()
+
             self.add_spack_compiler()
             if self.spack_yaml_file:
                 self.add_spack_yaml_install()
