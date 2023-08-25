@@ -42,6 +42,32 @@ class CreateDefinitionfileModel(Model):
                 format_file_spaces = ' '.join(file.split())
                 src_file, dest_file = format_file_spaces.split(' ')
                 self.add_line(f'{src_file} {dest_file}\n', "files")
+                if src_file.endswith('.tar.gz') or src_file.endswith('.tgz'):
+                    command = f'cd {dest_dir} && tar -xzf {src_file} && rm {src_file}'
+                    self.add_line(f'{command}\n', "post")
+
+    def add_remote_files(self):
+        if self.remote_files:
+            self.add_line('# Add remote files from host to container\n')
+            for file_pair in self.remote_files:
+                format_file_spaces = ' '.join(file_pair.split())
+                src_file, dest_dir = format_file_spaces.split(' ')
+                command = f'mkdir -p {dest_dir} && cd {dest_dir} && curl -L '
+                if src_file.endswith('.tar.gz') or src_file.endswith('.tgz'):
+                    command += f'{src_file} | tar -xz'
+                else:
+                    command += f'-O {src_file}'
+
+                self.add_line(f'{command}\n', "post")
+            self.add_line_break()
+
+    @log_function_call
+    def add_repos(self):
+        if self.git_repos:
+            self.add_line('# Clone GitHub repos\n')
+            for repo in self.git_repos:
+                self.add_line(f'RUN git clone {repo}\n')
+            self.add_line_break()
 
     def add_env_variables(self):
         self.env_vars.extend(['DEBIAN_FRONTEND=noninteractive', 'PATH=/spack/bin:$PATH'])
