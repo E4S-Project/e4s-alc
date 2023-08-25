@@ -37,7 +37,8 @@ pre-spack-stage-commands:
 
 spack: True
 spack-version: latest
-spack-env-file: ./light_spack.yaml
+spack-compiler: gcc@10.3.0
+spack-yaml-file: ./light_spack.yaml
 
 post-spack-stage-commands:
   - echo "post spack command 1"
