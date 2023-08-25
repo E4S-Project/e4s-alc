@@ -159,7 +159,8 @@ class CreateDefinitionfileModel(Model):
         logger.debug("Adding spack env install commands")
         self.add_line('# Add Spack env file\n', "files")
         self.add_line(f'{self.spack_yaml_file} /spack.yaml\n', "files")
-        self.add_line(f'spack --env / install {signature_check}\n', "post")
+        self.add_line(f'spack env create main /spack.yaml\n', "post")
+        self.add_line(f'spack --env main install {signature_check}\n', "post")
         self.add_line_break("files")
         self.add_line_break("post")
 
