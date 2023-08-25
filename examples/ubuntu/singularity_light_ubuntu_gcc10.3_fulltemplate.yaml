@@ -1,0 +1,43 @@
+######## Base group ########
+backend: singularity
+bootstrap: library 
+registry:
+image: ubuntu:latest
+repull: False
+
+initial-commands:
+ - echo "initial command 1" 
+ - echo "initial command 2" 
+
+env-variables:
+ - TEST_ENV="testing ENV"
+ - export TEST_ENV_2="testing ENV 2"
+
+add-files:
+  - ./light_ubuntu@20.04-yaml.yaml /yaml_file.yaml
+
+post-base-stage-commands:
+  - echo "post base command 1"
+
+pre-system-stage-commands:
+  - echo "pre system command 1"
+
+certificates:
+  - ./light_ubuntu@20.04-yaml.yaml /yaml_file_2.yaml
+
+os-packages:
+  - cowsay
+
+post-system-stage-commands:
+  - echo "post system command 1"
+
+####### Spack group #######
+pre-spack-stage-commands:
+  - echo "pre spack command 1"
+
+spack: True
+spack-version: latest
+spack-env-file: ./light_spack.yaml
+
+post-spack-stage-commands:
+  - echo "post spack command 1"
