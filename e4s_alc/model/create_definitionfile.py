@@ -263,7 +263,6 @@ class CreateDefinitionfileModel(Model):
     def create_files(self):
         self.add_line('%files\n', "files", indent=False)
         self.add_local_files()
-        self.add_remote_files()
 
     def create_post(self):
         self.add_line('%post\n', "post", indent=False)
