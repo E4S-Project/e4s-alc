@@ -40,15 +40,15 @@ class CreateDefinitionfileModel(Model):
             logger.debug("Adding local files")
             for file in self.local_files:
                 format_file_spaces = ' '.join(file.split())
-                src_file, dest_file = format_file_spaces.split(' ')
-                self.add_line(f'{src_file} {dest_file}\n', "files")
+                src_file, dest_dir = format_file_spaces.split(' ')
+                self.add_line(f'{src_file} {dest_dir}\n', "files")
                 if src_file.endswith('.tar.gz') or src_file.endswith('.tgz'):
                     command = f'cd {dest_dir} && tar -xzf {src_file} && rm {src_file}'
                     self.add_line(f'{command}\n', "post")
 
     def add_remote_files(self):
         if self.remote_files:
-            self.add_line('# Add remote files from host to container\n')
+            self.add_line('# Add remote files from host to container\n', "post")
             for file_pair in self.remote_files:
                 format_file_spaces = ' '.join(file_pair.split())
                 src_file, dest_dir = format_file_spaces.split(' ')
@@ -59,15 +59,15 @@ class CreateDefinitionfileModel(Model):
                     command += f'-O {src_file}'
 
                 self.add_line(f'{command}\n', "post")
-            self.add_line_break()
+            self.add_line_break("post")
 
     @log_function_call
     def add_repos(self):
         if self.git_repos:
-            self.add_line('# Clone GitHub repos\n')
+            self.add_line('# Clone GitHub repos\n', "post")
             for repo in self.git_repos:
-                self.add_line(f'RUN git clone {repo}\n')
-            self.add_line_break()
+                self.add_line(f'git clone {repo}\n', "post")
+            self.add_line_break("post")
 
     def add_env_variables(self):
         self.env_vars.extend(['DEBIAN_FRONTEND=noninteractive', 'PATH=/spack/bin:$PATH'])
@@ -263,6 +263,7 @@ class CreateDefinitionfileModel(Model):
     def create_files(self):
         self.add_line('%files\n', "files", indent=False)
         self.add_local_files()
+        self.add_remote_files()
 
     def create_post(self):
         self.add_line('%post\n', "post", indent=False)
@@ -273,6 +274,8 @@ class CreateDefinitionfileModel(Model):
         self.add_pre_system_stage_commands()
         self.add_certificates()
         self.add_os_package_commands()
+        self.add_remote_files()
+        self.add_repos()
         self.add_post_system_stage_commands()
         if self.spack_install:
             self.add_pre_spack_stage_commands()
