@@ -19,14 +19,18 @@ add-files:
 post-base-stage-commands:
   - echo "post base command 1"
 
+####### System group #######
 pre-system-stage-commands:
   - echo "pre system command 1"
 
-certificates:
-  - ./light_ubuntu@20.04-yaml.yaml /yaml_file_2.yaml
-
 os-packages:
   - cowsay
+
+add-remote-files:
+  - https://www.nic.uoregon.edu/~cfd/e4s-alc/modules.yaml /testing_remotefiles.txt
+
+add-repos:
+  - https://github.com/E4S-Project/e4s-alc
 
 post-system-stage-commands:
   - echo "post system command 1"
