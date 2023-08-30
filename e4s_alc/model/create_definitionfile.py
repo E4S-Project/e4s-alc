@@ -134,8 +134,9 @@ class CreateDefinitionfileModel(Model):
 
         spack_install_commands = [
             f'curl -L {spack_url} -o /spack.tar.gz',
-            'gzip -d /spack.tar.gz && tar -xf /spack.tar && rm /spack.tar',
-            f'mv /spack-{self.spack_version} /spack && . /spack/share/spack/setup-env.sh',
+            'mkdir /untared_spack',
+            'gzip -d /spack.tar.gz && tar -xf /spack.tar -C /untared_spack && rm /spack.tar',
+            f'mv /untared_spack/spack-{self.spack_version} /spack && . /spack/share/spack/setup-env.sh',
             'echo export PATH=/spack/bin:$PATH >> ~/.bashrc'
         ]
 
