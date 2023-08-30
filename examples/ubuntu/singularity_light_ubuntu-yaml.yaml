@@ -1,0 +1,11 @@
+######## Base group ########
+backend: singularity
+bootstrap: library 
+registry:
+image: ubuntu:latest
+repull: False
+
+####### Spack group #######
+spack: True
+spack-version: latest
+spack-yaml-file: ./light_spack.yaml
