@@ -54,9 +54,9 @@ class CreateDefinitionfileModel(Model):
                 src_file, dest_dir = format_file_spaces.split(' ')
                 command = f'mkdir -p {dest_dir} && cd {dest_dir} && curl -L '
                 if src_file.endswith('.tar.gz') or src_file.endswith('.tgz'):
-                    command += f'{src_file} | tar -xz'
+                    command += f'{src_file} | tar -xz && cd -'
                 else:
-                    command += f'-O {src_file}'
+                    command += f'-O {src_file} && cd -'
 
                 self.add_line(f'{command}\n', "post")
             self.add_line_break("post")
@@ -129,20 +129,10 @@ class CreateDefinitionfileModel(Model):
 
     # Spack group
     def add_spack(self):
-        logger.debug("Adding spack")
-        spack_url = f'https://github.com/spack/spack/releases/download/v{self.spack_version}/spack-{self.spack_version}.tar.gz'
-
-        spack_install_commands = [
-            f'curl -L {spack_url} -o /spack.tar.gz',
-            'mkdir /untared_spack',
-            'gzip -d /spack.tar.gz && tar -xf /spack.tar -C /untared_spack && rm /spack.tar',
-            f'mv /untared_spack/spack-{self.spack_version} /spack && . /spack/share/spack/setup-env.sh',
-            'echo export PATH=/spack/bin:$PATH >> ~/.bashrc'
-        ]
-
         self.add_line(f'# Install Spack version {self.spack_version}\n', "post")
-        for command in spack_install_commands:
-            self.add_line(f'{command}\n', "post")
+        spack_url = f'https://github.com/spack/spack/releases/download/v{self.spack_version}/spack-{self.spack_version}.tar.gz'
+        command = f'curl -L {spack_url} | tar xz && mv /spack-{self.spack_version} /spack'
+        self.add_line(f'{command}\n', "post")
         self.add_line_break("post")
 
     def add_spack_mirrors(self):
@@ -268,6 +258,8 @@ class CreateDefinitionfileModel(Model):
     def create_post(self):
         self.add_line('%post\n', "post", indent=False)
         self.add_line('export DEBIAN_FRONTEND=noninteractive\n', "post")
+        if self.spack_install:
+            self.add_line('export PATH=/spack/bin:$PATH\n', "post")
         self.add_line_break("post")
         self.add_initial_commands()
         self.add_post_base_stage_commands()
