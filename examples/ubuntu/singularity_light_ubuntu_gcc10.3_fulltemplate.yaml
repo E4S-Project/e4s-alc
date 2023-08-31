@@ -27,7 +27,7 @@ os-packages:
   - cowsay
 
 add-remote-files:
-  - https://www.nic.uoregon.edu/~cfd/e4s-alc/modules.yaml /testing_remotefiles.txt
+  - https://www.nic.uoregon.edu/~cfd/e4s-alc/modules.yaml /testing_remotefiles
 
 add-repos:
   - https://github.com/E4S-Project/e4s-alc
