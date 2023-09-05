@@ -197,6 +197,7 @@ class CreateDockerfileModel(Model):
         self.add_line(f'COPY {self.spack_yaml_file} /spack.yaml\n')
         self.add_line(f'RUN spack env create main /spack.yaml\n')
         self.add_line(f'RUN spack --env main install {signature_check}\n')
+        self.add_line(f'RUN echo "spack env activate main" >> {self.controller.setup_script}\n')
         self.add_line_break()
 
     @log_function_call
@@ -212,6 +213,7 @@ class CreateDockerfileModel(Model):
             spack_compiler_commands = self.spack_compiler.get_spack_compiler_commands(self.spack_check_signature)
             for command in spack_compiler_commands:
                 self.add_line(f'RUN {command}\n')
+            self.add_line(f'RUN echo "spack load {self.spack_compiler.spack_compiler}" >> {self.controller.setup_script}\n')
             self.add_line_break()
 
     @log_function_call

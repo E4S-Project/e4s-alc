@@ -194,8 +194,7 @@ class Controller:
         commands = [
             f'echo ". /etc/profile.d/modules.sh" >> {self.setup_script}',
             f'echo ". /spack/share/spack/setup-env.sh" >> {self.setup_script}',
-            f'echo "export MODULEPATH=\$(echo \$MODULEPATH | cut -d\':\' -f1)" >> {self.setup_script}',
-            f'echo "spack env activate main" >> {self.setup_script}'
+            f'echo "export MODULEPATH=\$(echo \$MODULEPATH | cut -d\':\' -f1)" >> {self.setup_script}'
         ]
         return commands
 

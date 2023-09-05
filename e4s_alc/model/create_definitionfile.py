@@ -178,6 +178,7 @@ class CreateDefinitionfileModel(Model):
         self.add_line(f'{self.spack_yaml_file} /spack.yaml\n', "files")
         self.add_line(f'spack env create main /spack.yaml\n', "post")
         self.add_line(f'spack --env main install {signature_check}\n', "post")
+        self.add_line(f'echo "spack env activate main" >> {self.controller.setup_script}\n', "post")
         self.add_line_break("files")
         self.add_line_break("post")
 
@@ -188,6 +189,8 @@ class CreateDefinitionfileModel(Model):
             spack_compiler_commands = self.spack_compiler.get_spack_compiler_commands(self.spack_check_signature)
             for command in spack_compiler_commands:
                 self.add_line(f'{command}\n', "post")
+            self.add_line(f'echo "spack load {self.spack_compiler.spack_compiler}" >> {self.controller.setup_script}\n', "post")
+            self.add_line(f'echo "spack compiler find " >> {self.controller.setup_script}\n', "post")
             self.add_line_break("post")
 
     def add_spack_packages(self):
