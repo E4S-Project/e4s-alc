@@ -1,6 +1,5 @@
 ######## Base group ########
 backend: singularity
-bootstrap: library 
 registry:
 image: ubuntu:latest
 repull: False
