@@ -110,7 +110,7 @@ class Model():
         self.modules_yaml_file = args.get('modules-yaml-file', None)
         self.spack_compiler = args.get('spack-compiler', None)
         if self.spack_compiler:
-            self.spack_compiler = Compiler(self.spack_compiler) 
+            self.spack_compiler = Compiler(self.spack_compiler, self.backend)
 
         self.spack_yaml_file = args.get('spack-yaml-file', None)
         self.spack_packages = self.remove_nones(args.get('spack-packages', []))
