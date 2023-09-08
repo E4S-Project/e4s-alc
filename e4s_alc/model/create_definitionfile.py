@@ -191,6 +191,7 @@ class CreateDefinitionfileModel(Model):
                 self.add_line(f'{command}\n', "post")
             self.add_line(f'echo "spack load {self.spack_compiler.spack_compiler}" >> {self.controller.setup_script}\n', "post")
             self.add_line(f'echo "spack compiler find " >> {self.controller.setup_script}\n', "post")
+            self.add_line(f'echo "spack config add \'packages:all:compiler:[{self.spack_compiler.spack_compiler}]\'" >> {self.controller.setup_script}\n', "post")
             self.add_line_break("post")
 
     def add_spack_packages(self):
