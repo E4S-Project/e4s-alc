@@ -20,13 +20,14 @@ class Compiler:
     }
 
     @log_function_call
-    def __init__(self, spack_compiler):
+    def __init__(self, spack_compiler, backend):
         """Initialize Compiler instance with spack compiler name string.
 
         Args:
             spack_compiler (str): The compiler name as parsed by spack.
         """
         self.spack_compiler = spack_compiler
+        self.backend = backend
         self.compiler, self.package, self.version, self.version_suffix = self._parse_compiler_info()
 
     @log_function_call
@@ -63,9 +64,9 @@ class Compiler:
         spack_compiler_commands = [
             "spack compiler find",
             f"spack install {signature_flag}{self.spack_compiler}",
-            "spack module tcl refresh -y 1> /dev/null",
-            f". /spack/share/spack/setup-env.sh && spack load {self.spack_compiler} && spack compiler find",
-            f"spack config add 'packages:all:compiler:[{self.compiler}{self.version_suffix}]'",
-        ]
+            "spack module tcl refresh -y 1> /dev/null"]
+        if self.backend != "singularity":
+            spack_compiler_commands = spack_compiler_commands + [f". /spack/share/spack/setup-env.sh && spack load {self.spack_compiler} && spack compiler find",
+            f"spack config add 'packages:all:compiler:[{self.compiler}{self.version_suffix}]'"]
 
         return spack_compiler_commands

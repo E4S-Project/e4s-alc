@@ -14,8 +14,19 @@ class Model():
         self.controller = None
         self.instructions = []
 
+        # Definition file specific attributes
+        self.name = ''
+        self.header = []
+        self.environment = []
+        self.files = []
+        self.post = []
+        self.startscript = []
+        self.runscript = []
+        self.repull = None
+
         # Base group
         self.backend = None
+        self.bootstrap = None
         self.base_image = None
         self.image_registry = None
         self.full_image_path = None
@@ -51,13 +62,20 @@ class Model():
         self.spack_compiler_matrix = None
 
         self.read_arguments(arg_namespace)
-        self.controller = Controller(self.backend, self.full_image_path)
+        self.controller = Controller(self.backend, self.full_image_path, self.repull)
 
     @log_function_call
     def read_arguments(self, args):
+        
+        # Output file name
+        self.name = args.get('name', None)
+
+        # Definition file specific attributes
+        self.repull = args.get('repull', None)
 
         # Base group
         self.backend = args.get('backend', None)
+        self.bootstrap = args.get('bootstrap', None)
         if not self.backend:
             self.backend = self.discover_backend()
 
@@ -92,7 +110,7 @@ class Model():
         self.modules_yaml_file = args.get('modules-yaml-file', None)
         self.spack_compiler = args.get('spack-compiler', None)
         if self.spack_compiler:
-            self.spack_compiler = Compiler(self.spack_compiler) 
+            self.spack_compiler = Compiler(self.spack_compiler, self.backend)
 
         self.spack_yaml_file = args.get('spack-yaml-file', None)
         self.spack_packages = self.remove_nones(args.get('spack-packages', []))

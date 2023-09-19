@@ -1,9 +1,11 @@
 ######## Base group ########
-backend: podman
+backend: singularity
 registry: 
-image: ubuntu:20.04
+image: ubuntu:latest
+repull: False
 
 ####### Spack group #######
 spack: True
 spack-version: latest
+spack-compiler: gcc@10.3.0
 spack-yaml-file: ./light_spack.yaml

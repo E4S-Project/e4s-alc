@@ -1,7 +1,9 @@
 ######## Base group ########
-backend: podman
-registry: 
-image: ubuntu:20.04
+backend: singularity
+bootstrap: library 
+registry:
+image: ubuntu:latest
+repull: False
 
 ####### Spack group #######
 spack: True

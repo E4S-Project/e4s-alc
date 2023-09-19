@@ -30,13 +30,14 @@ class CreateCommand(AbstractCommand):
 
         self.parser.add_argument('-h', '--help', help='Display the help page', default=False, action='store_true', dest='help')
         self.parser.add_argument('-v', '--verbose', help='Verbose mode', default=False, action='store_true', dest='verbose')
+        self.parser.add_argument('-n', '--name', help='Name of the output file')
 
         file_group_args = self.parser.add_argument_group('Load Arguments by file')
         file_group_args.add_argument('-f', '--file', help='The file used to create a new image')
         
         base_group_desc = 'The base stage of the Dockerfile provides the foundation of the image.'
         base_group_args = self.parser.add_argument_group('Base Stage Arguments', base_group_desc)
-        base_group_args.add_argument('-b', '--backend', help='The container backend used for image inspection')
+        base_group_args.add_argument('-b', '--backend', help='The container backend used for image inspection. Available backends are Docker, Podman and Singularity')
         base_group_args.add_argument('-i', '--image', help='The base image name <image:tag>')
         base_group_args.add_argument('-r', '--registry', help='The image registry to search for the base image')
         base_group_args.add_argument('--env-variable', help='Set an environment variable inside the container', action='append', default=[], dest='env-variables')
