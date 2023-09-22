@@ -1,22 +1,19 @@
-from e4s_alc.util import log_function_call
-from e4s_alc.controller.image import SlesImage, CentosImage, UbuntuImage, RhelImage, RockyImage
-from e4s_alc.controller.backend import DockerBackend, PodmanBackend
+from e4s_alc.util import log_function_call, log_info, log_error
+from e4s_alc.controller.image import UbuntuImage, RhelImage, RockyImage
+from e4s_alc.controller.backend import DockerBackend, PodmanBackend, SingularityBackend
 
 class Controller:
     """
     Class for managing container images and performing operations with them using specified backend.
     """
 
-    _image_os_dict = {'sles': SlesImage,
-                      'centos': CentosImage,
-                      'ubuntu': UbuntuImage,
+    _image_os_dict = {'ubuntu': UbuntuImage,
                       'rhel': RhelImage,
                       'rocky': RockyImage}
-
     _image_cache = {}
 
     @log_function_call
-    def __init__(self, backend_type, base_image):
+    def __init__(self, backend_type, base_image, repull=None):
         """
         Initializes a Controller instance.
 
@@ -24,6 +21,10 @@ class Controller:
             backend_type (str): Type of backend to be used (either `podman` or `docker`).
             base_image (str): Base image to be used.
         """
+        # singularity-specific parameter
+        self.repull = repull
+        
+        self.backend_str = backend_type
         self.backend = self._initialize_backend(backend_type)
         self.image = self._get_image_os(base_image)
         self.setup_script = '/etc/profile.d/setup-env.sh'
@@ -46,6 +47,8 @@ class Controller:
             return PodmanBackend()
         elif backend_type == 'docker':
             return DockerBackend()
+        elif backend_type == 'singularity':
+            return SingularityBackend()
         else:
             raise ValueError(f"Unsupported backend type: {backend_type}")
 
@@ -62,33 +65,41 @@ class Controller:
         """
         image, tag = base_image, 'latest'
         if ':' in base_image:
-            image, tag = base_image.split(':')
+            image, tag = base_image.rsplit(':', 1)
+
+        log_info(f"Image: {image}, Tag: {tag}")
         return image, tag
 
     @log_function_call
     def _get_image_os(self, base_image):
         """
         Retrieves the operating system of the base image.
-
+        
         Args:
             base_image (str): Base image from which to get the operating system.
 
         Returns:
             Image: Instance of the Image class corresponding to the operating system.
         """
+
         image, tag = self._split_image_and_tag(base_image)
         image_key = f'{image}:{tag}'
 
         if image_key in self._image_cache:
+            log_info("Image key found in image cache.")
             self.os_release = self._image_cache[image_key]
         else:
-            self.os_release = self._pull_and_get_os_release(image, tag, image_key)
+            log_info("Image key not found in image cache. Pulling and getting os release.")
+            self.os_release = self._pull_and_get_os_release(image, tag, image_key, self.repull)
 
         os_id = self.get_os_id()
-        return self._image_os_dict[os_id](self.os_release) if os_id in self._image_os_dict else None
+        image_os = self._image_os_dict[os_id](self.os_release) if os_id in self._image_os_dict else None
+        log_info(f"Final image_os: {image_os}")
+
+        return image_os
 
     @log_function_call
-    def _pull_and_get_os_release(self, image, tag, image_key):
+    def _pull_and_get_os_release(self, image, tag, image_key, repull):
         """
         Pulls the specified image and retrieves its operating system release.
 
@@ -100,9 +111,18 @@ class Controller:
         Returns:
             dict: Dictionary containing release information of the operating system.
         """
-        self.backend.pull(image, tag)
+        if self.backend_str == "singularity":
+            self.backend.pull(image, tag, repull)
+        else:
+            self.backend.pull(image, tag)
+
+        log_info("Getting OS release from backend.")
         os_release = self.backend.get_os_release(image, tag)
+
+        log_info(f"Caching OS release with image_key: {image_key}.")
         self._image_cache[image_key] = os_release
+
+        log_info(f"Returning OS release: {os_release}.")
         return os_release
 
     @log_function_call
@@ -166,16 +186,6 @@ class Controller:
     @log_function_call
     def get_env_setup_commands(self):
         """
-        Retrieves the environment setup commands.
-
-        Returns:
-            list: List of environment setup commands.
-        """
-        return self._generate_env_setup_commands()
-
-    @log_function_call
-    def _generate_env_setup_commands(self):
-        """
         Generates the environment setup commands and returns them.
 
         Returns:
@@ -184,8 +194,7 @@ class Controller:
         commands = [
             f'echo ". /etc/profile.d/modules.sh" >> {self.setup_script}',
             f'echo ". /spack/share/spack/setup-env.sh" >> {self.setup_script}',
-            f'echo "export MODULEPATH=\$(echo \$MODULEPATH | cut -d\':\' -f1)" >> {self.setup_script}',
-            f'echo "spack env activate main" >> {self.setup_script}'
+            f'echo "export MODULEPATH=\$(echo \$MODULEPATH | cut -d\':\' -f1)" >> {self.setup_script}'
         ]
         return commands
 

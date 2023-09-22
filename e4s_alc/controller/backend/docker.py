@@ -1,7 +1,7 @@
 import os
 import subprocess
 from e4s_alc.controller.backend import ContainerBackend
-from e4s_alc.util import log_function_call, BackendFailedError
+from e4s_alc.util import log_function_call, log_info, log_error, BackendFailedError
 
 class DockerBackend(ContainerBackend):
     """
@@ -17,7 +17,7 @@ class DockerBackend(ContainerBackend):
         self.program = 'docker'
 
     @log_function_call
-    def execute_system_command(self, command):
+    def system_call(self, command):
         """
         Execute the given system command and raise an exception if it fails
 
@@ -27,13 +27,15 @@ class DockerBackend(ContainerBackend):
         Returns:
             bool: True if command execution is successful
         """
+        log_info(f"Executing command: {command}")
         call_success = not os.system(command)
         if not call_success:
+            log_error(f"Command execution failed. Raising BackendFailedError for program: {self.program}")
             raise BackendFailedError(self.program, command)
         return call_success
 
     @log_function_call
-    def execute_subprocess_command(self, command):
+    def subprocess_call(self, command):
         """
         Execute subprocess command and return its output
 
@@ -43,8 +45,10 @@ class DockerBackend(ContainerBackend):
         Returns:
             str: Output of the command
         """
+        log_info(f"Executing command: {command}")
         output = subprocess.check_output(command, shell=True)
         if not output:
+            log_error(f"Command execution failed. Raising BackendFailedError for program: {self.program}")
             raise BackendFailedError(self.program, command)
         return output
 
@@ -58,7 +62,7 @@ class DockerBackend(ContainerBackend):
             tag (str): Image tag
         """
         pull_command = f'{self.program} pull {image}:{tag}'
-        self.execute_system_command(pull_command)
+        self.system_call(pull_command)
 
     @log_function_call
     def get_os_release(self, image, tag):
@@ -74,10 +78,14 @@ class DockerBackend(ContainerBackend):
         """
         container_command = 'cat /etc/os-release'
         run_command = f'{self.program} run {image}:{tag} {container_command}'
-        system_command_output = self.execute_subprocess_command(run_command)
 
+        log_info("Executing subprocess command.")
+        system_command_output = self.subprocess_call(run_command)
+
+        log_info("Cleaning up.")
         self.clean_up()
 
+        log_info("Parsing OS release.")
         os_release = self.parse_os_release(system_command_output)
         return os_release
 
@@ -87,10 +95,12 @@ class DockerBackend(ContainerBackend):
         Stops and removes the running Docker container
         """
         stop_container_command = f'{self.program} stop $({self.program} ps -l -q) &> /dev/null'
-        self.execute_system_command(stop_container_command)
+        log_info("Executing stop container command.")
+        self.system_call(stop_container_command)
 
         remove_container_command = f'{self.program} rm $({self.program} ps -l -q) &> /dev/null'
-        self.execute_system_command(remove_container_command)
+        log_info("Executing remove container command.")
+        self.system_call(remove_container_command)
 
     @log_function_call
     def parse_os_release(self, system_command_output):

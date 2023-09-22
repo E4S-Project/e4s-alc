@@ -1,7 +1,7 @@
 import os
 import subprocess
 from e4s_alc.controller import Controller, Compiler
-from e4s_alc.util import log_function_call, BackendMissingError, YAMLNotFoundError
+from e4s_alc.util import log_function_call, log_info, log_error, BackendMissingError, YAMLNotFoundError
 
 class Model():
 
@@ -14,8 +14,19 @@ class Model():
         self.controller = None
         self.instructions = []
 
+        # Definition file specific attributes
+        self.name = ''
+        self.header = []
+        self.environment = []
+        self.files = []
+        self.post = []
+        self.startscript = []
+        self.runscript = []
+        self.repull = None
+
         # Base group
         self.backend = None
+        self.bootstrap = None
         self.base_image = None
         self.image_registry = None
         self.full_image_path = None
@@ -27,6 +38,8 @@ class Model():
         # System group
         self.certificates = None
         self.os_packages = None
+        self.remote_files = None
+        self.git_repos = None
         self.pre_system_stage_commands = None
         self.post_system_stage_commands = None
 
@@ -49,17 +62,23 @@ class Model():
         self.spack_compiler_matrix = None
 
         self.read_arguments(arg_namespace)
-        self.controller = Controller(self.backend, self.full_image_path)
+        self.controller = Controller(self.backend, self.full_image_path, self.repull)
 
     @log_function_call
     def read_arguments(self, args):
+        
+        # Output file name
+        self.name = args.get('name', None)
+
+        # Definition file specific attributes
+        self.repull = args.get('repull', None)
 
         # Base group
         self.backend = args.get('backend', None)
+        self.bootstrap = args.get('bootstrap', None)
         if not self.backend:
             self.backend = self.discover_backend()
 
-        self.backend = args.get('backend', self.discover_backend())
         self.base_image = args.get('image', None)
         self.image_registry = self.none_to_blank(args.get('registry', ''))
         if self.image_registry:
@@ -74,8 +93,9 @@ class Model():
 
         # System group
         self.os_packages = self.remove_nones(args.get('os-packages', []))
-        self.git_repos = self.remove_nones(args.get('add-repos', []))
         self.certificates = self.remove_nones(args.get('certificates', []))
+        self.remote_files = self.remove_nones(args.get('add-remote-files', []))
+        self.git_repos = self.remove_nones(args.get('add-repos', []))
         self.pre_system_stage_commands = self.remove_nones(args.get('pre-system-stage-commands', []))
         self.post_system_stage_commands = self.remove_nones(args.get('post-system-stage-commands', []))
 
@@ -90,7 +110,7 @@ class Model():
         self.modules_yaml_file = args.get('modules-yaml-file', None)
         self.spack_compiler = args.get('spack-compiler', None)
         if self.spack_compiler:
-            self.spack_compiler = Compiler(self.spack_compiler) 
+            self.spack_compiler = Compiler(self.spack_compiler, self.backend)
 
         self.spack_yaml_file = args.get('spack-yaml-file', None)
         self.spack_packages = self.remove_nones(args.get('spack-packages', []))
@@ -105,18 +125,15 @@ class Model():
             self.spack_version_matrix = args.get('spack-version-matrix', [])
             self.spack_compiler_matrix = args.get('spack-compiler-matrix', [])
 
-    @log_function_call
     def remove_nones(self, l):
         return [s for s in l if s != None]
 
-    @log_function_call
     def string_to_bool(self, s):
         if isinstance(s, str):
             return s.lower() == 'true'
         if isinstance(s, bool):
             return s
 
-    @log_function_call
     def none_to_blank(self, n):
         if n == None: 
             return ''
@@ -127,21 +144,27 @@ class Model():
     def discover_backend(self):        
         # Capture exit status of container version
         # The exit status is flipped to return a True/False
+        log_info("Checking for podman...")
         podman_check = not os.system('podman -v &> /dev/null')
-        docker_check = not os.system('docker -v &> /dev/null')
-
+        
         if podman_check:
-            return 'podman' 
-
+            log_info("Podman found.")
+            return 'podman'
+        
+        log_info("Checking for docker...")
+        docker_check = not os.system('docker -v &> /dev/null')
+        
         if docker_check:
+            log_info("Docker found.")
             return 'docker'
-
-        raise BackendMissingError        
+        
+        log_error("No backend (podman or docker) found.")
+        raise BackendMissingError
 
     @log_function_call
     def discover_latest_spack_version(self):
-
         if Model._spack_version_cache:
+            log_info("Found cached spack version: " + Model._spack_version_cache)
             return Model._spack_version_cache
 
         # create the curl, grep, and sed commands as strings
@@ -151,13 +174,16 @@ class Model():
 
         # add the commands together
         full_command = curl_command + " | " + grep_command + " | " + sed_command
-        
+        log_info("Final command to execute: " + full_command)
+
         output = subprocess.check_output(full_command, shell=True)
         version_number = output.decode('utf-8').strip().replace('v', '')
 
         if not version_number:
-            print('Failed to discover latest Spack version. Defaulting to Spack v0.20.1')
+            log_info('Failed to discover latest Spack version. Defaulting to Spack v0.20.1')
             version_number = '0.20.1'
+        else:
+            log_info('Discovered latest spack version: ' + version_number)
 
         Model._spack_version_cache = version_number
-        return version_number 
+        return version_number

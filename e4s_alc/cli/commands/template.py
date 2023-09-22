@@ -20,6 +20,7 @@ class TemplateCommand(AbstractCommand):
                                             )
  
         self.parser.add_argument('-o', '--output', type=str, choices=['json', 'yaml'], help='Choose a format to output a message: json or yaml', default='yaml')
+        self.parser.add_argument('-n', '--name', help='Name of the output file')
         self.parser.add_argument('-h', '--help', help='Display the help page', default=False, action='store_true', dest='help')
         return {'command': self, 'parser': self.parser}
 
@@ -43,9 +44,6 @@ backend:
 registry:
 image:
 
-# registry-image-matrix:
-#   -
-
 initial-commands:
   -
 
@@ -68,21 +66,21 @@ certificates:
 os-packages: 
   -
 
+add-remote-files:
+  -
+
+add-repos:
+  -
+
 post-system-stage-commands: 
   -
 
 ####### Spack group #######
 spack: True
-
 pre-spack-stage-commands:
   -
 
 spack-version:
-
-# spack-version-matrix:
-#   - 
-
-
 spack-mirrors:
   -
 
@@ -93,12 +91,18 @@ post-spack-install-commands:
 
 spack-yaml-file: 
 spack-compiler:
-
-# spack-compiler-matrix:
-#   - 
-
 spack-packages: 
   -
 
 post-spack-stage-commands: 
+  -
+  
+####### Matrix group #######
+registry-image-matrix:
+  -
+
+spack-version-matrix:
+  - 
+
+spack-compiler-matrix:
   -"""

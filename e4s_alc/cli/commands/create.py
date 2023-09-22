@@ -30,17 +30,18 @@ class CreateCommand(AbstractCommand):
 
         self.parser.add_argument('-h', '--help', help='Display the help page', default=False, action='store_true', dest='help')
         self.parser.add_argument('-v', '--verbose', help='Verbose mode', default=False, action='store_true', dest='verbose')
+        self.parser.add_argument('-n', '--name', help='Name of the output file')
 
         file_group_args = self.parser.add_argument_group('Load Arguments by file')
         file_group_args.add_argument('-f', '--file', help='The file used to create a new image')
         
         base_group_desc = 'The base stage of the Dockerfile provides the foundation of the image.'
         base_group_args = self.parser.add_argument_group('Base Stage Arguments', base_group_desc)
-        base_group_args.add_argument('-b', '--backend', help='The container backend used for image inspection')
+        base_group_args.add_argument('-b', '--backend', help='The container backend used for image inspection. Available backends are Docker, Podman and Singularity')
         base_group_args.add_argument('-i', '--image', help='The base image name <image:tag>')
         base_group_args.add_argument('-r', '--registry', help='The image registry to search for the base image')
-        base_group_args.add_argument('-ev', '--env-variable', help='Set an environment variable inside the container', action='append', default=[], dest='env-variables')
-        base_group_args.add_argument('-af', '--add-file', help='Add a file to the container', action='append', default=[], dest='add-files')
+        base_group_args.add_argument('--env-variable', help='Set an environment variable inside the container', action='append', default=[], dest='env-variables')
+        base_group_args.add_argument('--add-file', help='Add a file to the container', action='append', default=[], dest='add-files')
         base_group_args.add_argument('--initial-command', help='Commands to run after image is pulled', action='append', default=[], dest='initial-commands')
         base_group_args.add_argument('--post-base-stage-command', help='Commands to run at the end of the base stage', action='append', default=[], dest='post-base-stage-commands')
 
@@ -48,19 +49,20 @@ class CreateCommand(AbstractCommand):
         system_group_args = self.parser.add_argument_group('System Stage Arguments', system_group_desc)
         system_group_args.add_argument('-crt', '--certificate', help='Add an SSL certificate', action='append', default=[], dest='certificates')
         system_group_args.add_argument('-a', '--os-package', help='The name of an OS Package to install', action='append', default=[], dest='os-packages')
-        system_group_args.add_argument('-ar', '--add-repo', help='Clone a GitHub repository into the image', action='append', default=[], dest='add-repos')
+        system_group_args.add_argument('--add-remote-file', help='Add a remote file to the container', action='append', default=[], dest='add-remote-files')
+        system_group_args.add_argument('--add-repo', help='Clone a GitHub repository into the image', action='append', default=[], dest='add-repos')
         system_group_args.add_argument('--pre-system-stage-command', help='Commands to run at the beginning of the system stage', action='append', default=[], dest='pre-system-package-commands')
         system_group_args.add_argument('--post-system-stage-command',  help='Commands to run at the end of the system stage', action='append', default=[], dest='post-system-package-commands')
 
         spack_group_desc = 'The Spack stage of the Dockerfile provides Spack installations for the image.'
         spack_group_args = self.parser.add_argument_group('Spack Stage Arguments', spack_group_desc)
         spack_group_args.add_argument('-s', '--spack', help='Choose to install spack', default=True, dest='spack')
-        spack_group_args.add_argument('-sv', '--spack-version', help='The version of a Spack to install', dest='spack-version')
-        spack_group_args.add_argument('-sm', '--spack-mirrors', help='The Spack mirror URL/Paths for Spack package caches.', default=[], dest='spack-mirrors')
-        spack_group_args.add_argument('-ss', '--spack-check-signature', help='Check for Spack package signature when installing packages from mirror', default=True, dest='spack-check-signature')
-        spack_group_args.add_argument('-me', '--modules-yaml-file', help='The path to a modules.yaml environment file', dest='modules-yaml-file')
-        spack_group_args.add_argument('-sc', '--spack-compiler', help='The Spack compiler that will be installed and will build Spack packages', dest='spack-compiler')
-        spack_group_args.add_argument('-se', '--spack-yaml-file', help='The path to a spack.yaml environment file', dest='spack-yaml-file')
+        spack_group_args.add_argument('--spack-version', help='The version of a Spack to install', dest='spack-version')
+        spack_group_args.add_argument('--spack-mirrors', help='The Spack mirror URL/Paths for Spack package caches.', default=[], dest='spack-mirrors')
+        spack_group_args.add_argument('--spack-check-signature', help='Check for Spack package signature when installing packages from mirror', default=True, dest='spack-check-signature')
+        spack_group_args.add_argument('--modules-yaml-file', help='The path to a modules.yaml environment file', dest='modules-yaml-file')
+        spack_group_args.add_argument('--spack-compiler', help='The Spack compiler that will be installed and will build Spack packages', dest='spack-compiler')
+        spack_group_args.add_argument('--spack-yaml-file', help='The path to a spack.yaml environment file', dest='spack-yaml-file')
         spack_group_args.add_argument('-p', '--spack-package', help='The name of a Spack package to install', action='append', default=[], dest='spack-packages')
         spack_group_args.add_argument('--pre-spack-stage-command', help='Commands to run at the beginning of the spack stage', action='append', default=[], dest='pre-spack-install-commands')
         spack_group_args.add_argument('--post-spack-install-command', help='Commands to run after Spack is installed', action='append', default=[], dest='post-spack-install-commands')
@@ -68,16 +70,19 @@ class CreateCommand(AbstractCommand):
 
         matrix_option_desc = 'The matrix options allow users to build multiple Dockerfiles in one call with.'
         matrix_option_args = self.parser.add_argument_group('Matrix Option Arguments', matrix_option_desc)
-        matrix_option_args.add_argument('-rim', '--registry-image-matrix', help='The registry+image paths for each image to build', action='append', default=[], dest='registry-image-matrix')
-        matrix_option_args.add_argument('-svm', '--spack-version-matrix', help='The Spack version for each image to build', action='append', default=[], dest='spack-version-matrix')
-        matrix_option_args.add_argument('-scm', '--spack-compiler-matrix', help='The Spack compiler for each image to build', action='append', default=[], dest='spack-compiler-matrix')
+        matrix_option_args.add_argument('--registry-image-matrix', help='The registry+image paths for each image to build', action='append', default=[], dest='registry-image-matrix')
+        matrix_option_args.add_argument('--spack-version-matrix', help='The Spack version for each image to build', action='append', default=[], dest='spack-version-matrix')
+        matrix_option_args.add_argument('--spack-compiler-matrix', help='The Spack compiler for each image to build', action='append', default=[], dest='spack-compiler-matrix')
 
         return {'command': self, 'parser': self.parser}
 
     def check_arguments(self, args):
         """Check the arguments passed to the command."""
 
-        logger = Logger('core', '.logs.log', args['verbose'])
+        log_path = '/tmp/e4s-alc/'
+        if not os.path.exists(log_path):
+            os.mkdir(log_path)
+        logger = Logger('core', log_path + 'logs.log', args['verbose'])
 
         if args['help']:
             self.parser.print_help()
