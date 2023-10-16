@@ -149,7 +149,7 @@ class CreateDockerfileModel(Model):
     @log_function_call
     def add_spack(self):
         self.add_line(f'# Install Spack version {self.spack_version}\n')
-        spack_url = f'https://github.com/spack/spack/releases/download/v{self.spack_version}/spack-{self.spack_version}.tar.gz'
+        spack_url = f'https://github.com/spack/spack/archive/refs/tags/v{self.spack_version}.tar.gz'
         command = f'curl -L {spack_url} | tar xz && mv /spack-{self.spack_version} /spack'
         self.add_line(f'RUN {command}\n')
         self.add_line_break()
