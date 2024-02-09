@@ -7,5 +7,4 @@ image: ubi8/ubi
 spack: True
 spack-version: latest
 spack-compiler: gcc@11.2
-spack-packages: 
-  - trilinos
+spack-yaml-file: spack.yaml

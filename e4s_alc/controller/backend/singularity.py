@@ -23,11 +23,15 @@ class SingularityBackend(ContainerBackend):
             system_command = f'{self.program} pull --dir {self.image_dir} {image}:{tag}'
             pull_success = not os.system(system_command)
             if not pull_success:
-                logger.error("Failed to pull Singularity image")
-                raise BackendFailedError(self.program, system_command)
+                logger.error("Failed to pull Singularity image, trying with docker registry:")
+                system_command_docker_reg = f'{self.program} pull --disable-cache --dir {self.image_dir} docker://{image}:{tag}'
+                pull_success = not os.system(system_command_docker_reg)
+                if not pull_success:
+                    logger.error("Failed to pull Singularity image")
+                    raise BackendFailedError(self.program, system_command)
 
         logger.debug("Pulling image")
-        image_name = f'{image}_{tag}.sif'
+        image_name = f'{image.split("/")[-1]}_{tag}.sif'
         image_path = f'{SINGULARITY_IMAGES}{image_name}'
         if os.path.exists(image_path):
             if repull is not None:
