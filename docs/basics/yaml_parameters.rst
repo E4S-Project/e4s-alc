@@ -91,6 +91,7 @@ Base Group Parameters
 
 | **Note**: The ``<source>`` path must be inside the context of the build. Because the first step of a container build is to send the context directory to the container daemon, you cannot use the form ``- ../something /something``.
 | **Note**: If the extension of ``<source>`` is ``.tgz`` or ``.tar.gz`` then the file will be unpacked and placed in ``<destination_directory>``.
+
 ----
 
 ~~~~~~~~~~~~~~~~~
@@ -179,9 +180,9 @@ System Group Parameters
 ----
 
 
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 ``add-remote-files``
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 | **Type**: ``list<string>``
 | **Description**: Similar to the parameter, ``add-files`` except instead of using a local file as the ``<source>``, the ``<source>`` is a URL to a file. This parameter will download the file to the ``<destination_directory>``. This parameter is optional.
