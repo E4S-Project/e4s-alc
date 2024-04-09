@@ -2,15 +2,15 @@
 Tutorial: ``e4s-alc`` 101
 =========================
 
-This tutorial assumes that you have installed ``e4s-alc``, you have all the dependancies, and that the binary can be located in your ``PATH``.
+This tutorial assumes that you have installed ``e4s-alc`` and the binary can be located in your ``PATH``.
 
 ----------------------------------------------------
 1. Installing ``hwloc`` and ``cmake`` on Rocky Linux
 ----------------------------------------------------
 
-For the first tutorial, I want to demonstrate the actions you could perform in order to build Spack loaded images on the fly using only the command line tool.
+For the first tutorial, we will walk through the commands to build Spack-loaded images on the fly using only the command line tool.
 
-Imagine a client needs a Rocky Linux 9 image loaded with ``hwloc`` and ``cmake`` for a project. 
+Imagine we need a Rocky Linux 9 image loaded with ``hwloc`` and ``cmake`` for a project. 
 
 To start fresh, we'll create a new directory called ``MyProject`` and we'll work inside of it.
 
@@ -66,9 +66,9 @@ Using ``podman``, let's build, run, and inspect our image:
 2. Installing ``hwloc`` and ``cmake`` on Rocky Linux using ``gcc@11.2``
 -----------------------------------------------------------------------
 
-We finalized the project for the client and they were happy until they realized that they forgot an important part of the image description... The Spack packages have to be built using ``gcc@11.2`` and wants ``tau`` downloaded to ``/opt`` . No problem. 
+For this example, the Spack packages have to be built using ``gcc@11.2`` and we want ``tau`` downloaded to ``/opt``. 
 
-We'll use a similar call to the last example but we'll insert a ``spack-compiler`` parameter and ``add-remote-file`` parameter:
+We'll use a similar call to the previous example but we'll insert a ``spack-compiler`` parameter and ``add-remote-file`` parameter:
 
 .. code-block:: console 
 
@@ -113,10 +113,10 @@ For organization and quick reproducibility, we may want to use a ``.yaml`` file 
 
    $ e4s-alc create \
         --image rockylinux:9 \ 
-        --add-remote-file "http://tau.uoregon.edu/tau.tgz /opt" \
         --spack-compiler gcc@11.2 \
         --spack-package hwloc \
-        --spack-package cmake
+        --spack-package cmake \
+        --add-remote-file "http://tau.uoregon.edu/tau.tgz /opt"
 
 
 Transformed to a ``.yaml`` file, we have:
