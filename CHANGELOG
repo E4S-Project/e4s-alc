@@ -1,0 +1,11 @@
+v1.0.1 (Apr 17 2024)
+---------------------
+
+- Shift from outwright building images to building Dockerfiles and Singularity definition files
+- Singularity backend no longer supported through Podman or Docker backends but as a standalone
+- Added ability to create "matrices" of Dockerfiles
+
+v1.0.0 (Jul 20 2023)
+---------------------
+
+- Releasing the first complete version of e4s-alc, which function's using container backends' python APIs.
