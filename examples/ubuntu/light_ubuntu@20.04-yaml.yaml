@@ -6,4 +6,5 @@ image: ubuntu:20.04
 ####### Spack group #######
 spack: True
 spack-version: latest
+spack-compiler: gcc@10.3.0
 spack-yaml-file: ./light_spack.yaml

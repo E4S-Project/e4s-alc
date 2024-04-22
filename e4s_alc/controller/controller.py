@@ -113,6 +113,8 @@ class Controller:
         """
         if self.backend_str == "singularity":
             self.backend.pull(image, tag, repull)
+            # Modify image variable to fit
+            image = image.split('/')[-1]
         else:
             self.backend.pull(image, tag)
 

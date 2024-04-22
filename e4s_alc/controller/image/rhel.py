@@ -99,5 +99,5 @@ class RhelImage(Image):
         Returns:
             commands (list) : List of commands.
         """
-        commands = ['/bin/bash']
+        commands = ['/bin/bash' , '-c', f'. {setup_script} && exec /bin/bash']
         return commands
