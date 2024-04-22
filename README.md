@@ -2,7 +2,7 @@
 
 ## Description
 
-E4S à la Carte is a practical tool designed to facilitate the generation of Dockerfiles infused with OS packages, Spack packages, as well as custom commands. In the simplifying the process, this tool targets the elimination of manual Dockerfile scripting, enabling users to concentrate on critical aspects such as application-specific resources and configurations. 
+E4S à la Carte is a practical tool designed to facilitate the generation of Dockerfiles and Singularity definition files infused with OS packages, Spack packages, as well as custom commands. In the simplifying the process, this tool targets the elimination of manual definition files scripting, enabling users to concentrate on critical aspects such as application-specific resources and configurations.
 
 ## Documentation
 [![Documentation Status](https://readthedocs.org/projects/e4s-alc/badge/?version=latest)](https://e4s-alc.readthedocs.io/en/latest/?badge=latest)
@@ -11,7 +11,7 @@ Our documentation is located here: <a href="https://e4s-alc.readthedocs.io/en/la
 
 ## Overview
 
-The `e4s-alc` tool is designed to facilitate the process of crafting Dockerfiles. This tool leverages `.yaml` files as input to generate Dockerfiles.
+The `e4s-alc` tool is designed to facilitate the process of crafting Dockerfiles and Singularity definition files. This tool leverages `.yaml` files as input to generate images' definition files.
 
 ## Installation
 
