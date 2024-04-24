@@ -34,3 +34,6 @@ find = {}
 
 [project.scripts]
 e4s-alc = "e4s_alc.cli.entry:main"
+
+[tool.setuptools_scm]
+write_to = "e4s_alc/version.py"
