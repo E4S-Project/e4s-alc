@@ -16,7 +16,10 @@ class SuseImage(Image):
             os_release (str): OS release version.
         """
         super().__init__(os_release)
-        self.packages = ['tar', 'gzip', 'python3', 'gcc', 'gcc-c++', 'gcc-fortran', 'patch', 'awk', 'make', 'xz', 'bzip2', 'hostname', 'vim']
+        self.packages = [
+                'tar', 'gzip', 'python3', 'gcc', 'gcc-c++', 'gcc-fortran',
+                'patch', 'awk', 'make', 'xz', 'bzip2', 'hostname', 'vim', 'git'
+        ]
         self.update_cert_command = 'update-ca-certificates'
         self.cert_location = '/usr/local/share/ca-certificates/'
 
