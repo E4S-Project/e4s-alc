@@ -1,5 +1,5 @@
 from e4s_alc.util import log_function_call, log_info, log_error
-from e4s_alc.controller.image import UbuntuImage, RhelImage, RockyImage
+from e4s_alc.controller.image import UbuntuImage, RhelImage, RockyImage, SuseImage
 from e4s_alc.controller.backend import DockerBackend, PodmanBackend, SingularityBackend
 
 class Controller:
@@ -9,6 +9,7 @@ class Controller:
 
     _image_os_dict = {'ubuntu': UbuntuImage,
                       'rhel': RhelImage,
+                      'sles': SuseImage,
                       'rocky': RockyImage}
     _image_cache = {}
 
