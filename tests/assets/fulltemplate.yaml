@@ -1,0 +1,47 @@
+######## Base group ########
+backend: singularity
+registry:
+image: ubuntu:latest
+repull: False
+
+initial-commands:
+ - echo "initial command 1" 
+ - echo "initial command 2" 
+
+env-variables:
+ - TEST_ENV="testing ENV"
+ - export TEST_ENV_2="testing ENV 2"
+
+add-files:
+  - ./light_ubuntu@20.04-yaml.yaml /yaml_file.yaml
+
+post-base-stage-commands:
+  - echo "post base command 1"
+
+####### System group #######
+pre-system-stage-commands:
+  - echo "pre system command 1"
+
+os-packages:
+  - cowsay
+
+add-remote-files:
+  - https://www.nic.uoregon.edu/~cfd/e4s-alc/modules.yaml /testing_remotefiles
+
+add-repos:
+  - https://github.com/E4S-Project/e4s-alc
+
+post-system-stage-commands:
+  - echo "post system command 1"
+
+####### Spack group #######
+pre-spack-stage-commands:
+  - echo "pre spack command 1"
+
+spack: True
+spack-version: latest
+spack-compiler: gcc@10.3.0
+spack-yaml-file: ./light_spack.yaml
+
+post-spack-stage-commands:
+  - echo "post spack command 1"
