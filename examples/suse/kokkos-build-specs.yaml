@@ -1,0 +1,17 @@
+######## Base group ########
+backend: singularity
+registry: registry.suse.com/bci/
+image: bci-base:15.4
+repull: False
+
+####### System group #######
+os-packages:
+  - gcc11
+  - gcc11-c++
+  - gcc11-fortran
+
+####### Spack group #######
+spack: True
+spack-packages: 
+  - kokkos ^gmake@4.3
+
