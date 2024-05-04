@@ -1,5 +1,6 @@
 import os
 import yaml
+import time
 import tempfile
 import argparse
 from itertools import product
@@ -80,7 +81,8 @@ class CreateCommand(AbstractCommand):
     def check_arguments(self, args):
         """Check the arguments passed to the command."""
 
-        log_dir = tempfile.mkdtemp(prefix='e4s-alc-')
+        timestamp = int(time.time())
+        log_dir = tempfile.mkdtemp(prefix=f'e4s-alc-{timestamp}-')
         log_path = os.path.join(log_dir, 'logs.log')
         logger = Logger('core', log_path, args['verbose'])
 
