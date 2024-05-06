@@ -1,3 +1,9 @@
+v1.0.2 (May 3 2024)
+---------------------
+
+- Logs will be created in a mktemp directory
+- Fixed minor escape sequence warning
+
 v1.0.1 (Apr 17 2024)
 ---------------------
 
