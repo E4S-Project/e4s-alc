@@ -1,5 +1,7 @@
 import os
 import yaml
+import time
+import tempfile
 import argparse
 from itertools import product
 from e4s_alc.model.create import CreateModel
@@ -79,11 +81,13 @@ class CreateCommand(AbstractCommand):
     def check_arguments(self, args):
         """Check the arguments passed to the command."""
 
-        log_path = '/tmp/e4s-alc/'
-        if not os.path.exists(log_path):
-            os.mkdir(log_path)
-        logger = Logger('core', log_path + 'logs.log', args['verbose'])
+        timestamp = int(time.time())
+        log_dir = tempfile.mkdtemp(prefix=f'e4s-alc-{timestamp}-')
+        log_path = os.path.join(log_dir, 'logs.log')
+        logger = Logger('core', log_path, args['verbose'])
 
+        print(f"Logs will be saved to {log_path}")
+        
         if args['help']:
             self.parser.print_help()
             exit(0)
