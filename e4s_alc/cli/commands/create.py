@@ -4,7 +4,7 @@ import time
 import tempfile
 import argparse
 from itertools import product
-from e4s_alc.model.create import CreateModel
+from e4s_alc.model.create import CreateModel, MODULES_YAML
 from e4s_alc.util import Logger, YAMLNotFoundError
 from e4s_alc.cli.cli_view import HelpDescriptionFormatter
 from e4s_alc.cli.commands.command import AbstractCommand
@@ -62,7 +62,7 @@ class CreateCommand(AbstractCommand):
         spack_group_args.add_argument('--spack-version', help='The version of a Spack to install', dest='spack-version')
         spack_group_args.add_argument('--spack-mirrors', help='The Spack mirror URL/Paths for Spack package caches.', default=[], dest='spack-mirrors')
         spack_group_args.add_argument('--spack-check-signature', help='Check for Spack package signature when installing packages from mirror', default=True, dest='spack-check-signature')
-        spack_group_args.add_argument('--modules-yaml-file', help='The path to a modules.yaml environment file', dest='modules-yaml-file')
+        spack_group_args.add_argument('--modules-yaml-file', help='The path to a modules.yaml environment file', default=MODULES_YAML, dest='modules-yaml-file')
         spack_group_args.add_argument('--spack-compiler', help='The Spack compiler that will be installed and will build Spack packages', dest='spack-compiler')
         spack_group_args.add_argument('--spack-yaml-file', help='The path to a spack.yaml environment file', dest='spack-yaml-file')
         spack_group_args.add_argument('-p', '--spack-package', help='The name of a Spack package to install', action='append', default=[], dest='spack-packages')
