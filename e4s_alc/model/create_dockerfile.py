@@ -172,11 +172,9 @@ class CreateDockerfileModel(Model):
 
     @log_function_call
     def add_modules_file(self):
-        self.add_line('# Add modules.yaml file\n')
         if self.modules_yaml_file:
+            self.add_line('# Add modules.yaml file\n')
             self.add_line(f'COPY {self.modules_yaml_file} /spack/etc/spack/modules.yaml\n')
-        else:
-            self.add_line(f'RUN curl https://www.nic.uoregon.edu/~cfd/e4s-alc/modules.yaml -o /spack/etc/spack/modules.yaml\n')
         self.add_line_break()
 
     @log_function_call

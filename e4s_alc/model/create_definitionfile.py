@@ -155,10 +155,6 @@ class CreateDefinitionfileModel(Model):
             self.add_line('# Add modules.yaml file\n', "files")
             self.add_line(f'{self.modules_yaml_file} /spack/etc/spack/modules.yaml\n', "files")
             self.add_line_break("files")
-        else:
-            self.add_line('# Add modules.yaml file\n', "post")
-            self.add_line(f'curl https://www.nic.uoregon.edu/~cfd/e4s-alc/modules.yaml -o /spack/etc/spack/modules.yaml\n', "post")
-            self.add_line_break("post")
 
     def add_post_spack_install_commands(self):
         if self.post_spack_install_commands:
