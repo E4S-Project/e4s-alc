@@ -2,8 +2,7 @@ from e4s_alc.model.model import Model
 from e4s_alc.model.create_dockerfile import CreateDockerfileModel
 from e4s_alc.model.create_definitionfile import CreateDefinitionfileModel
 
-modules_content = """
-modules:
+modules_content = """modules:
   prefix_inspections:
     ./bin:
       - PATH
@@ -16,19 +15,19 @@ modules:
     ./include:
     - INCLUDE
     ./man:
-    - MANPATH
+      - MANPATH
     ./share/man:
-    - MANPATH
+      - MANPATH
     ./share/aclocal:
-    - ACLOCAL_PATH
+      - ACLOCAL_PATH
     ./lib/pkgconfig:
-    - PKG_CONFIG_PATH
+      - PKG_CONFIG_PATH
     ./lib64/pkgconfig:
-    - PKG_CONFIG_PATH
+      - PKG_CONFIG_PATH
     ./share/pkgconfig:
-    - PKG_CONFIG_PATH
+      - PKG_CONFIG_PATH
     ./:
-    - CMAKE_PREFIX_PATH
+      - CMAKE_PREFIX_PATH
   default:
     roots:
      tcl:   /modulefiles

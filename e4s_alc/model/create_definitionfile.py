@@ -153,8 +153,10 @@ class CreateDefinitionfileModel(Model):
     def add_modules_file(self):
         if self.modules_yaml_file:
             self.add_line('# Add modules.yaml file\n', "files")
-            self.add_line(f'{self.modules_yaml_file} /spack/etc/spack/modules.yaml\n', "files")
+            self.add_line(f'{self.modules_yaml_file} /tmp-modules.yaml\n', "files")
             self.add_line_break("files")
+            self.add_line(f'mv /tmp-modules.yaml /spack/etc/spack/modules.yaml\n', "post")
+            self.add_line_break("post")
 
     def add_post_spack_install_commands(self):
         if self.post_spack_install_commands:
