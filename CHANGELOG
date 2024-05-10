@@ -1,3 +1,9 @@
+v1.0.3
+---------------------
+
+- Added Suse OS support
+- Removed templated modules.yaml as it served no concrete purpose
+
 v1.0.2 (May 3 2024)
 ---------------------
 
