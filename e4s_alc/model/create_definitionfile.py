@@ -285,9 +285,7 @@ class CreateDefinitionfileModel(Model):
                 self.add_spack_yaml_install()
             else:
                 self.add_spack_packages()
-                self.add_line('useradd -m tempuser\n', "post")
-                self.add_line("su -c 'export PATH=/spack/bin:$PATH; spack compiler find' tempuser \n", "post")
-                self.add_line('ARCH=$(spack arch | awk -F\'-\' \'{print $1}\'); echo "cp /home/tempuser/.spack/linux/compilers.yaml ~/.spack/linux/compilers.yaml" >> /etc/profile.d/setup-env.sh\n', "post")
+                self.add_line('echo "spack compiler find" >> /etc/profile.d/setup-env.sh\n', "post")
             self.add_post_spack_stage_commands()
             self.add_line_break("post")
 
