@@ -38,10 +38,12 @@ class Compiler:
             tuple: The compiler, package, version, and version suffix information.
         """
         compiler, package, version, version_suffix = None, None, None, None
-        package, version = self.spack_compiler.split("@") if "@" in self.spack_compiler else (self.spack_compiler, None)
+        spack_compiler_no_dep, dependency = self.spack_compiler.split(" ") if " " in self.spack_compiler else (self.spack_compiler, None)
+        package, version = spack_compiler_no_dep.split("@") if "@" in self.spack_compiler else (self.spack_compiler, None)
         log_info(f"Determined package: {package}, version: {version}.")
 
         compiler = self.PACKAGE_TO_COMPILER.get(package, package or self.spack_compiler)
+        compiler = ' '.join([compiler, dependency])
         log_info(f"Determined compiler: {compiler}.")
 
         version_suffix = f"@{version}" if version else ""
