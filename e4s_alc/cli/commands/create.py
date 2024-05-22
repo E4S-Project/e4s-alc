@@ -152,6 +152,10 @@ class CreateCommand(AbstractCommand):
             "spack-compiler": args.get('spack-compiler-matrix', [])
         }
 
+        for key in matrices.keys():
+            if all(x is None for x in matrices[key]):
+                matrices[key] = []
+
         if matrices['image'] or matrices['spack-version'] or matrices['spack-compiler']:
             self.generate_combinations(args, matrices)
             return
