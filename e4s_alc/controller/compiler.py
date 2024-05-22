@@ -43,7 +43,7 @@ class Compiler:
         log_info(f"Determined package: {package}, version: {version}.")
 
         compiler = self.PACKAGE_TO_COMPILER.get(package, package or self.spack_compiler)
-        compiler = ' '.join([compiler, dependency])
+        compiler = ' '.join([compiler, dependency]) if dependency is not None else compiler
         log_info(f"Determined compiler: {compiler}.")
 
         version_suffix = f"@{version}" if version else ""
