@@ -1,5 +1,6 @@
 import os
 import yaml
+import json
 import time
 import tempfile
 import argparse
@@ -112,8 +113,11 @@ class CreateCommand(AbstractCommand):
             if file_path.endswith('.yaml'):
                 data = yaml.safe_load(file)
                 data['file'] = None
+            elif file_path.endswith('.json'):
+                data = json.load(file)
+                data['file'] = None
             else:
-                print('Invalid file format. Please provide .yaml file format. Run `e4s-alc template` to generate a template .yaml file.')
+                print('Invalid file format. Please provide .yaml or json file format. Run `e4s-alc template` to generate a template .yaml file.')
                 exit(1)
         return data
 
