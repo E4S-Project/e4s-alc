@@ -36,7 +36,10 @@ class TemplateCommand(AbstractCommand):
         """Run the command after checking the arguments"""
 
         self.check_arguments(arg_namespace)
-        print(self.create_yaml_template())
+        if arg_namespace.output == "yaml":
+            print(self.create_yaml_template())
+        else:
+            print(self.create_json_template())
 
     def create_yaml_template(self):
         return """######## Base group ########
@@ -106,3 +109,34 @@ spack-version-matrix:
 
 spack-compiler-matrix:
   -"""
+
+    def create_json_template(self):
+       return """ {
+    "backend": null,
+    "registry": null,
+    "image": null,
+    "initial-commands": [null],
+    "env-variables": [null],
+    "add-files": [null],
+    "post-base-stage-commands": [null],
+    "pre-system-stage-commands": [null],
+    "certificates": [null],
+    "os-packages": [null],
+    "add-remote-files": [null],
+    "add-repos": [null],
+    "post-system-stage-commands": [null],
+    "spack": true,
+    "pre-spack-stage-commands": [null],
+    "spack-version": null,
+    "spack-mirrors": [null],
+    "spack-check-signature": true,
+    "modules-yaml-file": null,
+    "post-spack-install-commands": [null],
+    "spack-yaml-file": null,
+    "spack-compiler": null,
+    "spack-packages": [null],
+    "post-spack-stage-commands": [null],
+    "registry-image-matrix": [null],
+    "spack-version-matrix": [null],
+    "spack-compiler-matrix": [null]
+}"""
