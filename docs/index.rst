@@ -11,7 +11,7 @@
    basics/introduction
    basics/getting_started
    basics/basic_usage
-   basics/yaml_parameters
+   basics/alc_parameters
    basics/tutorial_101
    basics/tutorial_matrix
 
