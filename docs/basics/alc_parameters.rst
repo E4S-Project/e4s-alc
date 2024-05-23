@@ -1,7 +1,7 @@
-.. _yaml_params:
+.. _alc_params:
 
 ===============
-YAML Parameters
+ALC Parameters
 ===============
 
 .. contents:: 

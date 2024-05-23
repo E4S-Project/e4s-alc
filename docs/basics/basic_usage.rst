@@ -24,7 +24,7 @@ Basic Usage
 ``e4s-alc create``
 ------------------
 
-Because building scientific packages is not easy, ``e4s-alc`` provides enough flags to ensure your build can become what you intend it to be with only 1 call. Below is the ``help`` display when you call for ``e4s-alc create``. We'll touch on what each of these flags do in the YAML Format section of the docs.
+Because building scientific packages is not easy, ``e4s-alc`` provides enough flags to ensure your build can become what you intend it to be with only 1 call. Below is the ``help`` display when you call for ``e4s-alc create``. We'll touch on what each of these flags do in the ALC Parameters section of the docs.
 
 .. code-block:: console
 
@@ -88,10 +88,19 @@ Because building scientific packages is not easy, ``e4s-alc`` provides enough fl
 ``e4s-alc template``
 --------------------
 
-Running an ``e4s-alc create`` command with a lot of parameters can become messy. To organize the setup of your build, you can use ``e4s-alc create -f {file_name}.yaml`` to build out your Dockerfile. The ``e4s-alc template`` command outputs a template structure for your approach to creating a custom build. Each of these commands provide specific instructions for building out Dockerfile. Notice that ``registry-image-matrix``, ``spack-version-matrix``, and ``spack-compiler-matrix`` are in a group called ``Matrix group``. These are powerful parameters that allow the creation of multiple Dockerfiles in a single call. We'll go over them in the YAML Format section and the Tutorial at the end of the Basics section of the documentation.
+Running an ``e4s-alc create`` command with a lot of parameters can become messy. To organize the setup of your build, you can use ``e4s-alc create -f {file_name}.[yaml|json]`` to build out your Dockerfile. The ``e4s-alc template`` command outputs a template structure for your approach to creating a custom build. Each of these commands provide specific instructions for building out Dockerfile. This command can output both the template in yaml format as well as json format, with yaml being the default.
+Notice that ``registry-image-matrix``, ``spack-version-matrix``, and ``spack-compiler-matrix`` are in a group called ``Matrix group``. These are powerful parameters that allow the creation of multiple Dockerfiles in a single call. We'll go over them in the ALC Parameters section and the Tutorial at the end of the Basics section of the documentation.
 
 .. code-block:: console
 
+   $ e4s-alc template -h
+    usage: e4s-alc template [options]
+
+    options:
+      -o {json,yaml}, --output {json,yaml}
+                            Choose a format to output a message: json or yaml
+      -n NAME, --name NAME  Name of the output file
+      -h, --help            Display the help page
    $ e4s-alc template > template.yaml
    $ cat template.yaml
    ######## Base group ########

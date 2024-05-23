@@ -104,10 +104,10 @@ Let's build, run, and inspect the image:
    tau-2.32
    
 --------------------
-3. Using a YAML file
+3. Using a YAML|JSON file
 --------------------
 
-For organization and quick reproducibility, we may want to use a ``.yaml`` file to specify parameters instead of specifying the parameters in the command line. To start, let's rewrite the previous ``e4s-alc`` command in the form of an ``e4s-alc`` compatible ``.yaml`` file. We have:
+For organization and quick reproducibility, we may want to use an input file to specify parameters instead of specifying the parameters in the command line. To start, let's rewrite the previous ``e4s-alc`` command in the form of an ``e4s-alc`` compatible ``.yaml`` file. We have:
 
 .. code-block:: console 
 
@@ -133,4 +133,22 @@ Transformed to a ``.yaml`` file, we have:
      - cmake
    $ e4s-alc create -f input.yaml
 
-For more information on the ``.yaml`` parameters, visit :ref:`YAML Parameters <yaml_params>`.
+Transformed to a ``.json`` file, we have:
+
+.. code-bloc:: console
+
+   $ cat input.json
+   {
+    "image": "rockylinux:9",
+    "add-remote-files": [
+        "http://tau.uoregon.edu/demo.tgz /opt"
+    ],
+    "spack-compiler": "gcc@11.2",
+    "spack-packages": [
+        "hwloc",
+        "cmake"
+    ]
+   }
+   $ e4s-alc create -f input.json
+
+For more information on the ALC parameters, visit :ref:`ALC Parameters <alc_params>`.
