@@ -1,6 +1,7 @@
 v1.0.3
 ---------------------
 
+- Added json support
 - Added support to specifying dependencies for spack installed compilers
 - Added Suse OS support
 - Removed templated modules.yaml as it served no concrete purpose
