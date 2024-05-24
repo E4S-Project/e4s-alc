@@ -135,7 +135,7 @@ Transformed to a ``.yaml`` file, we have:
 
 Transformed to a ``.json`` file, we have:
 
-.. code-bloc:: console
+.. code-block:: console
 
    $ cat input.json
    {
