@@ -341,7 +341,7 @@ Spack Group Parameters
 ~~~~~~~~~~~~~~~~~~~~~
 
 | **Type**: ``string``
-| **Description**: The path to a ``modules.yaml`` file that will help configure the layout and usage of ``module``. This parameter is optional but defaults to downloading this `modules.yaml <https://www.nic.uoregon.edu/~cfd/e4s-alc/modules.yaml>`__
+| **Description**: The path to a ``modules.yaml`` file that will help configure the layout and usage of ``module``. This parameter is optional as spack already has a default on installation.
 | **Example**:
 
 .. code-block:: console
