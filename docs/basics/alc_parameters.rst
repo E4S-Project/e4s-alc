@@ -128,6 +128,20 @@ Base Group Parameters
 
 ----
 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``repull``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+| **Type**: ``bool``
+| **Description**: An optional parameter that can be used when creating a singularity definition file to predetermine if an image should be repulled if that image's name is found within e4s-alc's collection of pulled images. Not specifying this parameter will have e4s-alc prompt the user to ask if the image should be pulled again.
+| **Example**:
+
+.. code-block:: console
+
+   repull: True
+
+----
+
 -----------------------
 System Group Parameters
 -----------------------
