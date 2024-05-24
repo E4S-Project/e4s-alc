@@ -43,6 +43,7 @@ class CreateCommand(AbstractCommand):
         base_group_args.add_argument('-b', '--backend', help='The container backend used for image inspection. Available backends are Docker, Podman and Singularity')
         base_group_args.add_argument('-i', '--image', help='The base image name <image:tag>')
         base_group_args.add_argument('-r', '--registry', help='The image registry to search for the base image')
+        base_group_args.add_argument('--repull', help='Specify to repull an existing singularity image', action='store_true')
         base_group_args.add_argument('--env-variable', help='Set an environment variable inside the container', action='append', default=[], dest='env-variables')
         base_group_args.add_argument('--add-file', help='Add a file to the container', action='append', default=[], dest='add-files')
         base_group_args.add_argument('--initial-command', help='Commands to run after image is pulled', action='append', default=[], dest='initial-commands')
