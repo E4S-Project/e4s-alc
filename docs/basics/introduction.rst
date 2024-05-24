@@ -35,13 +35,13 @@ Coupling Spack with containers permits a high degree of reproducibility, vital i
 
 Given the critical nature of efficiency, reproducibility, and reliability in HPC and scientific computing, integrating Spack with containers leads to an organized, manageable, and robust framework. The ``e4s-alc`` tool harnesses this integration, significantly reducing the complexity of managing software environments. This allows scientists and researchers to concentrate more on their primary task—solving complex computational problems.
 
-By supporting major container technologies like Docker and Podman, ``e4s-alc`` simplifies the creation of custom, Spack-integrated Dockerfiles, minimizing manual effort.
+By supporting major container technologies like Docker, Podman and Singularity, ``e4s-alc`` simplifies the creation of custom, Spack-integrated container definition files (Dockerfiles in the case of Docker), minimizing manual effort.
 
 -------------------------------
 Why not ``spack containerize``?
 -------------------------------
 
-``spack containerize`` provides a means to create a Dockerfile from the spack build. However, it doesn't support image customization unless significant modifications are made to the output Dockerfile. Modifying the Dockerfile can be effective, but it can also be a time-consuming task. 
+``spack containerize`` provides a means to create a Dockerfile from the spack build. However, it doesn't support image customization unless significant modifications are made to the output Dockerfile. Modifying the Dockerfile can be effective, but it can also be a time-consuming task. It also only is able to create Dockerfiles, without supporting singularity definition files. 
 
 In contrast, the tool ``e4s-alc`` effortlessly incorporates a variety of features that are not available with ``spack containerize``. Here are some of them:
 
@@ -53,4 +53,4 @@ In contrast, the tool ``e4s-alc`` effortlessly incorporates a variety of feature
 * Adding Spack mirrors
 * Adding ``modules``
 * Choosing the compiler in which packages will be built
-* Creating multiple Dockerfiles based on the image, Spack version, and compiler
+* Creating multiple container definition files based on the image, Spack version, and compiler

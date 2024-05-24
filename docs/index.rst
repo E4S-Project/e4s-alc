@@ -2,7 +2,7 @@
 ``e4s-alc``
 ===========
 
-``e4s-alc`` (E4S À-la-carte) is a practical software tool designed to simplify the creation of Dockerfiles and Singularityfiles with relevant Spack configurations. Our tool focuses on making the set up of Spack package-loaded containers faster and easier, allowing developers to focus more on their coding and less on system configurations.
+``e4s-alc`` (E4S À-la-carte) is a practical software tool designed to simplify the creation of Dockerfiles and Singularity definition files with relevant Spack configurations. Our tool focuses on making the set up of Spack package-loaded containers faster and easier, allowing developers to focus more on their coding and less on system configurations.
 
 .. toctree::
    :maxdepth: 3

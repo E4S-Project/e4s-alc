@@ -2,7 +2,7 @@
 Basic Usage
 ===========
 
-``e4s-alc`` has 2 command line options. One command for creating the Dockerfiles and the other command for generating a ``.yaml`` template file that works with ``e4s-alc``. ``e4s-alc`` can take inputs as either parameters to the program call or through a file using the ``-f`` flag.
+``e4s-alc`` has 2 command line options. One command for creating the container definition files and the other command for generating templates for the input files that works with ``e4s-alc``. ``e4s-alc`` can take inputs as either parameters to the program call or through a file using the ``-f`` flag.
 
 -----------
 ``e4s-alc``
@@ -14,7 +14,7 @@ Basic Usage
    usage: e4s-alc [command] [options]
 
    positional arguments:
-     create      Create a Dockerfile
+     create      Create a container definition file
      template    Create a template file for e4s-alc
 
    options:
@@ -88,8 +88,8 @@ Because building scientific packages is not easy, ``e4s-alc`` provides enough fl
 ``e4s-alc template``
 --------------------
 
-Running an ``e4s-alc create`` command with a lot of parameters can become messy. To organize the setup of your build, you can use ``e4s-alc create -f {file_name}.[yaml|json]`` to build out your Dockerfile. The ``e4s-alc template`` command outputs a template structure for your approach to creating a custom build. Each of these commands provide specific instructions for building out Dockerfile. This command can output both the template in yaml format as well as json format, with yaml being the default.
-Notice that ``registry-image-matrix``, ``spack-version-matrix``, and ``spack-compiler-matrix`` are in a group called ``Matrix group``. These are powerful parameters that allow the creation of multiple Dockerfiles in a single call. We'll go over them in the ALC Parameters section and the Tutorial at the end of the Basics section of the documentation.
+Running an ``e4s-alc create`` command with a lot of parameters can become messy. To organize the setup of your build, you can use ``e4s-alc create -f {file_name}.[yaml|json]`` to build out your container definition file. The ``e4s-alc template`` command outputs a template structure for your input file defining your custom build. Each of these commands provide specific instructions for building out the definition file. This command can output both the template in yaml format as well as json format, with yaml being the default.
+Notice that ``registry-image-matrix``, ``spack-version-matrix``, and ``spack-compiler-matrix`` are in a group called ``Matrix group``. These are powerful parameters that allow the creation of multiple Dockerfiles in a single call. We'll go over them in the ALC Parameters section and the Tutorial at the end of the Basics section of the documentation. It is also to be noted that this feature is currently untested for creating multiple Singularity definition files.
 
 .. code-block:: console
 

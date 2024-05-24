@@ -18,10 +18,11 @@ Before installing and running this program, make sure that your system meets the
 
 2. ``wget`` or ``curl``: These are frequently used command-line tools for sending HTTP requests. Most Unix-based systems include them by default. If they are not installed, you can install either of them using your system's package manager. For instance, ``sudo apt install wget`` or ``sudo apt install curl``.
 
-3. **Container backend** (``docker`` or ``podman``): The program requires a container backend to run. You can choose between Docker, Podman. Please follow the official installation instructions for the particular backend you choose to install:
+3. **Container backend** (``docker``, ``podman`` or ``singularity``): The program requires a container backend to run. You can choose between Docker, Podman and Singularity. Please follow the official installation instructions for the particular backend you choose to install:
 
     - For Docker: https://docs.docker.com/engine/install/
     - For Podman: https://podman.io/getting-started/installation
+    - For Singularity: https://docs.sylabs.io/guides/3.0/user-guide/installation.html
   
 4. **Internet connection**: The program needs an active internet connection to function correctly. Please ensure your device is connected to the internet before initializing the program.
 
@@ -276,6 +277,6 @@ The container comes with Environment Modules so we can easily load and unload in
 How It Works
 ------------
 
-``e4s-alc`` operates by receiving a set of inputs in the form of a command line call. Once these inputs are processed, ``e4s-alc`` initiates the process of pulling the designated base image. Following this, the content of the base image is analyzed to confirm its compatibility with the succeeding stages.
+``e4s-alc`` operates by receiving a set of inputs in the form of a command line call or an input file. Once these inputs are processed, ``e4s-alc`` initiates the process of pulling the designated base image. Following this, the content of the base image is analyzed to confirm its compatibility with the succeeding stages.
 
-Upon completion of the analysis, ``e4s-alc`` shifts into the building phase. It commences the systematic construction of each stage, ensuring that the commands utilized in each stage align correctly with the given inputs and the base image. This iterative construction ensures the resulting Dockerfile maintains compatibility throughout all stages.
+Upon completion of the analysis, ``e4s-alc`` shifts into the building of the definition file phase. It commences the systematic construction of each stage, ensuring that the commands utilized in each stage align correctly with the given inputs and the base image. This iterative construction ensures the resulting container definition file maintains compatibility throughout all stages.

@@ -18,7 +18,7 @@ class CreateCommand(AbstractCommand):
         
         self.parser = None
         self.usage = 'e4s-alc create [options]'
-        self.help = 'Create a Dockerfile'
+        self.help = 'Create a container definition file'
 
     def create_subparser(self, subparsers):
         """Create subparser and its attributes for this command."""
