@@ -97,5 +97,5 @@ class RockyImage(Image):
         Returns:
             list: A list of entrypont commands. 
         """
-        commands = ['/bin/bash']
+        commands = ['/bin/bash', '-c', f'. {setup_script} && exec /bin/bash']
         return commands
