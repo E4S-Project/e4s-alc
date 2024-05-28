@@ -4,6 +4,10 @@ Tutorial: ``e4s-alc`` 101
 
 This tutorial assumes that you have installed ``e4s-alc`` and the binary can be located in your ``PATH``.
 
+=========================
+Creating a Dockerfile
+=========================
+
 ----------------------------------------------------
 1. Installing ``hwloc`` and ``cmake`` on Rocky Linux
 ----------------------------------------------------
@@ -152,3 +156,47 @@ Transformed to a ``.json`` file, we have:
    $ e4s-alc create -f input.json
 
 For more information on the ALC parameters, visit :ref:`ALC Parameters <alc_params>`.
+
+=========================
+Creating a Singularity definition file
+=========================
+
+From the user's side, creating a Singularity image with e4s-alc will be very similar to creating a Docker/Podman image. We simply havw to specify the use of the singularity backend to do so:
+
+.. code-block:: console
+
+   $ e4s-alc create \
+        --backend singularity \
+        --image rockylinux:9 \
+        --spack-package hwloc \
+        --spack-package cmake
+
+This works the same way than for creating a Dockerfile, except it will output a Singularity definition file:
+
+.. code-block:: console
+
+   $ ls
+   singularity.def
+
+Then we can use singularity to build, run and inspect our image:
+
+.. code-block:: console
+
+   $ singularity build example.sif singularity.def
+   [...]
+   $ singularity run example.sif
+   Singularity> spack find
+    -- linux-rocky9-zen3 / gcc@11.4.1 -------------------------------
+    berkeley-db@18.1.40                 diffutils@3.10      gmake@4.3          libxml2@2.10.3  perl@5.38.0         zlib-ng@2.1.6
+    bzip2@1.0.8                         findutils@4.9.0     hwloc@2.9.1        m4@1.4.19       pkgconf@2.2.0
+    ca-certificates-mozilla@2023-05-30  gcc-runtime@11.4.1  libpciaccess@0.17  ncurses@6.5     readline@8.2
+    cmake@3.27.9                        gdbm@1.23           libsigsegv@2.14    nghttp2@1.57.0  util-macros@1.19.3
+    curl@8.7.1                          glibc@2.34          libtool@2.4.7      openssl@3.3.0   xz@5.4.6
+    ==> 26 installed packages
+
+In the case we don't have sudo access, this previous build command would fail, as Singularity needs sudo writes to build an image from a definition file. Thankfully, Singularity provides a ``fakeroot`` option that allows an unprivileged user to run a container as a "fake root" user. This requires the user to be listed in the ``/etc/subuid`` and ``/etc/subgid`` (which requires administrator access to modify). More information :ref:`here <https://docs.sylabs.io/guides/3.3/user-guide/fakeroot.html>`.
+When doing so, our command will look like this:
+
+.. code-block:: console
+
+   $ singularity build --fakeroot example.sif singularity.def
