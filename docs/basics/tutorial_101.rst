@@ -194,10 +194,25 @@ Then we can use singularity to build, run and inspect our image:
     curl@8.7.1                          glibc@2.34          libtool@2.4.7      openssl@3.3.0   xz@5.4.6
     ==> 26 installed packages
 
-In the case we don't have sudo access, this previous build command would fail, as Singularity needs sudo writes to build an image from a definition file. Thankfully, Singularity provides a ``fakeroot`` option that allows an unprivileged user to run a container as a "fake root" user. This requires the user to be listed in the ``/etc/subuid`` and ``/etc/subgid`` (which requires administrator access to modify). More information `here <https://docs.sylabs.io/guides/3.3/user-guide/fakeroot.html>`_.
+.. note::
 
-When doing so, our command will look like this:
+    In the case we don't have sudo access, this previous build command would fail, as Singularity needs sudo writes to build an image from a definition file. Thankfully, Singularity provides a ``fakeroot`` option that allows an unprivileged user to run a container as a "fake root" user. This requires the user to be listed in the ``/etc/subuid`` and ``/etc/subgid`` (which requires administrator access to modify). More information `here <https://docs.sylabs.io/guides/3.3/user-guide/fakeroot.html>`_.
+
+    When doing so, our command will look like this:
+
+    .. code-block:: console
+
+       $ singularity build --fakeroot example.sif singularity.def
+
+
+We can also use an input file instead of using the CLI to create a Singularity definition file, which is advised for ease of use.
+Here is the same previous example translated into a `yaml` file:
 
 .. code-block:: console
 
-   $ singularity build --fakeroot example.sif singularity.def
+   $ cat input.yaml
+   backend: singularity
+   image: rockylinux:9
+   spack-packages:
+     - hwloc
+     - cmake
