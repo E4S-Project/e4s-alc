@@ -194,7 +194,7 @@ Then we can use singularity to build, run and inspect our image:
     curl@8.7.1                          glibc@2.34          libtool@2.4.7      openssl@3.3.0   xz@5.4.6
     ==> 26 installed packages
 
-.. note::
+.. warning::
 
     In the case we don't have sudo access, this previous build command would fail, as Singularity needs sudo writes to build an image from a definition file. Thankfully, Singularity provides a ``fakeroot`` option that allows an unprivileged user to run a container as a "fake root" user. This requires the user to be listed in the ``/etc/subuid`` and ``/etc/subgid`` (which requires administrator access to modify). More information `here <https://docs.sylabs.io/guides/3.3/user-guide/fakeroot.html>`_.
 
@@ -206,7 +206,7 @@ Then we can use singularity to build, run and inspect our image:
 
 
 We can also use an input file instead of using the CLI to create a Singularity definition file, which is advised for ease of use.
-Here is the same previous example translated into a `yaml` file:
+Here is the same previous example translated into a ``yaml`` file:
 
 .. code-block:: console
 
@@ -216,3 +216,13 @@ Here is the same previous example translated into a `yaml` file:
    spack-packages:
      - hwloc
      - cmake
+
+.. note::
+
+    When running ``e4s-alc create``, we pull the base image to run analysis on it. For the Docker and Podman backend, the image location is handled by them. But when pulling a singularity image, its location is handled by ``e4s-alc`` and stored in ``~/.e4s-alc/singularity_images`` under a [os]_[version].sif naming convention.
+
+    .. warning::
+
+        Before pulling the image, ``e4s-alc`` will check if the image can be found in its local collection using the same naming convention. It is possible for two different images to fall under the same name, for example when using ``latest`` as the needed version.
+
+    If the image is found in the local collection, ``e4s-alc`` will prompt the user to choose between keeping the image and pulling it again. This prompt can be pre-answered using the :ref:`repull<alc_params>` parameter.
