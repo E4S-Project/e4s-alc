@@ -221,8 +221,10 @@ Here is the same previous example translated into a ``yaml`` file:
 
     When running ``e4s-alc create``, we pull the base image to run analysis on it. For the Docker and Podman backend, the image location is handled by them. But when pulling a singularity image, its location is handled by ``e4s-alc`` and stored in ``~/.e4s-alc/singularity_images`` under a [os]_[version].sif naming convention.
 
+
+    Before pulling the image, ``e4s-alc`` will check if the image can be found in its local collection using the same naming convention. 
+    If the image is found in the local collection, ``e4s-alc`` will prompt the user to choose between keeping the image and pulling it again. This prompt can be pre-answered using the :ref:`repull<alc_params>` parameter.
+
     .. warning::
 
-        Before pulling the image, ``e4s-alc`` will check if the image can be found in its local collection using the same naming convention. It is possible for two different images to fall under the same name, for example when using ``latest`` as the needed version.
-
-    If the image is found in the local collection, ``e4s-alc`` will prompt the user to choose between keeping the image and pulling it again. This prompt can be pre-answered using the :ref:`repull<alc_params>` parameter.
+        It is possible for two different images to fall under the same name, for example when using ``latest`` as the needed version.
