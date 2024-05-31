@@ -291,8 +291,11 @@ class CreateDefinitionfileModel(Model):
 
     def convert_to_bash_script(self, command, section):
         logger.debug("Converting command to bash script")
-        self.add_line(f'#!{command[1]}\n', section)
-        self.add_line(f'{command[5]}\n', section)
+        command = [x for x in command if x != '' and x!=', ']
+        self.add_line(f'#!{command[0]}\n', section)
+        for k in command:
+            if k == '-c':
+                self.add_line(f'{command[command.index(k) + 1]}\n', section)
 
     def create_startscript(self):
         logger.debug("Adding startscript")
