@@ -1,6 +1,14 @@
 from e4s_alc.util import log_function_call, log_info
 from e4s_alc.controller.image.image import Image
 
+
+version_packages = {
+        '20.04': ['build-essential', 'ca-certificates', 'coreutils', 'curl', 'file',
+            'environment-modules', 'gfortran', 'git', 'gpg', 'lsb-release', 'vim',
+            'python3', 'python3-distutils', 'python3-venv', 'unzip', 'zip', 'cmake']
+
+        }
+
 class UbuntuImage(Image):
     """
     Class to represent an Ubuntu Image with its essential and additional packages, 
@@ -16,11 +24,7 @@ class UbuntuImage(Image):
             os_release (str): OS release version.
         """
         super().__init__(os_release)
-        self.packages = [
-            'build-essential', 'ca-certificates', 'coreutils', 'curl', 'file',
-            'environment-modules', 'gfortran', 'git', 'gpg', 'lsb-release', 'vim',
-            'python3', 'python3-distutils', 'python3-venv', 'unzip', 'zip', 'cmake'
-        ]
+        self.packages = version_packages[os_release["VERSION_ID"]]
         self.update_cert_command = 'update-ca-certificates'
         self.cert_location = '/usr/local/share/ca-certificates/'
 
