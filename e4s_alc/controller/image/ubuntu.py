@@ -8,8 +8,10 @@ version_packages = {
             'python3', 'python3-distutils', 'python3-venv', 'unzip', 'zip', 'cmake'],
         '20.04': ['build-essential', 'ca-certificates', 'coreutils', 'curl', 'file',
             'environment-modules', 'gfortran', 'git', 'gpg', 'lsb-release', 'vim',
-            'python3', 'python3-distutils', 'python3-venv', 'unzip', 'zip', 'cmake']
-
+            'python3', 'python3-distutils', 'python3-venv', 'unzip', 'zip', 'cmake'],
+        '22.04': ['build-essential', 'ca-certificates', 'coreutils', 'curl', 'file',
+            'environment-modules', 'gfortran', 'git', 'gpg', 'lsb-release', 'vim',
+            'python3', 'python3-venv', 'unzip', 'zip', 'cmake'],
         }
 
 class UbuntuImage(Image):
