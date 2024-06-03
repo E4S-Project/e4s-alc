@@ -3,6 +3,9 @@ from e4s_alc.controller.image.image import Image
 
 
 version_packages = {
+        'default': ['build-essential', 'ca-certificates', 'coreutils', 'curl', 'file',
+            'environment-modules', 'gfortran', 'git', 'gpg', 'lsb-release', 'vim',
+            'python3', 'python3-distutils', 'python3-venv', 'unzip', 'zip', 'cmake'],
         '20.04': ['build-essential', 'ca-certificates', 'coreutils', 'curl', 'file',
             'environment-modules', 'gfortran', 'git', 'gpg', 'lsb-release', 'vim',
             'python3', 'python3-distutils', 'python3-venv', 'unzip', 'zip', 'cmake']
@@ -24,7 +27,11 @@ class UbuntuImage(Image):
             os_release (str): OS release version.
         """
         super().__init__(os_release)
-        self.packages = version_packages[os_release["VERSION_ID"]]
+        os_version = os_release["VERSION_ID"]
+        if os_version in version_packages.keys():
+            self.packages = version_packages[os_version]
+        else:
+            self.packages = version_packages["default"]
         self.update_cert_command = 'update-ca-certificates'
         self.cert_location = '/usr/local/share/ca-certificates/'
 
