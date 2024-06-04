@@ -1,6 +1,18 @@
 from e4s_alc.util import log_function_call, log_info
 from e4s_alc.controller.image.image import Image
 
+version_packages = {
+        'default': ['curl', 'findutils', 'gcc-c++', 'gcc', 'gcc-gfortran', 'git',  'xz',
+            'gnupg2', 'hostname', 'iproute', 'redhat-lsb-core', 'make', 'patch', 'bzip2',
+            'python3', 'python3-pip', 'python3-setuptools', 'unzip', 'cmake', 'vim', 'environment-modules'],
+        '8.10': ['curl', 'findutils', 'gcc-c++', 'gcc', 'gcc-gfortran', 'git',  'xz',
+            'gnupg2', 'hostname', 'iproute', 'redhat-lsb-core', 'make', 'patch', 'bzip2',
+            'python3', 'python3-pip', 'python3-setuptools', 'unzip', 'cmake', 'vim', 'environment-modules'],
+        '9.4': ['findutils', 'gcc-c++', 'gcc', 'gcc-gfortran', 'git',  'xz',
+            'gnupg2', 'hostname', 'iproute', 'make', 'patch', 'bzip2',
+            'python3', 'python3-pip', 'python3-setuptools', 'unzip', 'cmake', 'vim', 'environment-modules'],
+    }
+
 class RhelImage(Image):
     """
     This class represents an object of Red Hat Enterprise Linux Image.
@@ -18,11 +30,11 @@ class RhelImage(Image):
         """
         super().__init__(os_release)
         self.pkg_manager_commands = None
-        self.packages = [
-            'curl', 'findutils', 'gcc-c++', 'gcc', 'gcc-gfortran', 'git',  'xz',
-            'gnupg2', 'hostname', 'iproute', 'redhat-lsb-core', 'make', 'patch', 'bzip2',
-            'python3', 'python3-pip', 'python3-setuptools', 'unzip', 'cmake', 'vim', 'environment-modules'
-        ]
+        os_version = os_release["VERSION_ID"]
+        if os_version in version_packages.keys():
+            self.packages = version_packages[os_version]
+        else:
+            self.packages = version_packages["default"]
         self.update_cert_command = 'update-ca-trust'
         self.cert_location = '/etc/pki/ca-trust/source/anchors/'
 
