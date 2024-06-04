@@ -12,6 +12,7 @@
    basics/getting_started
    basics/basic_usage
    basics/alc_parameters
+   basics/supported_software
    basics/tutorial_101
    basics/tutorial_matrix
 
