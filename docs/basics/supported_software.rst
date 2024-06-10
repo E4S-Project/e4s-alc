@@ -33,8 +33,11 @@ Singularity uses singularity definition files instead of Dockerfiles. ``e4s-alc`
 
 .. warning::
     This backend has a know issue with installing spack packages with gmake@4.4 when using singularity 3.11.0 (and doesn't with singularity 3.11.4). When this occurs, one can specify a dependency to gmake@4.3 for the related package:
+    
     .. code-block::
-        tcl => tcl ^gmake@4.3
+    
+     tcl => tcl ^gmake@4.3
+
 ----
 
 ~~~~~~~~~
