@@ -8,7 +8,7 @@ Supported Software
 .. contents:: 
    :depth: 3
 
-``e4s-alc`` needs in-code implementations in order to support container technologies, as well as operating system. For the former, ``e4s-alc`` needs to implement the generation of the container definition file in the format of the container technology. For the latter, ``e4s-alc`` needs to implement the specifics of analysing the base image, as well as know which os-packages need to be installed for the image building to function correctly. 
+``e4s-alc`` needs in-code implementations in order to support container technologies, as well as operating system. For the former, ``e4s-alc`` needs to implement the generation of the container definition file in the format of the container technology. For the latter, ``e4s-alc`` needs to implement the specifics of analysing the base image, as well as to know which os-packages need to be installed for the image building to function correctly.
 
 ---------------------
 Container software
@@ -46,10 +46,19 @@ Podman container definition files use Dockerfiles. Regarding ``e4s-alc``, it beh
 Operating systems
 -----------------------
 
+Here is the list of supported operating systems and the specific versions for which the list of os-packages has been checked and fine-tuned.
+
+.. note::
+    When using a different version than one listed here under a specific OS, one might run into packages errors. One can work around these errors by updating the container definition file to remove/add the packages at the origin of the error.
+..
+    _this: You can see how to update the source code
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ``ubuntu``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+* 20.04
+* 22.04
 
 ----
 
@@ -57,12 +66,16 @@ Operating systems
 ``rhel``
 ~~~~~~~~~~~~~~~~
 
+* 8.10
+* 9.4
+
 ----
 
 ~~~~~~~~~~~~~~~
 ``suse``
 ~~~~~~~~~~~~~~~
 
+* 15.4
 
 ----
 
