@@ -28,9 +28,13 @@ Docker container definition files, or Dockerfiles are supported, and ``e4s-al`` 
 
 Singularity uses singularity definition files instead of Dockerfiles. ``e4s-alc`` doesn't support multistage building at the moment for singularity definition files. Also, singularity doesn't use a deamon, so the resulting images are created in place.
 
- .. note::
+.. note::
     When building an image, the base image will be downloaded into ~/.e4s-alc/singularity_images in order to conduct analysis on it.
 
+.. warning::
+    This backend has a know issue with installing spack packages with gmake@4.4 when using singularity 3.11.0 (and doesn't with singularity 3.11.4). When this occurs, one can specify a dependency to gmake@4.3 for the related package:
+    .. code-block::
+        tcl => tcl ^gmake@4.3
 ----
 
 ~~~~~~~~~
