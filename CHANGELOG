@@ -1,6 +1,7 @@
 v1.0.3
 ---------------------
 
+- Added image base packages incrementation system
 - Added json support
 - Added support to specifying dependencies for spack installed compilers
 - Added Suse OS support

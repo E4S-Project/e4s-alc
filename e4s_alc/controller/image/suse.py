@@ -1,6 +1,14 @@
 from e4s_alc.util import log_function_call, log_info
 from e4s_alc.controller.image.image import Image
 
+version_packages = {
+        'default': ['tar', 'gzip', 'python3', 'gcc', 'gcc-c++', 'gcc-fortran',
+                'patch', 'awk', 'make', 'xz', 'bzip2', 'hostname', 'vim', 'git'],
+        '15.4': ['tar', 'gzip', 'python3', 'gcc', 'gcc-c++', 'gcc-fortran',
+                'patch', 'awk', 'make', 'xz', 'bzip2', 'hostname', 'vim', 'git']
+    }
+
+
 class SuseImage(Image):
     """
     Class to represent a Suze Image with its essential and additional packages, 
@@ -16,10 +24,11 @@ class SuseImage(Image):
             os_release (str): OS release version.
         """
         super().__init__(os_release)
-        self.packages = [
-                'tar', 'gzip', 'python3', 'gcc', 'gcc-c++', 'gcc-fortran',
-                'patch', 'awk', 'make', 'xz', 'bzip2', 'hostname', 'vim', 'git'
-        ]
+        os_version = os_release["VERSION_ID"]
+        if os_version in version_packages.keys():
+            self.packages = version_packages[os_version]
+        else:
+            self.packages = version_packages["default"]
         self.update_cert_command = 'update-ca-certificates'
         self.cert_location = '/usr/local/share/ca-certificates/'
 
