@@ -29,3 +29,9 @@
 
    general/use_cases
    general/contributing
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Developer
+
+   developer/supporting_os_version
