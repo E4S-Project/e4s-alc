@@ -11,7 +11,7 @@ This guide will walk you through supporting a new os version in ``e4s-alc``.
 Updating the source code
 --------------------
 
-1. Whether it's done for a user's personal use or with the objective of creating a pull request, it is advised to first fork the `e4s-alc`'s repository on github. More information on how to do so `here<https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo>`_
+1. Whether it's done for a user's personal use or with the objective of creating a pull request, it is advised to first fork the `e4s-alc`'s repository on github. More information on how to do so `here <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo>`_
 
 2. After cloning the forked repository to our machine, we need to determine what packages this new OS version needs for `e4s-alc` to be able to build an image with it. This is as simple as attempting to create the image with `e4s-alc` and observe the packages whose absence/presence prevent the image from building.
 
@@ -136,7 +136,7 @@ One way to determine the os_version is to add a debugging command into the const
 
 After rebuilding ``e4s-alc``, running the create command from before will trigger a prompt that allows us to inspect the state of the execution, including variables.
 
-More information about pdb `here<https://docs.python.org/3/library/pdb.html>`_.
+More information about pdb `here <https://docs.python.org/3/library/pdb.html>`_.
 
 In our case, the os_version is 9.4. Now we just have to add that entry to the dictionary:
 
