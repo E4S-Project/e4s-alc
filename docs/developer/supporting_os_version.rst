@@ -153,6 +153,7 @@ More information about pdb `here <https://docs.python.org/3/library/pdb.html>`_.
 In our case, the os_version is 9.4. Now we just have to add that entry to the dictionary:
 
 .. code:: python
+
     version_packages = { 
             'default': ['curl', 'findutils', 'gcc-c++', 'gcc', 'gcc-gfortran', 'git',  'xz',
                 'gnupg2', 'hostname', 'iproute', 'redhat-lsb-core', 'make', 'patch', 'bzip2',
@@ -164,6 +165,7 @@ In our case, the os_version is 9.4. Now we just have to add that entry to the di
                 'gnupg2', 'hostname', 'iproute', 'make', 'patch', 'bzip2',
                 'python3', 'python3-pip', 'python3-setuptools', 'unzip', 'cmake', 'vim', 'environment-modules'],
         }   
+
 --------------------
 Push the changes
 --------------------
