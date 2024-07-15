@@ -1,0 +1,12 @@
+######## Base group ########
+backend: singularity
+registry: registry.access.redhat.com
+image: ubi9/ubi
+repull: False
+
+####### Spack group #######
+spack: True
+spack-mirrors:
+  - https://binaries.spack.io/v0.22.1/e4s  
+spack-package:
+  - tcl

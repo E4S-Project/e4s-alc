@@ -1,0 +1,11 @@
+######## Base group ########
+backend: docker
+registry: registry.access.redhat.com
+image: ubi9/ubi
+
+####### Spack group #######
+spack: True
+spack-mirrors:
+  - https://binaries.spack.io/v0.22.1/e4s  
+spack-package:
+  - ./spack.yaml
