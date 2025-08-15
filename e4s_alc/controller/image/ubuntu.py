@@ -19,7 +19,7 @@ class UbuntuImage(Image):
         self.packages = [
             'build-essential', 'ca-certificates', 'coreutils', 'curl', 'file',
             'environment-modules', 'gfortran', 'git', 'gpg', 'lsb-release', 'vim',
-            'python3', 'python3-distutils', 'python3-venv', 'unzip', 'zip', 'cmake'
+            'python3', 'python3-venv', 'unzip', 'zip', 'cmake'
         ]
         self.update_cert_command = 'update-ca-certificates'
         self.cert_location = '/usr/local/share/ca-certificates/'
@@ -62,7 +62,7 @@ class UbuntuImage(Image):
         log_info("Adding update and installation commands for the packages.")
         self.pkg_manager_commands.extend([
             'apt-get update',
-            f'apt-get install -y {self.packages}'
+            f'apt-get -o Dpkg::Options::="--force-confold" -o Dpkg::Options::="--force-confdef" install -y {self.packages}'
         ])
         return self.pkg_manager_commands
 
